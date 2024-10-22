@@ -2,6 +2,7 @@ package main
 
 import (
 	"fenetre-ouvert/api/rest"
+	"fenetre-ouvert/database"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,10 +21,14 @@ func init() {
 func main() {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/api/", rest.PostGoodHandler)
-	r.HandleFunc("/api/", rest.GetGoodHandler)
-	r.HandleFunc("/api/", rest.DeleteGoodHandler)
-	r.HandleFunc("/api/", rest.UpdateGoodHandler)
+	/*
+		Handle Goods
+	*/
+	r.HandleFunc("/api/good", rest.PostGoodHandler)
+	r.HandleFunc("/api/goods", rest.GetGoodHandler)
+	r.HandleFunc("/api/good/{id}", rest.DeleteGoodHandler)
+	r.HandleFunc("/api/goog/{id}", rest.UpdateGoodHandler)
+	database.ConnectTodataBase()
 
 	port := getListeningPort()
 	log.Printf("Server is Listening on port %s", os.Getenv("PORT"))

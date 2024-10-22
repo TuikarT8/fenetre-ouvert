@@ -1,9 +1,9 @@
-package Type
+package rest
 
 import "time"
 
 type User struct {
-	Id           int            `bson:"id" json:"id"`
+	Id           int            `bson:"_id,ignore_empty" json:"id"`
 	FirstName    string         `bson:"fistname" json:"firstname"`
 	LastName     string         `bson:"lastname" json:"lastname"`
 	MiddleName   string         `bson:"middlename" json:"middlename"`
@@ -11,7 +11,7 @@ type User struct {
 }
 
 type Good struct {
-	Id                int    `bson:"id" json:"id"`
+	Id                int    `bson:"_id" json:"id"`
 	Name              string `bson:"name" json:"name"`
 	Description       string `bson:"description" json:"description"`
 	Number            string `bson:"number" json:"number"`
