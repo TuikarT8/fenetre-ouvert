@@ -1,33 +1,47 @@
 package rest
 
-import "time"
+import (
+	"log"
+	"net/http"
+	"time"
+)
 
 type User struct {
-	Id           int            `bson:"_id,ignore_empty" json:"id"`
-	FirstName    string         `bson:"fistname" json:"firstname"`
-	LastName     string         `bson:"lastname" json:"lastname"`
-	MiddleName   string         `bson:"middlename" json:"middlename"`
-	Notification []Notification `bson:"notification" json:"notification"`
+	Id           interface{}    `bson:"_id,omitempty" json:"id"`
+	FirstName    string         `bson:"fistname ,omitempty" json:"firstname"`
+	LastName     string         `bson:"lastname ,omitempty" json:"lastname"`
+	MiddleName   string         `bson:"middlename ,omitempty" json:"middlename"`
+	Notification []Notification `bson:"notification ,omitempty" json:"notification"`
 }
 
 type Good struct {
-	Id                int    `bson:"_id" json:"id"`
-	Name              string `bson:"name" json:"name"`
-	Description       string `bson:"description" json:"description"`
-	Number            string `bson:"number" json:"number"`
-	PurchaseValue     string `bson:"purchaseValue" json:"purchaseValue"`
-	ConditionProperty string `bson:"conditionProperty" json:"conditionProperty"`
-	SaleValue         string `bson:"saleValue" json:"saleValue"`
+	Id                interface{} `bson:"_id,omitempty" json:"id"`
+	Name              string      `bson:"name,omitempty" json:"name"`
+	Description       string      `bson:"description,omitempty" json:"description"`
+	Count             string      `bson:"count,omitempty" json:"count"`
+	PurchaseValue     string      `bson:"purchaseValue,omitempty" json:"purchaseValue"`
+	ConditionProperty string      `bson:"conditionProperty,omitempty" json:"conditionProperty"`
+	SaleValue         string      `bson:"saleValue,omitempty" json:"saleValue"`
 }
 
 type Session struct {
-	StartTime time.Time `bson:"starttime" json:"starttime"`
-	EndTime   time.Time `bson:"endtime" json:"endtime"`
-	Author    string    `bson:"author" json:"author"`
+	Id        interface{} `bson:"_id,omitempty" json:"id"`
+	StartTime time.Time   `bson:"starttime ,omitempty" json:"starttime"`
+	EndTime   time.Time   `bson:"endtime ,omitempty" json:"endtime"`
+	Author    string      `bson:"author ,omitempty" json:"author"`
 }
 
 type Notification struct {
-	Id          string `bson:"id" json:"id"`
-	Title       string `bson:"title" json:"title"`
-	Description string `bson:"description" json:"description"`
+	Id          interface{} `bson:"_id,omitempty" json:"id"`
+	Title       string      `bson:"title ,omitempty" json:"title"`
+	Description string      `bson:"description ,omitempty" json:"description"`
+}
+
+func checkMethod(w http.ResponseWriter, r *http.Request, method string) {
+	if r.Method != method {
+		log.Print("Vous tentez d'utiliser un Endpoint avec la methode Inaproprie", r.Method)
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("L'endpoint invalid"))
+		return
+	}
 }
