@@ -108,7 +108,6 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 		handleUnmarshallingError(err.Error(), w)
 		return
 	}
-	log.Println("voici le idSession", sessionId)
 
 	if _, err := session.UpdateSessionInDb(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -120,8 +119,39 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func ActiveSessionHandler(w http.ResponseWriter, r *http.Request) {
+	checkMethod(w, r, http.MethodPatch)
+
+	sessionId := mux.Vars(r)["id"]
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("  ActiveSessionHandler ()=> Errors lors de la lecture du corps de la requette"))
+		log.Print("  ActiveSessionHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		return
+	}
+
+	var session Session
+
+	err = json.Unmarshal(body, &session)
+	if err != nil {
+		handleUnmarshallingError(err.Error(), w)
+		return
+	}
+
+	if _, err := session.UpdateActiveSessionInDb(sessionId); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(" ActiveSessionHandler() => Errors while Active session"))
+		log.Print(" ActiveSessionHandler() => Errors while active session", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (session *Session) saveSessionInDb() (string, error) {
-	_, err := database.Sessions.InsertOne(ctx, session)
+	_, err := database.Sessions.InsertOne(database.Ctx, session)
 	if err != nil {
 		log.Printf("error inserting appointment, %v\n", err)
 		return "", err
@@ -134,7 +164,7 @@ func getSessionInDb(pagination PageQueryParams) ([]Session, error) {
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
 	opts.Skip = &pagination.startAt
 	opts.Limit = &pagination.count
-	result, err := database.Sessions.Find(ctx, bson.M{}, opts)
+	result, err := database.Sessions.Find(database.Ctx, bson.M{}, opts)
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -144,9 +174,9 @@ func getSessionInDb(pagination PageQueryParams) ([]Session, error) {
 		return sessions, err
 	}
 
-	defer result.Close(ctx)
+	defer result.Close(database.Ctx)
 
-	err = result.All(ctx, &sessions)
+	err = result.All(database.Ctx, &sessions)
 	if err != nil {
 		return sessions, err
 	}
@@ -181,7 +211,7 @@ func deleteSessionInDb(id string) error {
 	if err != nil {
 		return err
 	}
-	_, err = database.Sessions.DeleteOne(ctx, bson.M{
+	_, err = database.Sessions.DeleteOne(database.Ctx, bson.M{
 		"_id": bsonId,
 	})
 
@@ -189,4 +219,31 @@ func deleteSessionInDb(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (session *Session) UpdateActiveSessionInDb(id string) (string, error) {
+	bsonId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return "", err
+	}
+
+	updateMany := mongo.NewUpdateManyModel()
+	updateMany.Filter = bson.M{"active": true}
+	updateMany.Update = bson.M{"active": false}
+
+	updateOne := mongo.NewUpdateOneModel()
+	updateOne.Filter = bson.M{"_id": bsonId}
+	updateOne.Update = bson.M{"set": bson.M{"active": true}}
+	database.Sessions.BulkWrite(database.Ctx, []mongo.WriteModel{
+		updateMany,
+		updateOne,
+	})
+
+	if err != nil {
+		log.Printf("Error while updating Session, error=%v", err)
+		return "", err
+	}
+
+	return "", err
+
 }

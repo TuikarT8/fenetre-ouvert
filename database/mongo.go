@@ -14,7 +14,7 @@ var Users mongo.Collection
 var Goods mongo.Collection
 var Notifications mongo.Collection
 var Sessions mongo.Collection
-var ctx = context.TODO()
+var Ctx = context.TODO()
 
 func getMongoUrlFromArgs() string {
 	if len(os.Args) > 1 {
@@ -48,12 +48,12 @@ func ConnectTodataBase() {
 	DatabaseName := "fenetre"
 	MongoUrl := getMongoUrl()
 	clientOptions := options.Client().ApplyURI(MongoUrl)
-	client, err := mongo.Connect(ctx, clientOptions)
+	client, err := mongo.Connect(Ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = client.Ping(ctx, nil)
+	err = client.Ping(Ctx, nil)
 	if err != nil {
 		log.Fatalf("Error while connecting to the database, error: %v", err)
 	}

@@ -22,6 +22,7 @@ type Good struct {
 	PurchaseValue     string      `bson:"purchaseValue,omitempty" json:"purchaseValue"`
 	ConditionProperty string      `bson:"conditionProperty,omitempty" json:"conditionProperty"`
 	SaleValue         string      `bson:"saleValue,omitempty" json:"saleValue"`
+	IdSession         string      `bson:"idSession,omitempty" json:"idSession"`
 }
 
 type Session struct {
@@ -29,6 +30,7 @@ type Session struct {
 	StartTime time.Time   `bson:"starttime ,omitempty" json:"starttime"`
 	EndTime   time.Time   `bson:"endtime ,omitempty" json:"endtime"`
 	Author    string      `bson:"author ,omitempty" json:"author"`
+	Active    bool        `bson:"active" json:"active"`
 }
 
 type Notification struct {

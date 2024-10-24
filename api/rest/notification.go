@@ -123,7 +123,7 @@ func UpdateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (notification *Notification) saveNotificationInDb() (string, error) {
-	_, err := database.Notifications.InsertOne(ctx, notification)
+	_, err := database.Notifications.InsertOne(database.Ctx, notification)
 	if err != nil {
 		log.Printf("error inserting appointment, %v\n", err)
 		return "", err
@@ -136,7 +136,7 @@ func getNotificationInDb(pagination PageQueryParams) ([]Notification, error) {
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
 	opts.Skip = &pagination.startAt
 	opts.Limit = &pagination.count
-	result, err := database.Notifications.Find(ctx, bson.M{}, opts)
+	result, err := database.Notifications.Find(database.Ctx, bson.M{}, opts)
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -146,9 +146,9 @@ func getNotificationInDb(pagination PageQueryParams) ([]Notification, error) {
 		return nts, err
 	}
 
-	defer result.Close(ctx)
+	defer result.Close(database.Ctx)
 
-	err = result.All(ctx, &nts)
+	err = result.All(database.Ctx, &nts)
 	if err != nil {
 		return nts, err
 	}
@@ -182,7 +182,7 @@ func deleteNotificationInDb(id string) error {
 	if err != nil {
 		return err
 	}
-	_, err = database.Notifications.DeleteOne(ctx, bson.M{
+	_, err = database.Notifications.DeleteOne(database.Ctx, bson.M{
 		"_id": bsonId,
 	})
 

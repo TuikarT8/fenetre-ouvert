@@ -120,7 +120,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (User *User) saveUserInDb() (string, error) {
-	_, err := database.Users.InsertOne(ctx, User)
+	_, err := database.Users.InsertOne(database.Ctx, User)
 	if err != nil {
 		log.Printf("error inserting appointment, %v\n", err)
 		return "", err
@@ -133,7 +133,7 @@ func getUserInDb(pagination PageQueryParams) ([]User, error) {
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
 	opts.Skip = &pagination.startAt
 	opts.Limit = &pagination.count
-	result, err := database.Users.Find(ctx, bson.M{}, opts)
+	result, err := database.Users.Find(database.Ctx, bson.M{}, opts)
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -143,9 +143,9 @@ func getUserInDb(pagination PageQueryParams) ([]User, error) {
 		return usrs, err
 	}
 
-	defer result.Close(ctx)
+	defer result.Close(database.Ctx)
 
-	err = result.All(ctx, &usrs)
+	err = result.All(database.Ctx, &usrs)
 	if err != nil {
 		return usrs, err
 	}
@@ -179,7 +179,7 @@ func deleteUserInDb(id string) error {
 	if err != nil {
 		return err
 	}
-	_, err = database.Users.DeleteOne(ctx, bson.M{
+	_, err = database.Users.DeleteOne(database.Ctx, bson.M{
 		"_id": bsonId,
 	})
 

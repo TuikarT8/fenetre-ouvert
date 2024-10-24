@@ -135,7 +135,7 @@ func deleteGoodInDb(id string) error {
 	if err != nil {
 		return err
 	}
-	_, err = database.Goods.DeleteOne(ctx, bson.M{
+	_, err = database.Goods.DeleteOne(database.Ctx, bson.M{
 		"_id": bsonId,
 	})
 
@@ -150,7 +150,7 @@ func getGoodInDb(pagination PageQueryParams) ([]Good, error) {
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
 	opts.Skip = &pagination.startAt
 	opts.Limit = &pagination.count
-	result, err := database.Goods.Find(ctx, bson.M{}, opts)
+	result, err := database.Goods.Find(database.Ctx, bson.M{}, opts)
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -160,9 +160,9 @@ func getGoodInDb(pagination PageQueryParams) ([]Good, error) {
 		return apps, err
 	}
 
-	defer result.Close(ctx)
+	defer result.Close(database.Ctx)
 
-	err = result.All(ctx, &apps)
+	err = result.All(database.Ctx, &apps)
 	if err != nil {
 		return apps, err
 	}
@@ -176,7 +176,7 @@ func (good *Good) UpdateGoodInDb(id string) (string, error) {
 		return "", err
 	}
 	_, err = database.Goods.UpdateOne(
-		ctx,
+		database.Ctx,
 		primitive.M{"_id": bsonId},
 		primitive.M{
 			"$set": good,
@@ -191,7 +191,7 @@ func (good *Good) UpdateGoodInDb(id string) (string, error) {
 }
 
 func (good *Good) saveGoodInDb() (string, error) {
-	_, err := database.Goods.InsertOne(ctx, good)
+	_, err := database.Goods.InsertOne(database.Ctx, good)
 	if err != nil {
 		log.Printf("error inserting appointment, %v\n", err)
 		return "", err

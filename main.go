@@ -55,6 +55,7 @@ func main() {
 	r.HandleFunc("/api/sessions", rest.GetSessionHandler)
 	r.HandleFunc("/api/session/{id}/session", rest.DeleteSessionHandler)
 	r.HandleFunc("/api/session/{id}", rest.UpdateSessionHandler)
+	r.HandleFunc("/api/session/{id}/active", rest.ActiveSessionHandler)
 
 	database.ConnectTodataBase()
 
