@@ -15,14 +15,14 @@ type User struct {
 }
 
 type Good struct {
-	Id                interface{} `bson:"_id,omitempty" json:"id"`
+	ID                interface{} `bson:"_id,omitempty" json:"id"`
 	Name              string      `bson:"name,omitempty" json:"name"`
 	Description       string      `bson:"description,omitempty" json:"description"`
 	Count             string      `bson:"count,omitempty" json:"count"`
 	PurchaseValue     string      `bson:"purchaseValue,omitempty" json:"purchaseValue"`
 	ConditionProperty string      `bson:"conditionProperty,omitempty" json:"conditionProperty"`
 	SaleValue         string      `bson:"saleValue,omitempty" json:"saleValue"`
-	IdSession         string      `bson:"idSession,omitempty" json:"idSession"`
+	IdSession         interface{} `bson:"idSession,omitempty" json:"idSession"`
 }
 
 type Session struct {

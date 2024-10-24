@@ -199,10 +199,31 @@ func (good *Good) UpdateGoodInDb(id string) (string, error) {
 }
 
 func (good *Good) saveGoodInDb() (string, error) {
-	_, err := database.Goods.InsertOne(database.Ctx, good)
+	res, err := findSessionActive()
 	if err != nil {
-		log.Printf("error inserting appointment, %v\n", err)
+		log.Printf("Error while getting session activate, error=%v", err)
+		return "", err
+	}
+	good.IdSession = res.Id
+
+	_, err = database.Goods.InsertOne(database.Ctx, good)
+	if err != nil {
+		log.Printf("error inserting good, %v\n", err)
 		return "", err
 	}
 	return "", nil
+}
+
+func findSessionActive() (Session, error) {
+	var doc Session
+
+	result := database.Sessions.FindOne(ctx, bson.M{
+		"active": true,
+	})
+
+	err := result.Decode(&doc)
+	if err != nil {
+
+	}
+	return doc, err
 }
