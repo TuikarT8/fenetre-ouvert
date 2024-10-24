@@ -15,7 +15,10 @@ import (
 )
 
 func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodGet)
+	if !checkMethod(w, r, http.MethodGet) {
+		return
+	}
+
 	params, err := pageQueryFromRequestQueryParams(r)
 
 	if err != nil {
@@ -45,7 +48,9 @@ func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodPost)
+	if !checkMethod(w, r, http.MethodPost) {
+		return
+	}
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -76,7 +81,9 @@ func PostNotificationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodDelete)
+	if !checkMethod(w, r, http.MethodDelete) {
+
+	}
 
 	notificationId := mux.Vars(r)["id"]
 
@@ -91,7 +98,9 @@ func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodPatch)
+	if !checkMethod(w, r, http.MethodPatch) {
+		return
+	}
 
 	notificationId := mux.Vars(r)["id"]
 

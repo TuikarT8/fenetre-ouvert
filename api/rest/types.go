@@ -39,11 +39,13 @@ type Notification struct {
 	Description string      `bson:"description ,omitempty" json:"description"`
 }
 
-func checkMethod(w http.ResponseWriter, r *http.Request, method string) {
+func checkMethod(w http.ResponseWriter, r *http.Request, method string) bool {
 	if r.Method != method {
 		log.Print("Vous tentez d'utiliser un Endpoint avec la methode Inaproprie", r.Method)
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("L'endpoint invalid"))
-		return
+		return false
 	}
+
+	return true
 }

@@ -15,7 +15,9 @@ import (
 )
 
 func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodGet)
+	if !checkMethod(w, r, http.MethodGet) {
+		return
+	}
 
 	params, err := pageQueryFromRequestQueryParams(r)
 	if err != nil {
@@ -43,7 +45,9 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodPost)
+	if !checkMethod(w, r, http.MethodPost) {
+		return
+	}
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -74,7 +78,9 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodDelete)
+	if !checkMethod(w, r, http.MethodDelete) {
+		return
+	}
 
 	SessionId := mux.Vars(r)["id"]
 
@@ -89,7 +95,9 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodPatch)
+	if !checkMethod(w, r, http.MethodPatch) {
+		return
+	}
 
 	sessionId := mux.Vars(r)["id"]
 
@@ -120,27 +128,12 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ActiveSessionHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodPatch)
+	if !checkMethod(w, r, http.MethodPatch) {
+		return
+	}
 
 	sessionId := mux.Vars(r)["id"]
-
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("  ActiveSessionHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print("  ActiveSessionHandler ()=> Errors lors de la lecture du corps de la requette", err)
-		return
-	}
-
-	var session Session
-
-	err = json.Unmarshal(body, &session)
-	if err != nil {
-		handleUnmarshallingError(err.Error(), w)
-		return
-	}
-
-	if _, err := session.UpdateActiveSessionInDb(sessionId); err != nil {
+	if _, err := updateActiveSessionInDb(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(" ActiveSessionHandler() => Errors while Active session"))
 		log.Print(" ActiveSessionHandler() => Errors while active session", err)
@@ -221,7 +214,7 @@ func deleteSessionInDb(id string) error {
 	return nil
 }
 
-func (session *Session) UpdateActiveSessionInDb(id string) (string, error) {
+func updateActiveSessionInDb(id string) (string, error) {
 	bsonId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return "", err
@@ -229,15 +222,19 @@ func (session *Session) UpdateActiveSessionInDb(id string) (string, error) {
 
 	updateMany := mongo.NewUpdateManyModel()
 	updateMany.Filter = bson.M{"active": true}
-	updateMany.Update = bson.M{"active": false}
+	updateMany.Update = bson.M{"$set": bson.M{"active": false}}
 
 	updateOne := mongo.NewUpdateOneModel()
 	updateOne.Filter = bson.M{"_id": bsonId}
-	updateOne.Update = bson.M{"set": bson.M{"active": true}}
-	database.Sessions.BulkWrite(database.Ctx, []mongo.WriteModel{
-		updateMany,
-		updateOne,
-	})
+	updateOne.Update = bson.M{"$set": bson.M{"active": true}}
+	_, err = database.Sessions.BulkWrite(
+		database.Ctx,
+		[]mongo.WriteModel{
+			updateMany,
+			updateOne,
+		},
+		options.BulkWrite().SetOrdered(true),
+	)
 
 	if err != nil {
 		log.Printf("Error while updating Session, error=%v", err)
@@ -245,5 +242,4 @@ func (session *Session) UpdateActiveSessionInDb(id string) (string, error) {
 	}
 
 	return "", err
-
 }

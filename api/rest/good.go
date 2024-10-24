@@ -18,7 +18,9 @@ import (
 var ctx = context.TODO()
 
 func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodGet)
+	if !checkMethod(w, r, http.MethodGet) {
+		return
+	}
 
 	params, err := pageQueryFromRequestQueryParams(r)
 
@@ -48,7 +50,9 @@ func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodPost)
+	if !checkMethod(w, r, http.MethodPost) {
+		return
+	}
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -79,7 +83,9 @@ func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteGoodHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodDelete)
+	if !checkMethod(w, r, http.MethodDelete) {
+		return
+	}
 
 	goodId := mux.Vars(r)["id"]
 
@@ -94,7 +100,9 @@ func DeleteGoodHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodPatch)
+	if !checkMethod(w, r, http.MethodPatch) {
+		return
+	}
 
 	goodId := mux.Vars(r)["id"]
 

@@ -15,7 +15,9 @@ import (
 )
 
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodGet)
+	if !checkMethod(w, r, http.MethodGet) {
+		return
+	}
 
 	params, err := pageQueryFromRequestQueryParams(r)
 	if err != nil {
@@ -43,7 +45,9 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostUserHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodPost)
+	if !checkMethod(w, r, http.MethodPost) {
+		return
+	}
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -74,7 +78,9 @@ func PostUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodDelete)
+	if !checkMethod(w, r, http.MethodDelete) {
+		return
+	}
 
 	UserId := mux.Vars(r)["id"]
 
@@ -89,7 +95,9 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
-	checkMethod(w, r, http.MethodPatch)
+	if !checkMethod(w, r, http.MethodPatch) {
+		return
+	}
 
 	UserId := mux.Vars(r)["id"]
 
