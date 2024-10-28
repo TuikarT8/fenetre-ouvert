@@ -191,7 +191,6 @@ func deleteUserInDb(id string) error {
 		"_id": bsonId,
 	})
 
-	log.Println("voici l'identifiant", id)
 	if err != nil {
 		return err
 	}

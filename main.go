@@ -24,10 +24,11 @@ func main() {
 	/*
 		Handle Goods
 	*/
-	r.HandleFunc("/api/good", rest.PostGoodHandler)
+	r.HandleFunc("/api/goods", rest.PostGoodHandler)
 	r.HandleFunc("/api/goods", rest.GetGoodHandler)
-	r.HandleFunc("/api/good/{id}/good", rest.DeleteGoodHandler)
-	r.HandleFunc("/api/good/{id}", rest.UpdateGoodHandler)
+	r.HandleFunc("/api/goods/{id}", rest.DeleteGoodHandler)
+	r.HandleFunc("/api/goods/{id}", rest.UpdateGoodHandler)
+	r.HandleFunc("/api/goods/{id}/changes", rest.PostGoodChangeHandler)
 
 	/*
 		Handle Notifications

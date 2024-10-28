@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	database "fenetre-ouvert/database"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -62,7 +64,7 @@ func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var good Good
+	var good FormularyGood
 
 	err = json.Unmarshal(body, &good)
 	if err != nil {
@@ -70,7 +72,7 @@ func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = good.saveGoodInDb()
+	_, err = good.saveGoodInDb(good.Condition)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(" postGoodHandler ()=> Errors while creating good"))
@@ -122,6 +124,13 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 		handleUnmarshallingError(err.Error(), w)
 		return
 	}
+	errs := good.checkUpdateField()
+	if len(errs) != 0 {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(" UpdateGoodHandler() => Errors while Updating fields good :descrpition,count,saleValue,"))
+		log.Print(" UpdateGoodHandler() => Errors while Updating fields good", errs)
+		return
+	}
 
 	if _, err := good.UpdateGoodInDb(goodId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -132,10 +141,78 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func PostGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
+	if !checkMethod(w, r, http.MethodPost) {
+		return
+	}
+	goodId := mux.Vars(r)["id"]
+
+	data, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("PostGoodChangeHandler() => Errors while reading good from body"))
+		log.Print("PostGoodChangeHandler () => Errors while reading good from body ")
+		return
+	}
+
+	var goodChange GoodChange
+
+	err = json.Unmarshal(data, &goodChange)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("PostGoodChangeHandler() => Errors while unmarsaling goodChange"))
+		log.Print("PostGoodChangeHandler () =>  Errors while unmarsaling goodChange ")
+		return
+	}
+
+	_, err = goodChange.addToGood(goodId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("PostGoodChangeHandler() => Errors while saving goodChange"))
+		log.Print("PostGoodChangeHandler () => Errors while creating good", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func handleUnmarshallingError(err string, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusBadRequest)
 	w.Write([]byte("Errors lors de l'unmarshalisation du corps de la requette"))
 	log.Print("Errors lors de l'unmarshalisation  du corps de la requette", err)
+}
+
+func (change *GoodChange) addToGood(id string) (string, error) {
+	hexId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return "", err
+	}
+
+	session, err := findActiveSession()
+	if err != nil {
+		log.Printf("Error while getting session activate, error=%v", err)
+		return "", err
+	}
+
+	change.SessionId = session.Id
+	change.Reason = GoodChangeReason_Modified
+	change.At = time.Now()
+
+	_, err = database.Goods.UpdateOne(database.Ctx,
+		primitive.M{"_id": hexId},
+		primitive.M{
+			"$push": primitive.M{
+				"changes": change,
+			},
+		},
+	)
+	if err != nil {
+		log.Printf("error inserting good, %v\n", err)
+		return "", err
+	}
+	return "", nil
 }
 
 func deleteGoodInDb(id string) error {
@@ -187,7 +264,10 @@ func (good *Good) UpdateGoodInDb(id string) (string, error) {
 		database.Ctx,
 		primitive.M{"_id": bsonId},
 		primitive.M{
-			"$set": good,
+			"$set": primitive.M{
+				"name":          good.Name,
+				"purchaseValue": good.PurchaseValue,
+			},
 		},
 	)
 	if err != nil {
@@ -198,13 +278,21 @@ func (good *Good) UpdateGoodInDb(id string) (string, error) {
 	return "", err
 }
 
-func (good *Good) saveGoodInDb() (string, error) {
-	res, err := findSessionActive()
+func (good *Good) saveGoodInDb(condition string) (string, error) {
+	session, err := findActiveSession()
 	if err != nil {
 		log.Printf("Error while getting session activate, error=%v", err)
 		return "", err
 	}
-	good.IdSession = res.Id
+
+	good.Changes = make([]GoodChange, 0)
+	good.Changes = append(good.Changes, GoodChange{
+		Condition: condition,
+		SaleValue: good.PurchaseValue,
+		SessionId: session.Id,
+		Reason:    GoodChangeReason_Created,
+		At:        time.Now(),
+	})
 
 	_, err = database.Goods.InsertOne(database.Ctx, good)
 	if err != nil {
@@ -214,7 +302,26 @@ func (good *Good) saveGoodInDb() (string, error) {
 	return "", nil
 }
 
-func findSessionActive() (Session, error) {
+func findGoodTOChange(id string) (Good, error) {
+	hexId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return Good{}, err
+	}
+
+	var doc Good
+
+	result := database.Goods.FindOne(ctx, bson.M{
+		"_id": hexId,
+	})
+
+	err = result.Decode(&doc)
+	if err != nil {
+
+	}
+	return doc, err
+}
+
+func findActiveSession() (Session, error) {
 	var doc Session
 
 	result := database.Sessions.FindOne(ctx, bson.M{
@@ -226,4 +333,29 @@ func findSessionActive() (Session, error) {
 
 	}
 	return doc, err
+}
+
+func (good *Good) checkUpdateField() []string {
+	errs := make([]string, 0)
+
+	if len(good.Description) != 0 {
+		log.Printf(" Vous ne pouvais pas modifier la description, error=%s", good.Description)
+		errs = append(errs, fmt.Sprintf("Vous ne pouvais pas modifier la description %s :", good.Description))
+	}
+
+	if len(good.Count) != 0 {
+		log.Printf(" Vous ne pouvais pas modifier la description, error=%s", good.Count)
+		errs = append(errs, fmt.Sprintf("Vous ne pouvais pas modifier la Count %s :", good.Count))
+	}
+
+	return errs
+}
+
+func (goodChange GoodChange) store() (string, error) {
+	_, err := database.GoodChanges.InsertOne(database.Ctx, goodChange)
+	if err != nil {
+		log.Printf("error inserting good, %v\n", err)
+		return "", err
+	}
+	return "", nil
 }
