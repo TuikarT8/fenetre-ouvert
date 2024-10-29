@@ -141,7 +141,7 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func PostGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
+func CreateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	if !checkMethod(w, r, http.MethodPost) {
 		return
 	}
@@ -151,8 +151,8 @@ func PostGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("PostGoodChangeHandler() => Errors while reading good from body"))
-		log.Print("PostGoodChangeHandler () => Errors while reading good from body ")
+		w.Write([]byte("CreateGoodChangeHandler() => Errors while reading good from body"))
+		log.Print("CreateGoodChangeHandler () => Errors while reading good from body ")
 		return
 	}
 
@@ -162,19 +162,38 @@ func PostGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("PostGoodChangeHandler() => Errors while unmarsaling goodChange"))
-		log.Print("PostGoodChangeHandler () =>  Errors while unmarsaling goodChange ")
+		w.Write([]byte("CreateGoodChangeHandler() => Errors while unmarsaling goodChange"))
+		log.Print("CreateGoodChangeHandler () =>  Errors while unmarsaling goodChange ")
 		return
 	}
 
 	_, err = goodChange.addToGood(goodId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("PostGoodChangeHandler() => Errors while saving goodChange"))
-		log.Print("PostGoodChangeHandler () => Errors while creating good", err)
+		w.Write([]byte("CreateGoodChangeHandler() => Errors while saving goodChange"))
+		log.Print("CreateGoodChangeHandler () => Errors while creating good", err)
 		return
 	}
 
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
+	if !checkMethod(w, r, http.MethodDelete) {
+		return
+	}
+
+	goodId := mux.Vars(r)["id"]
+	changeId := mux.Vars(r)["changeId"]
+
+	log.Printf("This is the goodId %s \n and the changeId %s", goodId, changeId)
+	err := deleteGoodChangeInDb(changeId, goodId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(" deleteGoodChangeInDb() => Errors while deleting []goodChange"))
+		log.Print(" deleteGoodChangeInDb() => Errors while deleting []goodChange", err)
+		return
+	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -182,6 +201,31 @@ func handleUnmarshallingError(err string, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusBadRequest)
 	w.Write([]byte("Errors lors de l'unmarshalisation du corps de la requette"))
 	log.Print("Errors lors de l'unmarshalisation  du corps de la requette", err)
+}
+
+func deleteGoodChangeInDb(id string, goodId string) error {
+	itemId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	goodHexId, err := primitive.ObjectIDFromHex(goodId)
+	if err != nil {
+		return err
+	}
+
+	_, err = database.Goods.UpdateOne(database.Ctx,
+		primitive.M{"_id": goodHexId},
+		primitive.M{
+			"$pull": primitive.M{
+				"changes": primitive.M{"_id": itemId},
+			},
+		})
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (change *GoodChange) addToGood(id string) (string, error) {
@@ -199,6 +243,7 @@ func (change *GoodChange) addToGood(id string) (string, error) {
 	change.SessionId = session.Id
 	change.Reason = GoodChangeReason_Modified
 	change.At = time.Now()
+	change.Id = primitive.NewObjectID()
 
 	_, err = database.Goods.UpdateOne(database.Ctx,
 		primitive.M{"_id": hexId},
@@ -349,13 +394,4 @@ func (good *Good) checkUpdateField() []string {
 	}
 
 	return errs
-}
-
-func (goodChange GoodChange) store() (string, error) {
-	_, err := database.GoodChanges.InsertOne(database.Ctx, goodChange)
-	if err != nil {
-		log.Printf("error inserting good, %v\n", err)
-		return "", err
-	}
-	return "", nil
 }

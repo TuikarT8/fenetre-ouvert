@@ -15,6 +15,7 @@ const (
 )
 
 type GoodChange struct {
+	Id        interface{} `bson:"_id,omitempty" json:"id"`
 	Condition string      `bson:"condition,state" json:"condition"`
 	SaleValue float32     `bson:"saleValue,omitempty" json:"saleValue"`
 	SessionId interface{} `bson:"SessionId,omitempty" json:"SessionId"`

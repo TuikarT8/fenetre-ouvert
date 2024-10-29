@@ -12,7 +12,6 @@ import (
 
 var Users mongo.Collection
 var Goods mongo.Collection
-var GoodChanges mongo.Collection
 var Notifications mongo.Collection
 var Sessions mongo.Collection
 var Ctx = context.TODO()
@@ -65,5 +64,4 @@ func ConnectTodataBase() {
 	Goods = *client.Database(DatabaseName).Collection("goods")
 	Notifications = *client.Database(DatabaseName).Collection("notifications")
 	Sessions = *client.Database(DatabaseName).Collection("sessions")
-	GoodChanges = *client.Database(DatabaseName).Collection("goodChanges")
 }
