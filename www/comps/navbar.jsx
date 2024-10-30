@@ -2,9 +2,12 @@ import React from 'react';
 import {
     AddFilled,
   FontDecreaseRegular,
+  HistoryFilled,
+  LauncherSettingsRegular,
   TextFontRegular,
 } from "@fluentui/react-icons";
 import { makeStyles, Toolbar, ToolbarButton } from "@fluentui/react-components";
+import { CreateMenuButton } from './button';
 
 
 const Logo = () => {
@@ -30,15 +33,14 @@ export const Navbar = (props) => {
             <Logo/>
             <span className="flex-expand"></span>
             <Toolbar aria-label="Vertical Button" {...props}>
-                <ToolbarButton vertical appearance="primary" icon={<AddFilled />}>
-                Nouveau
-                </ToolbarButton>
-                <ToolbarButton vertical icon={<FontDecreaseRegular />}>
+            <CreateMenuButton/> 
+            <ToolbarButton vertical icon={<HistoryFilled />}>
                 Historique
-                </ToolbarButton>
-                <ToolbarButton vertical icon={<TextFontRegular />}>
+            </ToolbarButton>
+            <ToolbarButton vertical icon={<LauncherSettingsRegular />}>
                 Configuration
-                </ToolbarButton>
+            </ToolbarButton>
+               
             </Toolbar>
         </div>
     );
