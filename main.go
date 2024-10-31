@@ -34,37 +34,33 @@ func main() {
 	/*
 		Handle Notifications
 	*/
-
 	r.HandleFunc("/api/notification", rest.PostNotificationHandler)
 	r.HandleFunc("/api/notifications", rest.GetNotificationHandler)
-	r.HandleFunc("/api/notification/{id}/notification", rest.DeleteNotificationHandler)
-	r.HandleFunc("/api/notification/{id}", rest.UpdateNotificationHandler)
+	r.HandleFunc("/api/notifications/{id}", rest.DeleteNotificationHandler)
+	r.HandleFunc("/api/notifications/{id}", rest.UpdateNotificationHandler)
 
 	/*
 		Handle Users
 	*/
-
 	r.HandleFunc("/api/user", rest.PostUserHandler)
 	r.HandleFunc("/api/users", rest.GetUserHandler)
-	r.HandleFunc("/api/user/{id}/user", rest.DeleteUserHandler)
-	r.HandleFunc("/api/user/{id}", rest.UpdateUserHandler)
+	r.HandleFunc("/api/users/{id}", rest.DeleteUserHandler)
+	r.HandleFunc("/api/users/{id}", rest.UpdateUserHandler)
 
 	/*
 		Handle Sessions
 	*/
-
-	r.HandleFunc("/api/session", rest.PostSessionHandler)
+	r.HandleFunc("/api/sessions", rest.PostSessionHandler)
 	r.HandleFunc("/api/sessions", rest.GetSessionHandler)
-	r.HandleFunc("/api/session/{id}/session", rest.DeleteSessionHandler)
-	r.HandleFunc("/api/session/{id}", rest.UpdateSessionHandler)
-	r.HandleFunc("/api/session/{id}/activate", rest.ActiveSessionHandler)
+	r.HandleFunc("/api/sessions/{id}", rest.DeleteSessionHandler)
+	r.HandleFunc("/api/sessions/{id}", rest.UpdateSessionHandler)
+	r.HandleFunc("/api/sessions/{id}/activate", rest.ActiveSessionHandler)
 
 	database.ConnectTodataBase()
 
 	port := getListeningPort()
 	log.Printf("Server is Listening on port %s", os.Getenv("PORT"))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), r))
-
 }
 
 func getListeningPort() string {

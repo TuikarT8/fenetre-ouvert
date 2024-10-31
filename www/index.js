@@ -7,7 +7,7 @@ import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 const element = document.getElementById('root');
 const root = createRoot(element);
 root.render(
-  <FluentProvider theme={webLightTheme}>
-    <App />
-  </FluentProvider>,
+	<FluentProvider theme={webLightTheme}>
+		<App />
+	</FluentProvider>,
 );

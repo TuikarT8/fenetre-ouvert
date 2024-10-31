@@ -48,9 +48,9 @@ type FormularyGood struct {
 
 type Session struct {
 	Id        interface{} `bson:"_id,omitempty" json:"id"`
-	StartTime time.Time   `bson:"starttime ,omitempty" json:"starttime"`
-	EndTime   time.Time   `bson:"endtime ,omitempty" json:"endtime"`
-	Author    string      `bson:"author ,omitempty" json:"author"`
+	StartDate time.Time   `bson:"startDate, omitempty" json:"startDate"`
+	EndDate   time.Time   `bson:"endDate ,omitempty" json:"endDate"`
+	Author    interface{} `bson:"author ,omitempty" json:"author"`
 	Active    bool        `bson:"active" json:"active"`
 }
 
@@ -62,9 +62,9 @@ type Notification struct {
 
 func checkMethod(w http.ResponseWriter, r *http.Request, method string) bool {
 	if r.Method != method {
-		log.Print("Vous tentez d'utiliser un Endpoint avec la methode Inaproprie", r.Method)
+		log.Print("Vous tentez d'utiliser un endpoint avec une méthode inaproprié", r.Method)
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write([]byte("L'endpoint invalid"))
+		w.Write([]byte("L'endpoint invalide"))
 		return false
 	}
 

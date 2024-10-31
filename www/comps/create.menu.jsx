@@ -1,14 +1,14 @@
-import * as React from "react";
+import * as React from 'react';
 
 import {
-  Menu,
-  MenuTrigger,
-  MenuList,
-  MenuItem,
-  MenuPopover,
-  ToolbarButton,
-} from "@fluentui/react-components";
-import { AddFilled } from "@fluentui/react-icons";
+	Menu,
+	MenuTrigger,
+	MenuList,
+	MenuItem,
+	MenuPopover,
+	ToolbarButton,
+} from '@fluentui/react-components';
+import { AddFilled } from '@fluentui/react-icons';
 import PropTypes from 'prop-types';
 
 /**
@@ -19,22 +19,27 @@ import PropTypes from 'prop-types';
  * @returns 
  */
 export const CreateMenuButton = (props) => (
-  <Menu>
-    <MenuTrigger disableButtonEnhancement>
-      <ToolbarButton vertical appearance="primary" icon={<AddFilled />}>
-        Créer
-      </ToolbarButton>
-    </MenuTrigger>
+	<Menu>
+		<MenuTrigger disableButtonEnhancement>
+			<ToolbarButton vertical appearance="primary" icon={<AddFilled />}>
+				Créer
+			</ToolbarButton>
+		</MenuTrigger>
 
-    <MenuPopover>
-      <MenuList>
-        <MenuItem onClick={() => props?.onMenuSelected?.('good')}>Bien</MenuItem>
-        <MenuItem onClick={() => props?.onSessionMenuSelected?.('session')}>Session inventoriage</MenuItem>
-      </MenuList>
-    </MenuPopover>
-  </Menu>
+		<MenuPopover>
+			<MenuList>
+				<MenuItem onClick={() => props?.onMenuSelected?.('good')}>
+					Bien
+				</MenuItem>
+				<MenuItem onClick={() => props?.onSessionMenuSelected?.('session')}>
+					Session inventoriage
+				</MenuItem>
+			</MenuList>
+		</MenuPopover>
+	</Menu>
 );
 
 CreateMenuButton.propTypes = {
-  onMenuSelected: PropTypes.func.isRequired,
-}
+	onMenuSelected: PropTypes.func.isRequired,
+	onSessionMenuSelected: PropTypes.func.isRequired,
+};
