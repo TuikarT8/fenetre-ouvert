@@ -1,4 +1,4 @@
-module fenetre-ouvert
+module fenetre-ouverte
 
 go 1.22.3
 

@@ -3,7 +3,7 @@ package rest
 import (
 	"context"
 	"encoding/json"
-	database "fenetre-ouvert/database"
+	database "fenetre-ouverte/database"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -324,22 +324,16 @@ func (good *Good) UpdateGoodInDb(id string) (string, error) {
 }
 
 func (good *Good) saveGoodInDb(condition string) (string, error) {
-	session, err := findActiveSession()
-	if err != nil {
-		log.Printf("Error while getting session activate, error=%v", err)
-		return "", err
-	}
-
 	good.Changes = make([]GoodChange, 0)
 	good.Changes = append(good.Changes, GoodChange{
 		Condition: condition,
 		SaleValue: good.PurchaseValue,
-		SessionId: session.Id,
+		SessionId: nil,
 		Reason:    GoodChangeReason_Created,
 		At:        time.Now(),
 	})
 
-	_, err = database.Goods.InsertOne(database.Ctx, good)
+	_, err := database.Goods.InsertOne(database.Ctx, good)
 	if err != nil {
 		log.Printf("error inserting good, %v\n", err)
 		return "", err
@@ -382,11 +376,6 @@ func findActiveSession() (Session, error) {
 
 func (good *Good) checkUpdateField() []string {
 	errs := make([]string, 0)
-
-	if len(good.Description) != 0 {
-		log.Printf(" Vous ne pouvais pas modifier la description, error=%s", good.Description)
-		errs = append(errs, fmt.Sprintf("Vous ne pouvais pas modifier la description %s :", good.Description))
-	}
 
 	if good.Count < 0 {
 		log.Printf(" Vous ne pouvais pas modifier la description, error=%s", good.Count)

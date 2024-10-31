@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fenetre-ouvert/api/rest"
-	"fenetre-ouvert/database"
+	"fenetre-ouverte/api/rest"
+	"fenetre-ouverte/database"
 	"fmt"
 	"log"
 	"net/http"

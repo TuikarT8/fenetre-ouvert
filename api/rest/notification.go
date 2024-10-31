@@ -2,7 +2,7 @@ package rest
 
 import (
 	"encoding/json"
-	"fenetre-ouvert/database"
+	"fenetre-ouverte/database"
 	"io/ioutil"
 	"log"
 	"net/http"

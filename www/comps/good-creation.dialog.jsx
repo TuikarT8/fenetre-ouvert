@@ -8,12 +8,12 @@ import {
   DialogActions,
   DialogContent,
   Button,
-  MenuItem,
   Label,
   Input,
   makeStyles,
 } from "@fluentui/react-components";
 import axios from "axios";
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles({
     content: {
@@ -23,6 +23,11 @@ const useStyles = makeStyles({
     },
   })
 
+/**
+ * Dialog forr creating goods
+ * @param {{onClose: () => void; open: boolean}} props 
+ * @returns 
+ */
 export const GoodCreationDialog = (props) => {
     const styles = useStyles();
 
@@ -30,8 +35,8 @@ export const GoodCreationDialog = (props) => {
         event.preventDefault();
         //const form = event.target;
         var good = {
-            name:event.target.nom.value,
-            description:event.target.description.value,
+            name: event.target.nom.value,
+            description: event.target.description.value,
             count: Number(event.target.number.value),
             purchaseValue: Number(event.target.achat.value),
           }
@@ -43,15 +48,12 @@ export const GoodCreationDialog = (props) => {
                 props.onClose?.();
             })
             .catch(e => {
-
+                console.error(e);
             });
     }
 
   return (
     <Dialog open={props.open}>
-      <DialogTrigger disableButtonEnhancement>
-        <MenuItem>Créer un bien</MenuItem>
-      </DialogTrigger>
       <DialogSurface>
       <form onSubmit={handleSubmitGoodForm}>
           <DialogBody>
@@ -70,15 +72,15 @@ export const GoodCreationDialog = (props) => {
               </Label>
               <Input required type="nombre" name="number" id={"Quantite-input"} />
               <Label required htmlFor={"purchaseValue"}>
-               Valeur D'achat
+               Valeur achat
               </Label>
               <Input required type="number" name="achat" id={"purchaseValue-input"} />
             </DialogContent>
             <DialogActions>
               <DialogTrigger disableButtonEnhancement>
-                <Button appearance="secondary">Close</Button>
+                <Button appearance="secondary" onClick={() => props?.onClose?.()}>Close</Button>
               </DialogTrigger>
-              <Button type="submit" onClick={props?.onClose?.()} appearance="primary">
+              <Button type="submit" appearance="primary">
                 Submit
               </Button>
             </DialogActions>
@@ -88,3 +90,8 @@ export const GoodCreationDialog = (props) => {
     </Dialog>
   );
 };
+
+GoodCreationDialog.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+}

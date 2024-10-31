@@ -4,8 +4,8 @@ import {
   LauncherSettingsRegular,
 } from "@fluentui/react-icons";
 import { makeStyles, Toolbar, ToolbarButton } from "@fluentui/react-components";
-import { CreateMenuButton } from './create-menu';
-import { GoodCreationDialog } from './dialog';
+import { CreateMenuButton } from './create.menu';
+import { GoodCreationDialog } from './good-creation.dialog';
 
 const Logo = () => {
     return (
@@ -39,20 +39,14 @@ export const Navbar = (props) => {
             <span className="flex-expand"></span>
             <Toolbar aria-label="Vertical Button" {...props}>
                 <CreateMenuButton onMenuSelected={onCreateMenuOptionSelected}/> 
-                <ToolbarButton vertical icon={<HistoryFilled />}>
+                <ToolbarButton vertical icon={<HistoryFilled/>}>
                     Historique
                 </ToolbarButton>
-                <ToolbarButton vertical icon={<LauncherSettingsRegular />}>
+                <ToolbarButton vertical icon={<LauncherSettingsRegular/>}>
                     Configuration
                 </ToolbarButton>
 
-                <GoodCreationDialog open={isCreateGoodDialogOpen} onClose={() => {
-                     if(!isCreateGoodDialogOpen){
-                        setIsCreateGoodDialogOpen(false)
-                        return
-                    } 
-                    setIsCreateGoodDialogOpen(true)
-                }
+                <GoodCreationDialog open={isCreateGoodDialogOpen} onClose={() => {setIsCreateGoodDialogOpen(false)}
             }/>
             </Toolbar>
         </div>

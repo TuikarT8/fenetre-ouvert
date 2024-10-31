@@ -9,7 +9,13 @@ import {
   ToolbarButton,
 } from "@fluentui/react-components";
 import { AddFilled } from "@fluentui/react-icons";
+import PropTypes from 'prop-types';
 
+/**
+ * Main app menu
+ * @param {{onMenuSelected: (value: 'good' | 'session') => void}} props 
+ * @returns 
+ */
 export const CreateMenuButton = (props) => (
   <Menu>
     <MenuTrigger disableButtonEnhancement>
@@ -26,3 +32,7 @@ export const CreateMenuButton = (props) => (
     </MenuPopover>
   </Menu>
 );
+
+CreateMenuButton.propTypes = {
+  onMenuSelected: PropTypes.func.isRequired,
+}
