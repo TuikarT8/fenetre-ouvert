@@ -1,14 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-    AddFilled,
-  FontDecreaseRegular,
   HistoryFilled,
   LauncherSettingsRegular,
-  TextFontRegular,
 } from "@fluentui/react-icons";
 import { makeStyles, Toolbar, ToolbarButton } from "@fluentui/react-components";
-import { CreateMenuButton } from './button';
-
+import { CreateMenuButton } from './create-menu';
+import { GoodCreationDialog } from './dialog';
 
 const Logo = () => {
     return (
@@ -26,21 +23,37 @@ const useClasses = makeStyles({
 })
 
 export const Navbar = (props) => {
+    const [isCreateGoodDialogOpen, setIsCreateGoodDialogOpen] = useState(false);
     const styles = useClasses();
+    
+    const onCreateMenuOptionSelected = (option) => {
+        if (option === 'good') {
+            setIsCreateGoodDialogOpen(true);
+            console.log('Opening the good dialog');
+        }
+    }
 
     return (
         <div className={styles.container}>
             <Logo/>
             <span className="flex-expand"></span>
             <Toolbar aria-label="Vertical Button" {...props}>
-            <CreateMenuButton/> 
-            <ToolbarButton vertical icon={<HistoryFilled />}>
-                Historique
-            </ToolbarButton>
-            <ToolbarButton vertical icon={<LauncherSettingsRegular />}>
-                Configuration
-            </ToolbarButton>
-               
+                <CreateMenuButton onMenuSelected={onCreateMenuOptionSelected}/> 
+                <ToolbarButton vertical icon={<HistoryFilled />}>
+                    Historique
+                </ToolbarButton>
+                <ToolbarButton vertical icon={<LauncherSettingsRegular />}>
+                    Configuration
+                </ToolbarButton>
+
+                <GoodCreationDialog open={isCreateGoodDialogOpen} onClose={() => {
+                     if(!isCreateGoodDialogOpen){
+                        setIsCreateGoodDialogOpen(false)
+                        return
+                    } 
+                    setIsCreateGoodDialogOpen(true)
+                }
+            }/>
             </Toolbar>
         </div>
     );

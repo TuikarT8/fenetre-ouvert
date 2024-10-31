@@ -388,7 +388,7 @@ func (good *Good) checkUpdateField() []string {
 		errs = append(errs, fmt.Sprintf("Vous ne pouvais pas modifier la description %s :", good.Description))
 	}
 
-	if len(good.Count) != 0 {
+	if good.Count < 0 {
 		log.Printf(" Vous ne pouvais pas modifier la description, error=%s", good.Count)
 		errs = append(errs, fmt.Sprintf("Vous ne pouvais pas modifier la Count %s :", good.Count))
 	}

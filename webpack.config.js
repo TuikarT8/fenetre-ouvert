@@ -19,7 +19,14 @@ const config = {
         open: true,
         host: 'localhost',
         compress: true,
-        port: 9000,
+        port: 'auto',
+        proxy:[
+            {
+                context: ['/api'],
+                target: 'http://localhost:3100',
+                secure: false,
+            },
+        ],
     },
     resolve: {
         extensions: ['.js', '.jsx']

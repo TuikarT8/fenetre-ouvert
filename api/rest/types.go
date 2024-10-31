@@ -36,7 +36,7 @@ type Good struct {
 	ID            interface{}  `bson:"_id,omitempty" json:"id"`
 	Name          string       `bson:"name,omitempty" json:"name"`
 	Description   string       `bson:"description,omitempty" json:"description"`
-	Count         string       `bson:"count,omitempty" json:"count"`
+	Count         int32        `bson:"count,omitempty" json:"count"`
 	PurchaseValue float32      `bson:"purchaseValue,omitempty" json:"purchaseValue"`
 	Changes       []GoodChange `bson:"changes ,omitempty" json:"changes"`
 }
