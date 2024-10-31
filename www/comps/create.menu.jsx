@@ -14,6 +14,8 @@ import PropTypes from 'prop-types';
 /**
  * Main app menu
  * @param {{onMenuSelected: (value: 'good' | 'session') => void}} props 
+ * @param {{onSessionMenuSelected: (value: 'good' | 'session') => void}} props 
+
  * @returns 
  */
 export const CreateMenuButton = (props) => (
@@ -27,7 +29,7 @@ export const CreateMenuButton = (props) => (
     <MenuPopover>
       <MenuList>
         <MenuItem onClick={() => props?.onMenuSelected?.('good')}>Bien</MenuItem>
-        <MenuItem>Session inventoriage</MenuItem>
+        <MenuItem onClick={() => props?.onSessionMenuSelected?.('session')}>Session inventoriage</MenuItem>
       </MenuList>
     </MenuPopover>
   </Menu>

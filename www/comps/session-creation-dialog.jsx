@@ -8,12 +8,14 @@ import {
   DialogActions,
   DialogContent,
   Button,
+  makeStyles,
   Label,
   Input,
-  makeStyles,
+  Field,
 } from "@fluentui/react-components";
 import axios from "axios";
 import PropTypes from 'prop-types';
+import { DatePicker } from "@fluentui/react";
 
 const useStyles = makeStyles({
     content: {
@@ -28,7 +30,7 @@ const useStyles = makeStyles({
  * @param {{onClose: () => void; open: boolean}} props 
  * @returns 
  */
-export const GoodCreationDialog = (props) => {
+export const SessionCreationDialog = (props) => {
     const styles = useStyles();
 
     const handleSubmitGoodForm = (event) => {
@@ -41,7 +43,7 @@ export const GoodCreationDialog = (props) => {
             purchaseValue: Number(event.target.achat.value),
           }
           
-        axios.post('/api/goods', good)
+        axios.post('/api/sessions', good)
             .then(function (response) {
                 console.log(response.state);
                 console.log(response.data);
@@ -57,24 +59,15 @@ export const GoodCreationDialog = (props) => {
       <DialogSurface>
       <form onSubmit={handleSubmitGoodForm}>
           <DialogBody>
-            <DialogTitle>Créer un bien </DialogTitle>
+            <DialogTitle>Créer une session </DialogTitle>
             <DialogContent className={styles.content}>
-              <Label required htmlFor={"nom"}>
-                Nom
-              </Label>
-              <Input required type="nom" name="nom" id={"nom-input"} />
-              <Label required htmlFor={"Description"}>
-                Description
-              </Label>
-              <Input required type="Description" name="description" id={"Description-input"} />
-              <Label required htmlFor={"Quantite"}>
-                Quantite
-              </Label>
-              <Input required type="nombre" name="number" id={"Quantite-input"} />
-              <Label required htmlFor={"purchaseValue"}>
-               Valeur achat
-              </Label>
-              <Input required type="number" name="achat" id={"purchaseValue-input"} />
+                <Field label="Select a date">
+                    <DatePicker 
+                        placeholder="Select a date..."
+                    />
+                </Field>
+                <Label required htmlFor={"Description"}>Description</Label>
+                <Input required type="Description" name="description" id={"Description-input"} />
             </DialogContent>
             <DialogActions>
               <DialogTrigger disableButtonEnhancement>
@@ -91,7 +84,7 @@ export const GoodCreationDialog = (props) => {
   );
 };
 
-GoodCreationDialog.propTypes = {
+SessionCreationDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 }
