@@ -77,8 +77,7 @@ export const SessionCreationDialog = (props) => {
 							<DialogTrigger disableButtonEnhancement>
 								<Button
 									appearance="secondary"
-									onClick={() => props?.onClose?.()}
-								>
+									onClick={() => props?.onClose?.()}>
 									Close
 								</Button>
 							</DialogTrigger>
