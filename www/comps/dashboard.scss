@@ -1,0 +1,26 @@
+
+.container {
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+
+    .card {
+        width: 250px;
+        height: 100px; 
+        display: flex;
+        flex-direction: column;
+
+        padding: 4px;
+
+        .header {
+            display: flex;
+            flex-direction: row;
+        }
+    }
+}
+
+.flex-expand {
+    flex: 1 1;
+  }
