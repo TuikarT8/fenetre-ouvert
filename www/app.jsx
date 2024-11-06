@@ -5,8 +5,8 @@ import { DashBoard } from './comps/dashboard';
 export function App() {
 	return (
 		<div>
-			<Navbar/>
-			<DashBoard/>
+			<Navbar />
+			<DashBoard />
 		</div>
-	)
+	);
 }

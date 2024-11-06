@@ -62,13 +62,17 @@ type Notification struct {
 
 func checkMethod(w http.ResponseWriter, r *http.Request, method string) bool {
 	if r.Method != method {
-		log.Print("Vous tentez d'utiliser un endpoint avec une méthode inaproprié", r.Method)
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write([]byte("L'endpoint invalide"))
+		reportWrongHttpMethod(w, r, method)
 		return false
 	}
 
 	return true
+}
+
+func reportWrongHttpMethod(w http.ResponseWriter, r *http.Request, method string) {
+	log.Print("Vous tentez d'utiliser un endpoint avec une méthode inaproprié", r.Method)
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	w.Write([]byte("L'endpoint invalide"))
 }
 
 func ConvertStringToPrimitiveOBjectId(id string) (primitive.ObjectID, error) {

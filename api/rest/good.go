@@ -19,6 +19,16 @@ import (
 
 var ctx = context.TODO()
 
+func GoodsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		GetGoodHandler(w, r)
+	} else if r.Method == http.MethodPost {
+		PostGoodHandler(w, r)
+	} else {
+		reportWrongHttpMethod(w, r, r.Method)
+	}
+}
+
 func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
 	if !checkMethod(w, r, http.MethodGet) {
 		return

@@ -17,6 +17,7 @@ const useClasses = makeStyles({
 	container: {
 		display: 'flex',
 		flexDirection: 'row',
+		marginBottom: '64px',
 	},
 });
 

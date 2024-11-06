@@ -1,26 +1,60 @@
-
 .container {
-    width: fit-content;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
+	width: fit-content;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-around;
+	margin-bottom: 64px;
 
-    .card {
-        width: 250px;
-        height: 100px; 
-        display: flex;
-        flex-direction: column;
+	.card {
+		width: 250px;
+		height: 50px;
+		display: flex;
+		flex-direction: column;
+		padding: 24px;
 
-        padding: 4px;
+		.header {
+			display: flex;
+			flex-direction: row;
 
-        .header {
-            display: flex;
-            flex-direction: row;
-        }
-    }
+			.icons-1 {
+				color: #00796b;
+				border: 1px;
+				display: flex;
+				border-radius: 5px;
+				padding: auto;
+				align-items: center;
+			}
+
+			.icons-2 {
+				color: #ef5350;
+				display: flex;
+				border-radius: 5px;
+				padding: auto;
+				align-items: center;
+			}
+
+			.icons-3 {
+				color: #4fc3f7;
+				display: flex;
+				border-radius: 5px;
+				padding: auto;
+				align-items: center;
+				border: 1px;
+			}
+		}
+	}
 }
 
 .flex-expand {
-    flex: 1 1;
-  }
+	flex: 1 1;
+}
+
+.card-2 {
+	border-right: 1px solid rgb(226, 226, 226);
+	border-left: 1px solid rgb(226, 226, 226);
+}
+
+.main {
+	margin: 16px;
+}
