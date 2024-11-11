@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import './dashboard.scss';
 import { Caption1, Title1, Title2 } from '@fluentui/react-components';
 import {
@@ -6,10 +6,10 @@ import {
 	TextBulletListSquare32Filled,
 	WalletCreditCard32Regular,
 } from '@fluentui/react-icons';
-import { Tables } from './table';
-import { Toolbars } from './toolbar';
+import { GoodsTable } from './goods-table';
+import { Link } from 'react-router-dom';
 
-export const DashBoard = () => {
+export const Home = () => {
 	return (
 		<div className="main">
 			<Title1>Acceuil</Title1>
@@ -42,11 +42,11 @@ export const DashBoard = () => {
 							<WalletCreditCard32Regular />
 						</span>
 					</div>
-					<Caption1>Valeur marchande de l'inventaire</Caption1>
+					<Caption1>{`Valeur marchande de l'inventaire`}</Caption1>
 				</div>
 			</div>
-
-			<Tables></Tables>
+			<Link to="/inventory/active">{`Continuer l'inventaire en cours`}</Link>
+			<GoodsTable></GoodsTable>
 		</div>
 	);
 };
