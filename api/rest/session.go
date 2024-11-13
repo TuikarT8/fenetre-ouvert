@@ -14,6 +14,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+func SessionsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		GetSessionHandler(w, r)
+	} else if r.Method == http.MethodPost {
+		PostSessionHandler(w, r)
+	} else {
+		reportWrongHttpMethod(w, r, r.Method)
+	}
+}
+
 func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 	if !checkMethod(w, r, http.MethodGet) {
 		return
@@ -21,24 +31,24 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	params, err := pageQueryFromRequestQueryParams(r)
 	if err != nil {
-		w.Write([]byte(" GetSessionHandler ()=> Errors while gettig params"))
-		log.Print(" GetSessionHandler ()=> Errors while getting params", err)
+		w.Write([]byte("GetSessionHandler ()=> Errors while gettig params"))
+		log.Print("GetSessionHandler ()=> Errors while getting params", err)
 		return
 	}
 
-	Sessions, err := getSessionInDb(params)
+	Sessions, err := getSessionsFromDB(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" GetSessionHandler ()=> Errors while gettig good"))
-		log.Print(" GetSessionHandler ()=> Errors while getting good", err)
+		w.Write([]byte("GetSessionHandler ()=> Errors while gettig good"))
+		log.Print("GetSessionHandler ()=> Errors while getting good", err)
 		return
 	}
 
 	jsondata, err := json.Marshal(Sessions)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" GetSessionHandler ()=> Errors while marsalling good"))
-		log.Print(" GetSessionHandler ()=> Errors while marshalling good", err)
+		w.Write([]byte("GetSessionHandler ()=> Errors while marsalling good"))
+		log.Print("GetSessionHandler ()=> Errors while marshalling good", err)
 		return
 	}
 	w.Write(jsondata)
@@ -52,8 +62,8 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(" postSessionHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print(" postSessionHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte("postSessionHandler ()=> Errors lors de la lecture du corps de la requette"))
+		log.Print("postSessionHandler ()=> Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -68,8 +78,8 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = Session.saveSessionInDb()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" postSessionHandler ()=> Errors while creating good"))
-		log.Print(" postSessionHandler ()=> Errors while creating good", err)
+		w.Write([]byte("postSessionHandler ()=> Errors while creating good"))
+		log.Print("postSessionHandler ()=> Errors while creating good", err)
 		return
 	}
 
@@ -104,8 +114,8 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("  UpdateSessionHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print("  UpdateSessionHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte(" UpdateSessionHandler ()=> Errors lors de la lecture du corps de la requette"))
+		log.Print(" UpdateSessionHandler ()=> Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -119,8 +129,8 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := session.UpdateSessionInDb(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" UpdateSessionHandler() => Errors while Updating session"))
-		log.Print(" UpdateSessionHandler() => Errors while Updating session", err)
+		w.Write([]byte("UpdateSessionHandler() => Errors while Updating session"))
+		log.Print("UpdateSessionHandler() => Errors while Updating session", err)
 		return
 	}
 
@@ -133,14 +143,35 @@ func ActiveSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionId := mux.Vars(r)["id"]
-	if _, err := updateActiveSessionInDb(sessionId); err != nil {
+	if _, err := updateActiveSessionFromDB(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" ActiveSessionHandler() => Errors while Active session"))
-		log.Print(" ActiveSessionHandler() => Errors while active session", err)
+		w.Write([]byte("ActiveSessionHandler() => Errors while Active session"))
+		log.Print("ActiveSessionHandler() => Errors while active session", err)
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func GetSessionGoodsHandler(w http.ResponseWriter, r *http.Request) {
+	if !checkMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	sessionId := mux.Vars(r)["id"]
+	var goods []Good
+	var err error
+
+	if goods, err = getGoodsMatchingSession(sessionId); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("ActiveSessionHandler() => Errors while retrieving session goods"))
+		log.Printf("ActiveSessionHandler() => Error while retrieving session goods err=[%v]", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	jsonData, _ := json.Marshal(goods)
+	w.Write(jsonData)
 }
 
 func (session *Session) saveSessionInDb() (string, error) {
@@ -152,7 +183,64 @@ func (session *Session) saveSessionInDb() (string, error) {
 	return "", nil
 }
 
-func getSessionInDb(pagination PageQueryParams) ([]Session, error) {
+func getGoodsMatchingSession(sessionId string) ([]Good, error) {
+	if sessionId != "active" {
+		log.Printf("Going to look for active session goods")
+		return getGoodsMatchingActiveSession()
+	}
+
+	return getGoodsMatchingAnySession(sessionId)
+}
+
+func getGoodsMatchingAnySession(sessionId string) ([]Good, error) {
+	goods := make([]Good, 0)
+
+	cusor, err := database.Goods.Find(database.Ctx, bson.M{"changes.sessionId": sessionId})
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return goods, nil
+		}
+		return goods, err
+	}
+
+	defer cusor.Close(database.Ctx)
+
+	err = cusor.All(database.Ctx, &goods)
+	if err != nil {
+		return goods, err
+	}
+
+	return goods, nil
+}
+
+func getGoodsMatchingActiveSession() ([]Good, error) {
+	sessions := make([]SessionWithGoods, 0)
+
+	cursor, err := database.Sessions.Aggregate(database.Ctx, []bson.M{
+		{"$match": bson.M{"active": true}},
+		{"$lookup": bson.M{
+			"from":         "goods",
+			"localField":   "_id",
+			"foreignField": "changes.sessionId",
+			"as":           "goods",
+		}},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("We passed the direct error, the newt one will be given by Decode")
+	if err = cursor.All(database.Ctx, &sessions); err != nil {
+		return nil, err
+	}
+
+	if len(sessions) > 0 {
+		return sessions[0].Goods, nil
+	}
+	return []Good{}, nil
+}
+
+func getSessionsFromDB(pagination PageQueryParams) ([]Session, error) {
 	sessions := make([]Session, 0)
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
 	opts.Skip = &pagination.startAt
@@ -214,7 +302,7 @@ func deleteSessionInDb(id string) error {
 	return nil
 }
 
-func updateActiveSessionInDb(id string) (string, error) {
+func updateActiveSessionFromDB(id string) (string, error) {
 	bsonId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return "", err
@@ -242,4 +330,33 @@ func updateActiveSessionInDb(id string) (string, error) {
 	}
 
 	return "", err
+}
+
+func getActiveSessionFromDB() (Session, error) {
+	return getOneSessionFromDBWithQuery(bson.M{
+		"active": true,
+	})
+}
+
+func getOneSessionFromDBWithQuery(query bson.M) (Session, error) {
+	var sess Session
+
+	result := database.Sessions.FindOne(ctx, query)
+
+	err := result.Decode(&sess)
+	if err != nil {
+		return Session{}, err
+	}
+	return sess, nil
+}
+
+func getOneSessionFromDB(id string) (Session, error) {
+	hexId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return Session{}, err
+	}
+
+	return getOneSessionFromDBWithQuery(bson.M{
+		"_id": hexId,
+	})
 }

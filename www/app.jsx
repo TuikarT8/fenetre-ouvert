@@ -11,7 +11,7 @@ export function App() {
 			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Home />} />
-					<Route path="/inventories/{id}" element={<Inventory />} />
+					<Route path="/inventories/:inventoryId" element={<Inventory />} />
 				</Routes>
 			</BrowserRouter>
 		</div>

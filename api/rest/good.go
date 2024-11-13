@@ -37,24 +37,24 @@ func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
 	params, err := pageQueryFromRequestQueryParams(r)
 
 	if err != nil {
-		w.Write([]byte(" GetGoodHandler ()=> Errors while gettig params"))
-		log.Print(" GetGoodHandler ()=> Errors while getting params", err)
+		w.Write([]byte("GetGoodHandler ()=> Errors while gettig params"))
+		log.Print("GetGoodHandler ()=> Errors while getting params", err)
 		return
 	}
 
 	goods, err := getGoodInDb(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" GetGoodHandler ()=> Errors while gettig good"))
-		log.Print(" GetGoodHandler ()=> Errors while getting good", err)
+		w.Write([]byte("GetGoodHandler ()=> Errors while gettig good"))
+		log.Print("GetGoodHandler ()=> Errors while getting good", err)
 		return
 	}
 
 	jsondata, err := json.Marshal(goods)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" GetGoodHandler ()=> Errors while marsalling good"))
-		log.Print(" GetGoodHandler ()=> Errors while marshalling good", err)
+		w.Write([]byte("GetGoodHandler ()=> Errors while marsalling good"))
+		log.Print("GetGoodHandler ()=> Errors while marshalling good", err)
 		return
 	}
 	w.Write(jsondata)
@@ -69,8 +69,8 @@ func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(" postGoodHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print(" postGoodHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte("postGoodHandler ()=> Errors lors de la lecture du corps de la requette"))
+		log.Print("postGoodHandler ()=> Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -85,8 +85,8 @@ func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = good.saveGoodInDb(good.Condition)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" postGoodHandler ()=> Errors while creating good"))
-		log.Print(" postGoodHandler ()=> Errors while creating good", err)
+		w.Write([]byte("postGoodHandler ()=> Errors while creating good"))
+		log.Print("postGoodHandler ()=> Errors while creating good", err)
 		return
 	}
 
@@ -104,8 +104,8 @@ func DeleteGoodHandler(w http.ResponseWriter, r *http.Request) {
 	err := deleteGoodInDb(goodId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" DeleteGoodHandler() => Errors while deleting good"))
-		log.Print(" DeleteGoodHandler() => Errors while deleting good", err)
+		w.Write([]byte("DeleteGoodHandler() => Errors while deleting good"))
+		log.Print("DeleteGoodHandler() => Errors while deleting good", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -122,8 +122,8 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("  UpdateGoodHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print("  UpdateGoodHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte(" UpdateGoodHandler ()=> Errors lors de la lecture du corps de la requette"))
+		log.Print(" UpdateGoodHandler ()=> Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -137,15 +137,15 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 	errs := good.checkUpdateField()
 	if len(errs) != 0 {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" UpdateGoodHandler() => Errors while Updating fields good :descrpition,count,saleValue,"))
-		log.Print(" UpdateGoodHandler() => Errors while Updating fields good", errs)
+		w.Write([]byte("UpdateGoodHandler() => Errors while Updating fields good :descrpition,count,saleValue,"))
+		log.Print("UpdateGoodHandler() => Errors while Updating fields good", errs)
 		return
 	}
 
 	if _, err := good.UpdateGoodInDb(goodId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" UpdateGoodHandler() => Errors while Updating good"))
-		log.Print(" UpdateGoodHandler() => Errors while Updating good", err)
+		w.Write([]byte("UpdateGoodHandler() => Errors while Updating good"))
+		log.Print("UpdateGoodHandler() => Errors while Updating good", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -200,8 +200,8 @@ func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	err := deleteGoodChangeInDb(changeId, goodId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(" deleteGoodChangeInDb() => Errors while deleting []goodChange"))
-		log.Print(" deleteGoodChangeInDb() => Errors while deleting []goodChange", err)
+		w.Write([]byte("deleteGoodChangeInDb() => Errors while deleting []goodChange"))
+		log.Print("deleteGoodChangeInDb() => Errors while deleting []goodChange", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -296,7 +296,6 @@ func getGoodInDb(pagination PageQueryParams) ([]Good, error) {
 		if err == mongo.ErrNoDocuments {
 			return apps, nil
 		}
-
 		return apps, err
 	}
 
@@ -388,7 +387,7 @@ func (good *Good) checkUpdateField() []string {
 	errs := make([]string, 0)
 
 	if good.Count < 0 {
-		log.Printf(" Vous ne pouvais pas modifier la description, error=%s", good.Count)
+		log.Printf("Vous ne pouvais pas modifier la description, error=%s", good.Count)
 		errs = append(errs, fmt.Sprintf("Vous ne pouvais pas modifier la Count %s :", good.Count))
 	}
 

@@ -49,11 +49,11 @@ func main() {
 	/*
 		Handle Sessions
 	*/
-	r.HandleFunc("/api/sessions", rest.PostSessionHandler)
-	r.HandleFunc("/api/sessions", rest.GetSessionHandler)
+	r.HandleFunc("/api/sessions", rest.SessionsHandler)
 	r.HandleFunc("/api/sessions/{id}", rest.DeleteSessionHandler)
 	r.HandleFunc("/api/sessions/{id}", rest.UpdateSessionHandler)
 	r.HandleFunc("/api/sessions/{id}/activate", rest.ActiveSessionHandler)
+	r.HandleFunc("/api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
 
 	database.ConnectTodataBase()
 

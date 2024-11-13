@@ -45,7 +45,9 @@ export const Home = () => {
 					<Caption1>{`Valeur marchande de l'inventaire`}</Caption1>
 				</div>
 			</div>
-			<Link to="/inventory/active">{`Continuer l'inventaire en cours`}</Link>
+			<Link
+				to="/inventories/active"
+				replace={true}>{`Continuer l'inventaire en cours`}</Link>
 			<GoodsTable></GoodsTable>
 		</div>
 	);

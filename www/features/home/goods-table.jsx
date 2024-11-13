@@ -153,8 +153,8 @@ export const GoodsTable = () => {
 							</TableCell>
 							<TableCell>
 								{_.last(item.changes) && (
-									<TableCellLayout key={_.last(item.chages).id}>
-										{ConvertStringToDate(_.last(item.chages).date)}
+									<TableCellLayout key={_.last(item.changes).id}>
+										{ConvertStringToDate(_.last(item.changes).date)}
 									</TableCellLayout>
 								)}
 							</TableCell>

@@ -14,21 +14,12 @@ const (
 	GoodChangeReason_Deleted  = "deleted"
 )
 
-type GoodChange struct {
-	Id        interface{} `bson:"_id,omitempty" json:"id"`
-	Condition string      `bson:"condition,state" json:"condition"`
-	SaleValue float32     `bson:"saleValue,omitempty" json:"saleValue"`
-	SessionId interface{} `bson:"SessionId,omitempty" json:"SessionId"`
-	Reason    string      `bson:"reason" json:"reason"`
-	At        time.Time   `bson:"time" json:"time"`
-}
-
 type User struct {
 	Id           interface{}    `bson:"_id,omitempty" json:"id"`
-	FirstName    string         `bson:"fistname ,omitempty" json:"firstname"`
-	LastName     string         `bson:"lastname ,omitempty" json:"lastname"`
-	MiddleName   string         `bson:"middlename ,omitempty" json:"middlename"`
-	Notification []Notification `bson:"notification ,omitempty" json:"notification"`
+	FirstName    string         `bson:"fistname,omitempty" json:"firstname"`
+	LastName     string         `bson:"lastname,omitempty" json:"lastname"`
+	MiddleName   string         `bson:"middlename,omitempty" json:"middlename"`
+	Notification []Notification `bson:"notification,omitempty" json:"notification"`
 	Condition    string         `bson:"condition,omitempty" json:"condition"`
 }
 
@@ -38,7 +29,16 @@ type Good struct {
 	Description   string       `bson:"description,omitempty" json:"description"`
 	Count         int32        `bson:"count,omitempty" json:"count"`
 	PurchaseValue float32      `bson:"purchaseValue,omitempty" json:"purchaseValue"`
-	Changes       []GoodChange `bson:"changes ,omitempty" json:"changes"`
+	Changes       []GoodChange `bson:"changes,omitempty" json:"changes"`
+}
+
+type GoodChange struct {
+	Id        interface{} `bson:"_id,omitempty" json:"id"`
+	Condition string      `bson:"condition,state" json:"condition"`
+	SaleValue float32     `bson:"saleValue,omitempty" json:"saleValue"`
+	SessionId interface{} `bson:"sessionId,omitempty" json:"sessionId"`
+	Reason    string      `bson:"reason" json:"reason"`
+	At        time.Time   `bson:"time" json:"time"`
 }
 
 type FormularyGood struct {
@@ -48,16 +48,20 @@ type FormularyGood struct {
 
 type Session struct {
 	Id        interface{} `bson:"_id,omitempty" json:"id"`
-	StartDate time.Time   `bson:"startDate, omitempty" json:"startDate"`
-	EndDate   time.Time   `bson:"endDate ,omitempty" json:"endDate"`
-	Author    interface{} `bson:"author ,omitempty" json:"author"`
+	StartDate time.Time   `bson:"startDate,omitempty" json:"startDate"`
+	EndDate   time.Time   `bson:"endDate,omitempty" json:"endDate"`
+	Author    interface{} `bson:"author,omitempty" json:"author"`
 	Active    bool        `bson:"active" json:"active"`
 }
 
+type SessionWithGoods struct {
+	Session
+	Goods []Good `bson:"goods,omitempty"`
+}
 type Notification struct {
 	Id          interface{} `bson:"_id,omitempty" json:"id"`
-	Title       string      `bson:"title ,omitempty" json:"title"`
-	Description string      `bson:"description ,omitempty" json:"description"`
+	Title       string      `bson:"title,omitempty" json:"title"`
+	Description string      `bson:"description,omitempty" json:"description"`
 }
 
 func checkMethod(w http.ResponseWriter, r *http.Request, method string) bool {
