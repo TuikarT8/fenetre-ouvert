@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
-function ConvertStringToDate(elem) {
-	if (elem == undefined || elem == null) {
-		return;
-	} else {
-		const date = new Date(elem);
-		return date.toLocaleDateString();
+function convertStringToDate(dateString) {
+	console.log('The date to convert is', dateString);
+	if (dateString === undefined || dateString === null) {
+		return '';
 	}
+
+	const date = new Date(dateString);
+	console.log('The converted date is ', date)
+	return date.toDateString();
 }
 
 import { EditRegular, DeleteRegular } from '@fluentui/react-icons';
@@ -58,7 +60,7 @@ export const InventoryTable = () => {
 			.get('/api/sessions/${session.id}/goods')
 			.then(({ data }) => {
 				setGoods(data);
-				console.log("Voici les donnees",data)
+				console.log('Voici les donnees', data);
 			})
 			.catch((e) => {
 				console.error(e);
@@ -82,42 +84,42 @@ export const InventoryTable = () => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{goods.map((item) => (
-						<TableRow key={item.id}>
-							<TableCell>
-								<TableCellLayout>
-									{capitalizeFirstLetter(item.name)}
-								</TableCellLayout>
-							</TableCell>
-							<TableCell>
-								{_.last(item.changes) && (
-									<TableCellLayout key={_.last(item.changes)?.id}>
-										{ConvertStringToDate(_.last(item.changes)?.date)}
-									</TableCellLayout>
-								)}
-							</TableCell>
-							<TableCell>
-								{_.last(item.changes) && (
-									<TableCellLayout key={_.last(item.changes)?.id}>
-										{capitalizeFirstLetter(_.last(item.changes)?.condition)}
-									</TableCellLayout>
-								)}
-							</TableCell>
-							<TableCell>
-								<TableCellLayout>{item.count}</TableCellLayout>
-							</TableCell>
+					{goods.map((item) => {
+						const change = _.last(item.changes);
 
-							<TableCell>
-								<TableCellLayout>{item.purchaseValue}</TableCellLayout>
-							</TableCell>
-							<TableCell role="gridcell" tabIndex={0} {...focusableGroupAttr}>
-								<TableCellLayout>
-									<Button icon={<EditRegular />} aria-label="Edit" />
-									<Button icon={<DeleteRegular />} aria-label="Delete" />
-								</TableCellLayout>
-							</TableCell>
-						</TableRow>
-					))}
+						return (
+							<TableRow key={item.id}>
+								<TableCell>
+									<TableCellLayout>
+										{capitalizeFirstLetter(item.name)}
+									</TableCellLayout>
+								</TableCell>
+								<TableCell>
+									<TableCellLayout key={change.id}>
+										{convertStringToDate(change.time)}
+									</TableCellLayout>
+								</TableCell>
+								<TableCell>
+									<TableCellLayout key={change.id}>
+										{capitalizeFirstLetter(change.condition)}
+									</TableCellLayout>
+								</TableCell>
+								<TableCell>
+									<TableCellLayout>{item.count}</TableCellLayout>
+								</TableCell>
+
+								<TableCell>
+									<TableCellLayout>{change.saleValue}</TableCellLayout>
+								</TableCell>
+								<TableCell role="gridcell" tabIndex={0} {...focusableGroupAttr}>
+									<TableCellLayout>
+										<Button icon={<EditRegular />} aria-label="Edit" />
+										<Button icon={<DeleteRegular />} aria-label="Delete" />
+									</TableCellLayout>
+								</TableCell>
+							</TableRow>
+						);
+					})}
 				</TableBody>
 			</Table>
 		</div>

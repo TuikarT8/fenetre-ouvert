@@ -179,7 +179,7 @@ export const GoodsTable = () => {
 			{toolbar}
 			<GoodDrawer
 				isOpen={isGoodDrawerOpen}
-				selectedGood={selectedGood ? selectedGood : 'Nom indefini'}
+				selectedGood={selectedGood}
 				onClose={() => setIsGoodDrawerOpen(false)}
 			/>
 		</div>

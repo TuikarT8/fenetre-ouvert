@@ -16,6 +16,8 @@ export const GoodDrawer = ({ isOpen, selectedGood, onClose }) => {
 	// Overlay Drawer will handle focus by default, but inline Drawers need manual focus restoration attributes, if applicable
 	const restoreFocusSourceAttributes = useRestoreFocusSource();
 
+	if (!selectedGood) return null;
+
 	return (
 		<Drawer
 			{...restoreFocusSourceAttributes}
@@ -50,6 +52,6 @@ export const GoodDrawer = ({ isOpen, selectedGood, onClose }) => {
 
 GoodDrawer.propTypes = {
 	isOpen: PropTypes.bool.isRequired,
-	selectedGood: PropTypes.object.isRequired,
+	selectedGood: PropTypes.object,
 	onClose: PropTypes.func.isRequired,
 };

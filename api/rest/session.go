@@ -229,7 +229,6 @@ func getGoodsMatchingActiveSession() ([]Good, error) {
 		return nil, err
 	}
 
-	log.Printf("We passed the direct error, the newt one will be given by Decode")
 	if err = cursor.All(database.Ctx, &sessions); err != nil {
 		return nil, err
 	}

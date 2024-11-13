@@ -28,14 +28,14 @@ type Good struct {
 	Name          string       `bson:"name,omitempty" json:"name"`
 	Description   string       `bson:"description,omitempty" json:"description"`
 	Count         int32        `bson:"count,omitempty" json:"count"`
-	PurchaseValue float32      `bson:"purchaseValue,omitempty" json:"purchaseValue"`
+	PurchaseValue float64      `bson:"purchaseValue,omitempty" json:"purchaseValue"`
 	Changes       []GoodChange `bson:"changes,omitempty" json:"changes"`
 }
 
 type GoodChange struct {
 	Id        interface{} `bson:"_id,omitempty" json:"id"`
 	Condition string      `bson:"condition,state" json:"condition"`
-	SaleValue float32     `bson:"saleValue,omitempty" json:"saleValue"`
+	SaleValue float64     `bson:"saleValue,omitempty" json:"saleValue"`
 	SessionId interface{} `bson:"sessionId,omitempty" json:"sessionId"`
 	Reason    string      `bson:"reason" json:"reason"`
 	At        time.Time   `bson:"time" json:"time"`
