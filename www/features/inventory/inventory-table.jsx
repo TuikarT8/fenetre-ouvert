@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 function convertStringToDate(dateString) {
-	console.log('The date to convert is', dateString);
 	if (dateString === undefined || dateString === null) {
 		return '';
 	}
 
 	const date = new Date(dateString);
-	console.log('The converted date is ', date)
 	return date.toDateString();
 }
 
@@ -27,6 +25,7 @@ import {
 import axios from 'axios';
 import _ from 'lodash';
 import { useParams } from 'react-router-dom';
+import { InventoryDrawer } from './inventory-drawer';
 
 const columns = [
 	{ columnKey: 'good', label: 'Bien' },
@@ -46,6 +45,10 @@ function capitalizeFirstLetter(elem) {
 }
 
 export const InventoryTable = () => {
+	const [isGoodDrawerOpen, setIsGoodDrawerOpen] = useState(false);
+	const [isDisabled, setIsDisabled] = useState(false);
+	const [selectedGood, setSelectedGood] = useState(null);
+	const [sessionId, setSessionId] = useState('');
 	const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
@@ -57,10 +60,12 @@ export const InventoryTable = () => {
 		if (!inventoryId) return;
 
 		axios
-			.get('/api/sessions/${session.id}/goods')
+			.get(`/api/sessions/${inventoryId}/goods`)
 			.then(({ data }) => {
-				setGoods(data);
-				console.log('Voici les donnees', data);
+				setGoods(data.goods);
+				if (data.goods.length) {
+					setSessionId(data.sessionId);
+				}
 			})
 			.catch((e) => {
 				console.error(e);
@@ -73,7 +78,7 @@ export const InventoryTable = () => {
 				{...keyboardNavAttr}
 				role="grid"
 				aria-label="Table with grid keyboard navigation"
-				style={{ minWidth: '620px' }}>
+				style={{ minWidth: '620px', cursor: 'pointer' }}>
 				<TableHeader>
 					<TableRow>
 						{columns.map((column) => (
@@ -86,16 +91,20 @@ export const InventoryTable = () => {
 				<TableBody>
 					{goods.map((item) => {
 						const change = _.last(item.changes);
-
 						return (
 							<TableRow key={item.id}>
 								<TableCell>
-									<TableCellLayout>
+									<TableCellLayout
+										onClick={() => {
+											setIsGoodDrawerOpen(true);
+											setSelectedGood(item);
+											setIsDisabled(true);
+										}}>
 										{capitalizeFirstLetter(item.name)}
 									</TableCellLayout>
 								</TableCell>
 								<TableCell>
-									<TableCellLayout key={change.id}>
+									<TableCellLayout key={item.id}>
 										{convertStringToDate(change.time)}
 									</TableCellLayout>
 								</TableCell>
@@ -113,7 +122,15 @@ export const InventoryTable = () => {
 								</TableCell>
 								<TableCell role="gridcell" tabIndex={0} {...focusableGroupAttr}>
 									<TableCellLayout>
-										<Button icon={<EditRegular />} aria-label="Edit" />
+										<Button
+											icon={<EditRegular />}
+											aria-label="Edit"
+											onClick={() => {
+												setIsGoodDrawerOpen(true);
+												setSelectedGood(item);
+												setIsDisabled(false);
+											}}
+										/>
 										<Button icon={<DeleteRegular />} aria-label="Delete" />
 									</TableCellLayout>
 								</TableCell>
@@ -122,6 +139,13 @@ export const InventoryTable = () => {
 					})}
 				</TableBody>
 			</Table>
+			<InventoryDrawer
+				isOpen={isGoodDrawerOpen}
+				selectedGood={selectedGood}
+				isDisabled={isDisabled}
+				onClose={() => setIsGoodDrawerOpen(false)}
+				sessionId={sessionId}
+			/>
 		</div>
 	);
 };

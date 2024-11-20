@@ -159,18 +159,18 @@ func GetSessionGoodsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionId := mux.Vars(r)["id"]
-	var goods []Good
+	var response SessionGoodsLookupResponse
 	var err error
 
-	if goods, err = getGoodsMatchingSession(sessionId); err != nil {
+	if response, err = getGoodsMatchingSession(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("ActiveSessionHandler() => Errors while retrieving session goods"))
-		log.Printf("ActiveSessionHandler() => Error while retrieving session goods err=[%v]", err)
+		w.Write([]byte("GetSessionGoodsHandler() => Errors while retrieving session goods"))
+		log.Printf("GetSessionGoodsHandler() => Error while retrieving session goods err=[%v]", err)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	jsonData, _ := json.Marshal(goods)
+	jsonData, _ := json.Marshal(response)
 	w.Write(jsonData)
 }
 
@@ -183,38 +183,41 @@ func (session *Session) saveSessionInDb() (string, error) {
 	return "", nil
 }
 
-func getGoodsMatchingSession(sessionId string) ([]Good, error) {
-	if sessionId != "active" {
-		log.Printf("Going to look for active session goods")
+func getGoodsMatchingSession(sessionId string) (SessionGoodsLookupResponse, error) {
+	if sessionId == "active" {
 		return getGoodsMatchingActiveSession()
 	}
 
 	return getGoodsMatchingAnySession(sessionId)
 }
 
-func getGoodsMatchingAnySession(sessionId string) ([]Good, error) {
+func getGoodsMatchingAnySession(sessionId string) (SessionGoodsLookupResponse, error) {
 	goods := make([]Good, 0)
 
 	cusor, err := database.Goods.Find(database.Ctx, bson.M{"changes.sessionId": sessionId})
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return goods, nil
+			return SessionGoodsLookupResponse{}, nil
 		}
-		return goods, err
+		return SessionGoodsLookupResponse{}, err
 	}
 
 	defer cusor.Close(database.Ctx)
 
 	err = cusor.All(database.Ctx, &goods)
 	if err != nil {
-		return goods, err
+		return SessionGoodsLookupResponse{}, err
 	}
 
-	return goods, nil
+	return SessionGoodsLookupResponse{
+		SessionId: sessionId,
+		Goods:     goods,
+	}, nil
 }
 
-func getGoodsMatchingActiveSession() ([]Good, error) {
-	sessions := make([]SessionWithGoods, 0)
+func getGoodsMatchingActiveSession() (SessionGoodsLookupResponse, error) {
+	response := SessionGoodsLookupResponse{}
+	sessions := make([]SessionGoodsLookupResponse, 0)
 
 	cursor, err := database.Sessions.Aggregate(database.Ctx, []bson.M{
 		{"$match": bson.M{"active": true}},
@@ -226,17 +229,17 @@ func getGoodsMatchingActiveSession() ([]Good, error) {
 		}},
 	})
 	if err != nil {
-		return nil, err
+		return response, err
 	}
 
 	if err = cursor.All(database.Ctx, &sessions); err != nil {
-		return nil, err
+		return response, err
 	}
 
 	if len(sessions) > 0 {
-		return sessions[0].Goods, nil
+		return sessions[0], nil
 	}
-	return []Good{}, nil
+	return response, nil
 }
 
 func getSessionsFromDB(pagination PageQueryParams) ([]Session, error) {

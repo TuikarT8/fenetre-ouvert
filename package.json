@@ -15,6 +15,7 @@
     "eslint-plugin-react": "^7.37.2",
     "globals": "^15.11.0",
     "html-webpack-plugin": "^5.5.4",
+    "nodemon": "^3.1.7",
     "prettier": "^3.3.3",
     "sass": "^1.80.5",
     "sass-loader": "^16.0.2",
@@ -31,7 +32,8 @@
     "build:prod": "webpack --mode=production --node-env=production",
     "watch": "webpack --watch",
     "serve": "webpack serve",
-    "prettify": "prettier --write www"
+    "prettify": "prettier --write www",
+    "watch:server": "nodemon --exec go run . -e go"
   },
   "dependencies": {
     "@babel/preset-react": "^7.25.9",

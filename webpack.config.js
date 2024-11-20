@@ -2,6 +2,7 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { HotModuleReplacementPlugin } = require('webpack');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
@@ -19,6 +20,7 @@ const config = {
         open: true,
         host: 'localhost',
         compress: true,
+        hot: true,
         port: 'auto',
         proxy:[
             {
@@ -32,6 +34,7 @@ const config = {
         extensions: ['.js', '.jsx']
     },
     plugins: [
+        new HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
             template: 'index.html',
         }),
