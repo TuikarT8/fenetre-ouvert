@@ -3,7 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fenetre-ouverte/database"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -59,7 +59,7 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("postSessionHandler ()=> Errors lors de la lecture du corps de la requette"))
@@ -111,7 +111,7 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessionId := mux.Vars(r)["id"]
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(" UpdateSessionHandler ()=> Errors lors de la lecture du corps de la requette"))

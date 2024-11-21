@@ -58,6 +58,7 @@ export const Navbar = (props) => {
 				</ToolbarButton>
 
 				<GoodCreationDialog
+					title='Creer un bien'
 					open={isCreateGoodDialogOpen}
 					onClose={() => {
 						setIsCreateGoodDialogOpen(false);

@@ -77,6 +77,7 @@ export const InventoryDrawer = ({
 			change: {
 				condition: goodChange.condition,
 				saleValue: parseInt(_form.valeur.value),
+				countDelta: goodChange.countDelta,
 			},
 		};
 

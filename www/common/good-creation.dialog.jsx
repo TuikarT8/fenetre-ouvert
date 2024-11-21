@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 
 /**
  * Dialog for creating goods
- * @param {{onClose: () => void; open: boolean}} props
+ * @param {{onClose: () => void; open: boolean, title: string}} props
  * @returns
  */
 export const GoodCreationDialog = (props) => {
@@ -58,7 +58,7 @@ export const GoodCreationDialog = (props) => {
 			<DialogSurface>
 				<form onSubmit={handleSubmitGoodForm}>
 					<DialogBody>
-						<DialogTitle>Créer un bien </DialogTitle>
+						<DialogTitle>{props.title}</DialogTitle>
 						<DialogContent className={styles.content}>
 							<Label required htmlFor={'nom'}>
 								Nom
@@ -78,7 +78,7 @@ export const GoodCreationDialog = (props) => {
 							</Label>
 							<Input
 								required
-								type="nombre"
+								type="number"
 								name="number"
 								id={'Quantite-input'}
 							/>
@@ -114,4 +114,6 @@ export const GoodCreationDialog = (props) => {
 GoodCreationDialog.propTypes = {
 	open: PropTypes.bool.isRequired,
 	onClose: PropTypes.func.isRequired,
+	title: PropTypes.string.isRequired,
+
 };

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	database "fenetre-ouverte/database"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -75,7 +75,7 @@ func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("postGoodHandler ()=> Errors lors de la lecture du corps de la requette"))
@@ -91,7 +91,7 @@ func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = good.saveGoodInDb(good.Condition)
+	_, err = good.save(good.Condition)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("postGoodHandler ()=> Errors while creating good"))
@@ -127,7 +127,7 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 
 	goodId := mux.Vars(r)["id"]
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -159,7 +159,7 @@ func CreateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	goodId := mux.Vars(r)["id"]
 
-	data, err := ioutil.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -207,7 +207,7 @@ func UpdateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("UpdateGoodChangeHandler ()=> Errors lors de la lecture du corps de la requette"))
@@ -378,8 +378,9 @@ func (good *GoodUpdateRequest) Update(id string) (string, error) {
 			mongo.NewUpdateOneModel().
 				SetFilter(primitive.M{"_id": bsonId, "changes.sessionId": hexSessionId}).
 				SetUpdate(primitive.M{"$set": primitive.M{
-					"changes.$.saleValue": good.Change.SaleValue,
-					"changes.$.condition": good.Change.Condition,
+					"changes.$.saleValue":  good.Change.SaleValue,
+					"changes.$.condition":  good.Change.Condition,
+					"changes.$.countDelta": good.Change.CountDelta,
 				}}),
 		)
 	}
@@ -392,17 +393,24 @@ func (good *GoodUpdateRequest) Update(id string) (string, error) {
 	return "", nil
 }
 
-func (good *Good) saveGoodInDb(condition string) (string, error) {
+func (good *Good) save(condition string) (string, error) {
+
+	var sessionId interface{}
+	activeSession, err := findActiveSession()
+	if err == nil {
+		sessionId = activeSession.Id
+	}
+
 	good.Changes = make([]GoodChange, 0)
 	good.Changes = append(good.Changes, GoodChange{
 		Condition: condition,
 		SaleValue: good.PurchaseValue,
-		SessionId: nil,
+		SessionId: sessionId,
 		Reason:    GoodChangeReason_Created,
 		At:        time.Now(),
 	})
 
-	_, err := database.Goods.InsertOne(database.Ctx, good)
+	_, err = database.Goods.InsertOne(database.Ctx, good)
 	if err != nil {
 		log.Printf("error inserting good, %v\n", err)
 		return "", err

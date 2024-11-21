@@ -3,7 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fenetre-ouverte/database"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -52,7 +52,7 @@ func PostNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("postNotificationHandler ()=> Errors lors de la lecture du corps de la requette"))
@@ -104,7 +104,7 @@ func UpdateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	notificationId := mux.Vars(r)["id"]
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
