@@ -39,12 +39,13 @@ type GoodUpdateRequest struct {
 }
 
 type GoodChange struct {
-	Id        interface{} `bson:"_id,omitempty" json:"id"`
-	Condition string      `bson:"condition," json:"condition"`
-	SaleValue float64     `bson:"saleValue,omitempty" json:"saleValue"`
-	SessionId interface{} `bson:"sessionId,omitempty" json:"sessionId"`
-	Reason    string      `bson:"reason,omitempty" json:"reason"`
-	At        time.Time   `bson:"time,omitempty" json:"time"`
+	Id         interface{} `bson:"_id,omitempty" json:"id"`
+	Condition  string      `bson:"condition," json:"condition"`
+	SaleValue  float64     `bson:"saleValue,omitempty" json:"saleValue"`
+	SessionId  interface{} `bson:"sessionId,omitempty" json:"sessionId"`
+	Reason     string      `bson:"reason,omitempty" json:"reason"`
+	At         time.Time   `bson:"time,omitempty" json:"time"`
+	CountDelta int32       `bson:"countDelta,omitempty" json:"countDelta"`
 }
 
 type SessionGoodsLookupResponse struct {

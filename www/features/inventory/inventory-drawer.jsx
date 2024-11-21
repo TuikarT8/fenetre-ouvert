@@ -191,9 +191,14 @@ export const InventoryDrawer = ({
 							type="number"
 							name="count"
 							defaultValue={selectedGood.count}
-							onChange={(e, data) =>
-								setGood({ ...good, count: Number(data.value) })
-							}
+							onChange={(e, data) => {
+								setGood({ ...good, count: Number(data.value) });
+
+								if (Number(data.value)) {
+									setGoodChange({ ...goodChange, countDelta: Number(data.value) - good.count })
+								}
+							}}
+							disabled={isDisabled}
 						/>
 					</Field>
 				</form>
