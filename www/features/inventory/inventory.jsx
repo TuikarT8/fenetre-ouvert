@@ -6,8 +6,8 @@ export function Inventory() {
 	return (
 		<div>
 			<h1>{"Table d'inventaire"}</h1>
-				<InventoryToolbar/>
-				<InventoryTable />
+			<InventoryToolbar />
+			<InventoryTable />
 		</div>
 	);
 }

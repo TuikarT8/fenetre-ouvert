@@ -115,5 +115,4 @@ GoodCreationDialog.propTypes = {
 	open: PropTypes.bool.isRequired,
 	onClose: PropTypes.func.isRequired,
 	title: PropTypes.string.isRequired,
-
 };

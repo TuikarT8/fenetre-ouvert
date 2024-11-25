@@ -20,8 +20,10 @@ import PropTypes from 'prop-types';
 export const CreateButton = (props) => (
 	<Menu>
 		<MenuTrigger disableButtonEnhancement>
-			<ToolbarButton vertical appearance="primary" icon={<AddFilled />}>
-			</ToolbarButton>
+			<ToolbarButton
+				vertical
+				appearance="primary"
+				icon={<AddFilled />}></ToolbarButton>
 		</MenuTrigger>
 
 		<MenuPopover>

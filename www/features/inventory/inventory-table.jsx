@@ -1,14 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
-function convertStringToDate(dateString) {
-	if (dateString === undefined || dateString === null) {
-		return '';
-	}
-
-	const date = new Date(dateString);
-	return date.toDateString();
-}
-
 import { EditRegular, DeleteRegular } from '@fluentui/react-icons';
 import {
 	TableBody,
@@ -26,6 +16,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import { useParams } from 'react-router-dom';
 import { InventoryDrawer } from './inventory-drawer';
+import { ConfimationDialog } from '../../common/dialogs/confimation-dialog';
 
 const columns = [
 	{ columnKey: 'good', label: 'Bien' },
@@ -44,10 +35,20 @@ function capitalizeFirstLetter(elem) {
 	}
 }
 
+function convertStringToDate(dateString) {
+	if (dateString === undefined || dateString === null) {
+		return '';
+	}
+
+	const date = new Date(dateString);
+	return date.toDateString();
+}
+
 export const InventoryTable = () => {
 	const [isGoodDrawerOpen, setIsGoodDrawerOpen] = useState(false);
 	const [isDisabled, setIsDisabled] = useState(false);
 	const [selectedGood, setSelectedGood] = useState(null);
+	const [goodToDelete, setGoodToDelete] = useState(null);
 	const [sessionId, setSessionId] = useState('');
 	const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 	const focusableGroupAttr = useFocusableGroup({
@@ -71,6 +72,17 @@ export const InventoryTable = () => {
 				console.error(e);
 			});
 	}, [inventoryId]);
+
+	const handleDeleteGood = () => {
+		axios
+			.delete(`/api/goods/${goodToDelete.id}/changes/${sessionId}`)
+			.then(function () {
+				setGoodToDelete(undefined);
+			})
+			.catch((e) => {
+				console.error(e);
+			});
+	};
 
 	return (
 		<div>
@@ -131,7 +143,13 @@ export const InventoryTable = () => {
 												setIsDisabled(false);
 											}}
 										/>
-										<Button icon={<DeleteRegular />} aria-label="Delete" />
+										<Button
+											icon={<DeleteRegular />}
+											aria-label="Delete"
+											onClick={() => {
+												setGoodToDelete(item);
+											}}
+										/>
 									</TableCellLayout>
 								</TableCell>
 							</TableRow>
@@ -139,6 +157,21 @@ export const InventoryTable = () => {
 					})}
 				</TableBody>
 			</Table>
+
+			{!!goodToDelete && (
+				<ConfimationDialog
+					open={!!goodToDelete}
+					title={'Suppression de bien'}
+					content={
+						"Voulez-vous vraiment supprimer ce bien? Ce bien sera visible dans les inventaires précédents mais n'appaîtra plus partant de l'inventaire courant."
+					}
+					risky
+					onClose={(confirmed) =>
+						confirmed ? handleDeleteGood() : setGoodToDelete(undefined)
+					}
+				/>
+			)}
+
 			<InventoryDrawer
 				isOpen={isGoodDrawerOpen}
 				selectedGood={selectedGood}

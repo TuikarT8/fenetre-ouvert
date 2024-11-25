@@ -22,7 +22,7 @@ func GoodsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		GetGoodHandler(w, r)
 	} else if r.Method == http.MethodPost {
-		PostGoodHandler(w, r)
+		CreateGoodHandler(w, r)
 	} else {
 		reportWrongHttpMethod(w, r, r.Method)
 	}
@@ -51,7 +51,7 @@ func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	goods, err := getGoodInDb(params)
+	goods, err := getGoods(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("GetGoodHandler ()=> Errors while gettig good"))
@@ -70,7 +70,7 @@ func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
+func CreateGoodHandler(w http.ResponseWriter, r *http.Request) {
 	if !checkMethod(w, r, http.MethodPost) {
 		return
 	}
@@ -78,8 +78,8 @@ func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("postGoodHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print("postGoodHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte("CreateGoodHandler ()=> Errors lors de la lecture du corps de la requette"))
+		log.Print("CreateGoodHandler ()=> Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -94,8 +94,8 @@ func PostGoodHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = good.save(good.Condition)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("postGoodHandler ()=> Errors while creating good"))
-		log.Print("postGoodHandler ()=> Errors while creating good", err)
+		w.Write([]byte("CreateGoodHandler ()=> Errors while creating good"))
+		log.Print("CreateGoodHandler ()=> Errors while creating good", err)
 		return
 	}
 
@@ -110,7 +110,7 @@ func DeleteGoodHandler(w http.ResponseWriter, r *http.Request) {
 
 	goodId := mux.Vars(r)["id"]
 
-	err := deleteGoodInDb(goodId)
+	err := deleteGood(goodId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("DeleteGoodHandler() => Errors while deleting good"))
@@ -241,14 +241,14 @@ func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	goodId := mux.Vars(r)["id"]
-	changeId := mux.Vars(r)["sessionId"]
+	idSession := mux.Vars(r)["sessionId"]
 
-	log.Printf("This is the goodId %s \n and the changeId %s", goodId, changeId)
-	err := deleteGoodChangeInDb(changeId, goodId)
+	log.Printf("This is the sessonId  %s \n and the goodId %s", idSession, goodId)
+	err := deleteGoodChange(goodId, idSession)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("deleteGoodChangeInDb() => Errors while deleting []goodChange"))
-		log.Print("deleteGoodChangeInDb() => Errors while deleting []goodChange", err)
+		w.Write([]byte("deleteGoodChange() => Errors while deleting []goodChange"))
+		log.Print("deleteGoodChange() => Errors while deleting []goodChange", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -260,8 +260,8 @@ func handleUnmarshallingError(err string, w http.ResponseWriter) {
 	log.Print("Errors lors de l'unmarshalisation  du corps de la requette", err)
 }
 
-func deleteGoodChangeInDb(id string, goodId string) error {
-	itemId, err := primitive.ObjectIDFromHex(id)
+func deleteGoodChange(goodId string, idSession string) error {
+	sessionId, err := primitive.ObjectIDFromHex(idSession)
 	if err != nil {
 		return err
 	}
@@ -272,12 +272,11 @@ func deleteGoodChangeInDb(id string, goodId string) error {
 	}
 
 	_, err = database.Goods.UpdateOne(database.Ctx,
-		primitive.M{"_id": goodHexId},
-		primitive.M{
-			"$pull": primitive.M{
-				"changes": primitive.M{"_id": itemId},
-			},
-		})
+		primitive.M{"_id": goodHexId, "changes.sessionId": sessionId},
+		primitive.M{"$set": primitive.M{
+			"changes.$.deleted": true,
+		}},
+	)
 
 	if err != nil {
 		return err
@@ -316,7 +315,7 @@ func (change *GoodChange) addToGood(id string) (string, error) {
 	return "", nil
 }
 
-func deleteGoodInDb(id string) error {
+func deleteGood(id string) error {
 	bsonId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
@@ -331,7 +330,7 @@ func deleteGoodInDb(id string) error {
 	return nil
 }
 
-func getGoodInDb(pagination PageQueryParams) ([]Good, error) {
+func getGoods(pagination PageQueryParams) ([]Good, error) {
 	apps := make([]Good, 0)
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
 	opts.Skip = &pagination.startAt
@@ -408,6 +407,7 @@ func (good *Good) save(condition string) (string, error) {
 		SessionId: sessionId,
 		Reason:    GoodChangeReason_Created,
 		At:        time.Now(),
+		Deleted:   false,
 	})
 
 	_, err = database.Goods.InsertOne(database.Ctx, good)

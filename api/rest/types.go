@@ -46,6 +46,7 @@ type GoodChange struct {
 	Reason     string      `bson:"reason,omitempty" json:"reason"`
 	At         time.Time   `bson:"time,omitempty" json:"time"`
 	CountDelta int32       `bson:"countDelta,omitempty" json:"countDelta"`
+	Deleted    bool        `bson:"deleted,omitempty" json:"deleted"`
 }
 
 type SessionGoodsLookupResponse struct {

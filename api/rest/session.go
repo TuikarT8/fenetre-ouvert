@@ -226,6 +226,14 @@ func getGoodsMatchingActiveSession() (SessionGoodsLookupResponse, error) {
 			"localField":   "_id",
 			"foreignField": "changes.sessionId",
 			"as":           "goods",
+			"let":          bson.M{"changes": "$goods"},
+			"pipeline": []bson.M{
+				{
+					"$match": bson.M{
+						"changes.deleted": bson.M{"$ne": true},
+					},
+				},
+			},
 		}},
 	})
 	if err != nil {

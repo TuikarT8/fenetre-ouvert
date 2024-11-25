@@ -196,7 +196,10 @@ export const InventoryDrawer = ({
 								setGood({ ...good, count: Number(data.value) });
 
 								if (Number(data.value)) {
-									setGoodChange({ ...goodChange, countDelta: Number(data.value) - good.count })
+									setGoodChange({
+										...goodChange,
+										countDelta: Number(data.value) - good.count,
+									});
 								}
 							}}
 							disabled={isDisabled}

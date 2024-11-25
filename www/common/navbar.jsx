@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { HistoryFilled, LauncherSettingsRegular } from '@fluentui/react-icons';
 import { makeStyles, Toolbar, ToolbarButton } from '@fluentui/react-components';
 import { CreateMenuButton } from './create.menu';
-import { GoodCreationDialog } from './good-creation.dialog';
-import { SessionCreationDialog } from './session-creation-dialog';
+import { GoodCreationDialog } from './dialogs/good-creation.dialog';
+import { SessionCreationDialog } from './dialogs/session-creation-dialog';
 
 const Logo = () => {
 	return (
@@ -58,7 +58,7 @@ export const Navbar = (props) => {
 				</ToolbarButton>
 
 				<GoodCreationDialog
-					title='Creer un bien'
+					title="Creer un bien"
 					open={isCreateGoodDialogOpen}
 					onClose={() => {
 						setIsCreateGoodDialogOpen(false);
