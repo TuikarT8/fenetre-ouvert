@@ -190,7 +190,7 @@ func CreateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func HandleGoodOperation(w http.ResponseWriter, r *http.Request) {
+func HandleGoodChangeOperation(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodDelete {
 		DeleteGoodChangeHandler(w, r)
 		return
@@ -275,6 +275,7 @@ func deleteGoodChange(goodId string, idSession string) error {
 		primitive.M{"_id": goodHexId, "changes.sessionId": sessionId},
 		primitive.M{"$set": primitive.M{
 			"changes.$.deleted": true,
+			"deleted":           true,
 		}},
 	)
 
@@ -320,13 +321,30 @@ func deleteGood(id string) error {
 	if err != nil {
 		return err
 	}
-	_, err = database.Goods.DeleteOne(database.Ctx, bson.M{
-		"_id": bsonId,
-	})
 
+	operations := []mongo.WriteModel{
+		mongo.NewUpdateOneModel().
+			SetFilter(bson.M{"_id": bsonId}).
+			SetUpdate(bson.M{"$set": bson.M{"deleted": true}}),
+	}
+
+	activeSession, err := findActiveSession()
 	if err != nil {
+		log.Printf("deleteGood(): Cannot find actie session")
+	} else {
+		operations = append(
+			operations,
+			mongo.NewUpdateManyModel().
+				SetFilter(bson.M{"_id": bsonId, "changes.sessionId": activeSession.Id}).
+				SetUpdate(bson.M{"$set": bson.M{"changes.$.deleted": true}}),
+		)
+	}
+
+	if _, err = database.Goods.BulkWrite(database.Ctx, operations); err != nil {
+		log.Printf("deleteGood(): Error while deleting good, error=%v", err)
 		return err
 	}
+
 	return nil
 }
 
@@ -335,7 +353,7 @@ func getGoods(pagination PageQueryParams) ([]Good, error) {
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
 	opts.Skip = &pagination.startAt
 	opts.Limit = &pagination.count
-	result, err := database.Goods.Find(database.Ctx, bson.M{}, opts)
+	result, err := database.Goods.Find(database.Ctx, bson.M{"deleted": bson.M{"$ne": true}}, opts)
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

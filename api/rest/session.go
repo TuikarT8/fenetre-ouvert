@@ -230,6 +230,7 @@ func getGoodsMatchingActiveSession() (SessionGoodsLookupResponse, error) {
 			"pipeline": []bson.M{
 				{
 					"$match": bson.M{
+						"deleted":         bson.M{"$ne": true},
 						"changes.deleted": bson.M{"$ne": true},
 					},
 				},

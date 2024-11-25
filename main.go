@@ -27,12 +27,11 @@ func main() {
 	r.HandleFunc("/api/goods", rest.GoodsHandler)
 	r.HandleFunc("/api/goods/{id}", rest.GoodHandler)
 	r.HandleFunc("/api/goods/{id}/changes", rest.CreateGoodChangeHandler)
-	r.HandleFunc("/api/goods/{id}/changes/{sessionId}", rest.HandleGoodOperation)
+	r.HandleFunc("/api/goods/{id}/changes/{sessionId}", rest.HandleGoodChangeOperation)
 
 	/*
 		Handle Notifications
 	*/
-
 	r.HandleFunc("/api/notification", rest.PostNotificationHandler)
 	r.HandleFunc("/api/notifications", rest.GetNotificationHandler)
 	r.HandleFunc("/api/notifications/{id}", rest.DeleteNotificationHandler)
