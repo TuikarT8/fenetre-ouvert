@@ -100,14 +100,6 @@ export function useGoodsPagination() {
 		setPageGoods(goods.slice(startIndex, startIndex + pageSize - 1));
 	}
 
-	function navigateToPage(index) {
-		if (index < 0 || index >= pagesCount) {
-			return;
-		}
-
-		setPageIndex(index);
-	}
-
 	useEffect(() => {
 		axios
 			.get(`/api/goods?startAt=${(pageIndex + 1) * pageSize}&count=${pageSize}`)
@@ -124,7 +116,6 @@ export function useGoodsPagination() {
 	return {
 		retrogradeGoodsPage,
 		advanceGoodsPage,
-		navigateToPage,
 
 		goods: pageGoods,
 		pagesCount,

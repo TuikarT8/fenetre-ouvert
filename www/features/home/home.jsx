@@ -48,7 +48,7 @@ export const Home = () => {
 			<Link
 				to="/inventories/active"
 				replace={true}>{`Continuer l'inventaire en cours`}</Link>
-			<GoodsTable></GoodsTable>
+			<GoodsTable/>
 		</div>
 	);
 };

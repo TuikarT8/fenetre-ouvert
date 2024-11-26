@@ -57,8 +57,8 @@ function ConvertStringToDate(elem) {
 export const GoodsTable = () => {
 	const {
 		advanceGoodsPage,
-		goods,
 		retrogradeGoodsPage,
+		goods,
 		pagesCount,
 		pageIndex,
 	} = useGoodsPagination();
