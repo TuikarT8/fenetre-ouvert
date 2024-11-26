@@ -39,6 +39,11 @@ type GoodUpdateRequest struct {
 	SessionId string     `bson:"-" json:"sessionId"`
 }
 
+type GetGoodResponse struct {
+	Goods []Good `json:"goods"`
+	Total int64  `json:"total"`
+}
+
 type GoodChange struct {
 	Id         interface{} `bson:"_id,omitempty" json:"id"`
 	Condition  string      `bson:"condition," json:"condition"`

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
 	TableBody,
 	TableCell,
@@ -7,19 +7,18 @@ import {
 	TableHeader,
 	TableHeaderCell,
 	TableCellLayout,
-	Option,
 	makeStyles,
+	Caption1,
 } from '@fluentui/react-components';
-import axios from 'axios';
 import { CaretLeftFilled, CaretRightFilled } from '@fluentui/react-icons';
 import {
 	Toolbar,
 	ToolbarButton,
 	ToolbarDivider,
-	Dropdown,
 } from '@fluentui/react-components';
 import _ from 'lodash';
 import { GoodDrawer } from './good-drawer';
+import { useGoodsPagination } from '../../provider';
 
 const columns = [
 	{ columnKey: 'good', label: 'Bien' },
@@ -55,32 +54,17 @@ function ConvertStringToDate(elem) {
 	}
 }
 
-const pageSize = 10;
-
 export const GoodsTable = () => {
-	const [data, setData] = useState([]);
-	const [page, setPage] = useState(0);
+	const {
+		advanceGoodsPage,
+		goods,
+		retrogradeGoodsPage,
+		pagesCount,
+		pageIndex,
+	} = useGoodsPagination();
 	const [isGoodDrawerOpen, setIsGoodDrawerOpen] = useState(false);
 	const [selectedGood, setSelectedGood] = useState(null);
-	const [pages, setPages] = useState(0);
-	const goods = useMemo(() => {
-		const start = page * pageSize;
-		return data.slice(start, start + pageSize);
-	}, [page, JSON.stringify(data)]);
 	const styles = useStyles();
-
-	useEffect(() => {
-		axios
-			.get('/api/goods')
-			.then(({ data }) => {
-				setPage(0);
-				setData(data);
-				setPages(Math.ceil(data.length / pageSize));
-			})
-			.catch((e) => {
-				console.error(e);
-			});
-	}, []);
 
 	const toolbar = (
 		<Toolbar aria-label="Default">
@@ -88,38 +72,18 @@ export const GoodsTable = () => {
 				aria-label="Increase Font Size"
 				appearance="secondary"
 				icon={<CaretLeftFilled />}
-				onClick={() => {
-					if (page > 0) {
-						setPage(page - 1);
-					}
-				}}
+				onClick={advanceGoodsPage}
 			/>
 			<ToolbarDivider />
-			<Dropdown id="dropdown-id" value={page + 1}>
-				{pages > 0
-					? new Array(pages).fill(0).map((elm, index) => {
-							return (
-								<Option
-									onClick={() => setPage(index)}
-									key={`page-${index}`}
-									text={`Page ${index + 1}`}
-									value={index + 1}>
-									Page {index + 1}
-								</Option>
-							);
-						})
-					: null}
-			</Dropdown>
+			<Caption1>
+				Page {pageIndex + 1}/{pagesCount}
+			</Caption1>
 			<ToolbarDivider />
 			<ToolbarButton
 				aria-label="More"
 				appearance="secondary"
 				icon={<CaretRightFilled />}
-				onClick={() => {
-					if (page < data.length) {
-						setPage(page + 1);
-					}
-				}}
+				onClick={retrogradeGoodsPage}
 			/>
 		</Toolbar>
 	);

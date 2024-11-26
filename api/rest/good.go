@@ -348,8 +348,11 @@ func deleteGood(id string) error {
 	return nil
 }
 
-func getGoods(pagination PageQueryParams) ([]Good, error) {
-	apps := make([]Good, 0)
+func getGoods(pagination PageQueryParams) (GetGoodResponse, error) {
+	response := GetGoodResponse{
+		Goods: make([]Good, 0),
+		Total: 0,
+	}
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
 	opts.Skip = &pagination.startAt
 	opts.Limit = &pagination.count
@@ -357,19 +360,25 @@ func getGoods(pagination PageQueryParams) ([]Good, error) {
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return apps, nil
+			return response, nil
 		}
-		return apps, err
+		return response, err
 	}
+
+	count, err := database.Goods.CountDocuments(database.Ctx, bson.M{"deleted": bson.M{"$ne": true}})
+	if err != nil {
+		return response, err
+	}
+	response.Total = count
 
 	defer result.Close(database.Ctx)
 
-	err = result.All(database.Ctx, &apps)
+	err = result.All(database.Ctx, &response.Goods)
 	if err != nil {
-		return apps, err
+		return response, err
 	}
 
-	return apps, nil
+	return response, nil
 }
 
 func (good *GoodUpdateRequest) Update(id string) (string, error) {
