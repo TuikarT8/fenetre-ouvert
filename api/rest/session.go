@@ -31,24 +31,24 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	params, err := pageQueryFromRequestQueryParams(r)
 	if err != nil {
-		w.Write([]byte("GetSessionHandler ()=> Errors while gettig params"))
-		log.Print("GetSessionHandler ()=> Errors while getting params", err)
+		w.Write([]byte("GetSessionHandler () => Errors while gettig params"))
+		log.Print("GetSessionHandler () => Errors while getting params", err)
 		return
 	}
 
 	Sessions, err := getSessionsFromDB(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetSessionHandler ()=> Errors while gettig good"))
-		log.Print("GetSessionHandler ()=> Errors while getting good", err)
+		w.Write([]byte("GetSessionHandler () => Errors while gettig good"))
+		log.Print("GetSessionHandler () => Errors while getting good", err)
 		return
 	}
 
 	jsondata, err := json.Marshal(Sessions)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetSessionHandler ()=> Errors while marsalling good"))
-		log.Print("GetSessionHandler ()=> Errors while marshalling good", err)
+		w.Write([]byte("GetSessionHandler () => Errors while marsalling good"))
+		log.Print("GetSessionHandler () => Errors while marshalling good", err)
 		return
 	}
 	w.Write(jsondata)
@@ -62,8 +62,8 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("postSessionHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print("postSessionHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte("postSessionHandler () => Errors lors de la lecture du corps de la requette"))
+		log.Print("postSessionHandler () => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -78,8 +78,8 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = Session.saveSessionInDb()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("postSessionHandler ()=> Errors while creating good"))
-		log.Print("postSessionHandler ()=> Errors while creating good", err)
+		w.Write([]byte("postSessionHandler () => Errors while creating good"))
+		log.Print("postSessionHandler () => Errors while creating good", err)
 		return
 	}
 
@@ -114,8 +114,8 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(" UpdateSessionHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print(" UpdateSessionHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte(" UpdateSessionHandler () => Errors lors de la lecture du corps de la requette"))
+		log.Print(" UpdateSessionHandler () => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 

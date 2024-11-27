@@ -46,24 +46,24 @@ func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
 	params, err := pageQueryFromRequestQueryParams(r)
 
 	if err != nil {
-		w.Write([]byte("GetGoodHandler ()=> Errors while gettig params"))
-		log.Print("GetGoodHandler ()=> Errors while getting params", err)
+		w.Write([]byte("GetGoodHandler () => Errors while gettig params"))
+		log.Print("GetGoodHandler () => Errors while getting params", err)
 		return
 	}
 
 	goods, err := getGoods(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetGoodHandler ()=> Errors while gettig good"))
-		log.Print("GetGoodHandler ()=> Errors while getting good", err)
+		w.Write([]byte("GetGoodHandler () => Errors while gettig good"))
+		log.Print("GetGoodHandler () => Errors while getting good", err)
 		return
 	}
 
 	jsondata, err := json.Marshal(goods)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetGoodHandler ()=> Errors while marsalling good"))
-		log.Print("GetGoodHandler ()=> Errors while marshalling good", err)
+		w.Write([]byte("GetGoodHandler () => Errors while marsalling good"))
+		log.Print("GetGoodHandler () => Errors while marshalling good", err)
 		return
 	}
 	w.Write(jsondata)
@@ -75,14 +75,89 @@ func CreateGoodHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	createMode := r.Header.Get("Create-Mode")
+	if createMode == "many" {
+		handleCreateManyGoods(w, r)
+	} else {
+		handleCreateOneGood(w, r)
+	}
+}
+
+func handleCreateManyGoods(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("CreateGoodHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print("CreateGoodHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte("handleCreateOneGood() => Errors lors de la lecture du corps de la requette"))
+		log.Print("handleCreateOneGood() => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
+	var goods []FormularyGood = make([]FormularyGood, 0)
+	err = json.Unmarshal(body, &goods)
+	if err != nil {
+		handleUnmarshallingError(err.Error(), w)
+		return
+	}
+
+	goods, err = createManyGoods(goods)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("handleCreateOneGood () => Errors while creating good"))
+		log.Print("handleCreateOneGood () => Errors while creating good", err)
+		return
+	}
+
+	jsondata, _ := json.Marshal(goods)
+	w.Write([]byte(jsondata))
+}
+
+func createManyGoods(goods []FormularyGood) ([]FormularyGood, error) {
+	inserts := make([]interface{}, 0)
+	session, err := findActiveSession()
+	var activeSessionId interface{}
+
+	if err != nil && err != mongo.ErrNoDocuments {
+		log.Printf("Error while searching for active session, err=%v", err)
+		return nil, err
+	} else if err == nil {
+		activeSessionId = session.Id
+	}
+
+	for _, good := range goods {
+		good.Changes = make([]GoodChange, 0)
+		good.Changes = append(good.Changes, GoodChange{
+			Condition:  good.Condition,
+			SaleValue:  good.PurchaseValue,
+			SessionId:  activeSessionId,
+			Reason:     GoodChangeReason_Created,
+			At:         time.Now(),
+			CountDelta: good.Count,
+			Deleted:    false,
+		})
+		inserts = append(inserts, good)
+	}
+
+	opts := options.InsertMany().SetOrdered(true)
+	result, err := database.Goods.InsertMany(database.Ctx, inserts, opts)
+	if err != nil {
+		log.Printf("createManyGoods() Error while inserting goods, err=[%v]", err)
+		return nil, nil
+	}
+
+	for idx, _id := range result.InsertedIDs {
+		goods[idx].ID = _id
+	}
+	return goods, nil
+}
+
+func handleCreateOneGood(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("handleCreateOneGood() => Errors lors de la lecture du corps de la requette"))
+		log.Print("handleCreateOneGood() => Errors lors de la lecture du corps de la requette", err)
+		return
+	}
 	var good FormularyGood
 
 	err = json.Unmarshal(body, &good)
@@ -91,11 +166,11 @@ func CreateGoodHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = good.save(good.Condition)
+	err = good.save(good.Condition)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("CreateGoodHandler ()=> Errors while creating good"))
-		log.Print("CreateGoodHandler ()=> Errors while creating good", err)
+		w.Write([]byte("handleCreateOneGood () => Errors while creating good"))
+		log.Print("handleCreateOneGood () => Errors while creating good", err)
 		return
 	}
 
@@ -131,8 +206,8 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(" UpdateGoodHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print(" UpdateGoodHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte(" UpdateGoodHandler () => Errors lors de la lecture du corps de la requette"))
+		log.Print(" UpdateGoodHandler () => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -210,8 +285,8 @@ func UpdateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("UpdateGoodChangeHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print("UpdateGoodChangeHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte("UpdateGoodChangeHandler () => Errors lors de la lecture du corps de la requette"))
+		log.Print("UpdateGoodChangeHandler () => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -227,8 +302,8 @@ func UpdateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	sessionId := mux.Vars(r)["sessionId"]
 	if err := UpdateGoodChange(goodId, sessionId, change); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("UpdateGoodChangeHandler ()=> Errors while retrieving session goods"))
-		log.Printf("UpdateGoodChangeHandler ()=> Error while retrieving session goods err=[%v]", err)
+		w.Write([]byte("UpdateGoodChangeHandler () => Errors while retrieving session goods"))
+		log.Printf("UpdateGoodChangeHandler () => Error while retrieving session goods err=[%v]", err)
 		return
 	}
 
@@ -419,7 +494,7 @@ func (good *GoodUpdateRequest) Update(id string) (string, error) {
 	return "", nil
 }
 
-func (good *Good) save(condition string) (string, error) {
+func (good *Good) save(condition string) error {
 
 	var sessionId interface{}
 	activeSession, err := findActiveSession()
@@ -437,12 +512,14 @@ func (good *Good) save(condition string) (string, error) {
 		Deleted:   false,
 	})
 
-	_, err = database.Goods.InsertOne(database.Ctx, good)
+	result, err := database.Goods.InsertOne(database.Ctx, good)
 	if err != nil {
 		log.Printf("error inserting good, %v\n", err)
-		return "", err
+		return err
 	}
-	return "", nil
+
+	good.ID = result.InsertedID
+	return nil
 }
 
 func findGoodTOChange(id string) (Good, error) {

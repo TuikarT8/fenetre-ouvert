@@ -22,16 +22,16 @@ func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	params, err := pageQueryFromRequestQueryParams(r)
 
 	if err != nil {
-		w.Write([]byte("GetNotificationHandler ()=> Errors while gettig params"))
-		log.Print("GetNotificationHandler ()=> Errors while getting params", err)
+		w.Write([]byte("GetNotificationHandler () => Errors while gettig params"))
+		log.Print("GetNotificationHandler () => Errors while getting params", err)
 		return
 	}
 
 	notifications, err := getNotificationInDb(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetNotificationHandler ()=> Errors while gettig "))
-		log.Print("GetNotificationHandler ()=> Errors while getting ", err)
+		w.Write([]byte("GetNotificationHandler () => Errors while gettig "))
+		log.Print("GetNotificationHandler () => Errors while getting ", err)
 		return
 	}
 
@@ -40,8 +40,8 @@ func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	jsondata, err := json.Marshal(notifications)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetNotificationHandler ()=> Errors while marsalling notification"))
-		log.Print("GetNotificationHandler ()=> Errors while marshalling notification", err)
+		w.Write([]byte("GetNotificationHandler () => Errors while marsalling notification"))
+		log.Print("GetNotificationHandler () => Errors while marshalling notification", err)
 		return
 	}
 	w.Write(jsondata)
@@ -55,8 +55,8 @@ func PostNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("postNotificationHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print("postNotificationHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte("postNotificationHandler () => Errors lors de la lecture du corps de la requette"))
+		log.Print("postNotificationHandler () => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -71,8 +71,8 @@ func PostNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = notification.saveNotificationInDb()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("postNotificationHandler ()=> Errors while creating notification"))
-		log.Print("postNotificationHandler ()=> Errors while creating notification", err)
+		w.Write([]byte("postNotificationHandler () => Errors while creating notification"))
+		log.Print("postNotificationHandler () => Errors while creating notification", err)
 		return
 	}
 
@@ -108,8 +108,8 @@ func UpdateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(" UpdateNotificationHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print(" UpdateNotificationHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte(" UpdateNotificationHandler () => Errors lors de la lecture du corps de la requette"))
+		log.Print(" UpdateNotificationHandler () => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 

@@ -54,9 +54,6 @@ func main() {
 	r.HandleFunc("/api/sessions/{id}/activate", rest.ActiveSessionHandler)
 	r.HandleFunc("/api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
 
-	r.HandleFunc("/api/upload/{id}", rest.UploadHandler)
-
-
 	database.ConnectTodataBase()
 
 	port := getListeningPort()

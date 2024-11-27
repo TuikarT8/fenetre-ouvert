@@ -21,24 +21,24 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	params, err := pageQueryFromRequestQueryParams(r)
 	if err != nil {
-		w.Write([]byte("GetUserHandler ()=> Errors while gettig params"))
-		log.Print("GetUserHandler ()=> Errors while getting params", err)
+		w.Write([]byte("GetUserHandler () => Errors while gettig params"))
+		log.Print("GetUserHandler () => Errors while getting params", err)
 		return
 	}
 
 	Users, err := getUserInDb(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetUserHandler ()=> Errors while gettig good"))
-		log.Print("GetUserHandler ()=> Errors while getting good", err)
+		w.Write([]byte("GetUserHandler () => Errors while gettig good"))
+		log.Print("GetUserHandler () => Errors while getting good", err)
 		return
 	}
 
 	jsondata, err := json.Marshal(Users)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetUserHandler ()=> Errors while marsalling good"))
-		log.Print("GetUserHandler ()=> Errors while marshalling good", err)
+		w.Write([]byte("GetUserHandler () => Errors while marsalling good"))
+		log.Print("GetUserHandler () => Errors while marshalling good", err)
 		return
 	}
 	w.Write(jsondata)
@@ -52,8 +52,8 @@ func PostUserHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("postUserHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print("postUserHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte("postUserHandler () => Errors lors de la lecture du corps de la requette"))
+		log.Print("postUserHandler () => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -68,8 +68,8 @@ func PostUserHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = User.saveUserInDb()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("postUserHandler ()=> Errors while creating good"))
-		log.Print("postUserHandler ()=> Errors while creating good", err)
+		w.Write([]byte("postUserHandler () => Errors while creating good"))
+		log.Print("postUserHandler () => Errors while creating good", err)
 		return
 	}
 
@@ -105,8 +105,8 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(" UpdateUserHandler ()=> Errors lors de la lecture du corps de la requette"))
-		log.Print(" UpdateUserHandler ()=> Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte(" UpdateUserHandler () => Errors lors de la lecture du corps de la requette"))
+		log.Print(" UpdateUserHandler () => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
