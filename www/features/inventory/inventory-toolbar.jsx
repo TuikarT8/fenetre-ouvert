@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Toolbar, ToolbarButton, Tooltip } from '@fluentui/react-components';
 import { GoodCreationDialog } from '../../common/dialogs/good-creation.dialog';
 import { AddFilled, ArrowUploadFilled } from '@fluentui/react-icons';
+import { useFileUploader } from './use-file-uploader';
 
 export const InventoryToolbar = () => {
 	const [isCreateGoodDialogOpen, setIsCreateGoodDialogOpen] = useState(false);
 	const fileInputRef = useRef(null);
+	const { onFileUpload } = useFileUploader();
 
 	function handleFileUploadClick() {
 		fileInputRef.current?.click();
@@ -48,7 +50,10 @@ export const InventoryToolbar = () => {
 			<input
 				ref={fileInputRef}
 				type="file"
-				style={{ visibility: 'invisible', width: 0, height: 0 }}></input>
+				accept=".json,.csv,.xml"
+				style={{ visibility: 'invisible', width: 0, height: 0 }}
+				onChange={onFileUpload}
+			/>
 		</div>
 	);
 };
