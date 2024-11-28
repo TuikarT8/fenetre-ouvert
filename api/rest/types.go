@@ -107,3 +107,7 @@ func ConvertStringToPrimitiveOBjectId(id string) (primitive.ObjectID, error) {
 
 	return hexId, nil
 }
+
+func (good *FormularyGood) ToGood() Good {
+	return good.Good
+}

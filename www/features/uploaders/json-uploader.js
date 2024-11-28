@@ -3,6 +3,7 @@ import { Uploader } from './uploader';
 export class JSONUploader extends Uploader {
 	convert() {
 		return this.readFile().then((content) => {
+			console.log(content);
 			this.data = JSON.parse(content);
 		});
 	}
@@ -24,3 +25,6 @@ export class JSONUploader extends Uploader {
 		}
 	}
 }
+
+const up = new JSONUploader(null);
+up.upload();

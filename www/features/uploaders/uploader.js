@@ -22,7 +22,7 @@ export class Uploader {
 	async upload() {
 		await this.convert();
 		await this.validate();
-		await this.send();
+		return await this.send();
 	}
 
 	/**
@@ -34,12 +34,12 @@ export class Uploader {
 
 	send() {
 		if (this.data === null) {
-			Promise.resolve();
+			Promise.resolve(); 
 		}
 
 		return axios
-			.post('/api/goods', this.data, { headers: { 'Create-Mode': 'Many' } })
-			.then(() => {})
+			.post('/api/goods', this.data, { headers: { 'Create-Mode': 'many' } })
+			.then(({ data }) => data)
 			.catch((e) => {
 				console.error(e);
 			});
@@ -64,7 +64,7 @@ export class Uploader {
 
 			for (let i = 0; i < chunks; i++) {
 				const position = bufSize * i;
-				fileContent.push(buffer.subarray(position, bufSize).toString());
+				fileContent.push(buffer.subarray(position, bufSize));
 				buffer.subarray().progress = position;
 			}
 			this.#onProgress?.({ progress, max: progressMax });
@@ -75,7 +75,7 @@ export class Uploader {
 		return new Promise((resolve, reject) => {
 			reader.addEventListener('loadend', () => {
 				const results = fileContent.reduce((p, c) => p.set(c, p.length));
-				resolve(results.toString());
+				resolve(new TextDecoder().decode(results.buffer));
 			});
 
 			reader.addEventListener('error', () => {

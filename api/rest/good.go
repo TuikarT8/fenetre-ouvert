@@ -95,6 +95,7 @@ func handleCreateManyGoods(w http.ResponseWriter, r *http.Request) {
 	var goods []FormularyGood = make([]FormularyGood, 0)
 	err = json.Unmarshal(body, &goods)
 	if err != nil {
+		log.Printf("handleCreateManyGoods() Error while unmarshalling payload for creating many goods, err=[%v]", err)
 		handleUnmarshallingError(err.Error(), w)
 		return
 	}
@@ -123,10 +124,11 @@ func createManyGoods(goods []FormularyGood) ([]FormularyGood, error) {
 		activeSessionId = session.Id
 	}
 
-	for _, good := range goods {
+	for _, _good := range goods {
+		good := _good.ToGood()
 		good.Changes = make([]GoodChange, 0)
 		good.Changes = append(good.Changes, GoodChange{
-			Condition:  good.Condition,
+			Condition:  _good.Condition,
 			SaleValue:  good.PurchaseValue,
 			SessionId:  activeSessionId,
 			Reason:     GoodChangeReason_Created,
@@ -331,8 +333,8 @@ func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleUnmarshallingError(err string, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusBadRequest)
-	w.Write([]byte("Errors lors de l'unmarshalisation du corps de la requette"))
-	log.Print("Errors lors de l'unmarshalisation  du corps de la requette", err)
+	w.Write([]byte("Erreur lors de  la conversion du corps de la requette"))
+	log.Print("Erreur lors de  la conversion  du corps de la requette", err)
 }
 
 func deleteGoodChange(goodId string, idSession string) error {
