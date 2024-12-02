@@ -8,10 +8,10 @@ export function useFileUploader() {
 	const { addGoods, addGood } = useInventory();
 	const [file, setFile] = useState(null);
 	const uploader = useMemo(() => {
-        if (!file) {
-            return null;
-        }
-        
+		if (!file) {
+			return null;
+		}
+
 		const fileNameLower = file.name.toLowerCase();
 		if (fileNameLower.includes('.json')) {
 			return new JSONUploader(file);
@@ -27,7 +27,7 @@ export function useFileUploader() {
 	useEffect(() => {
 		uploader?.upload().then((goods) => {
 			if (goods.length) {
-				addGoods(goods); 
+				addGoods(goods);
 			} else {
 				addGood(goods);
 			}

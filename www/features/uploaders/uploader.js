@@ -30,7 +30,7 @@ export class Uploader {
 
 	send() {
 		if (this.data === null) {
-			Promise.resolve(); 
+			Promise.resolve();
 		}
 
 		return axios
@@ -80,7 +80,7 @@ export class Uploader {
 		});
 	}
 
-    validate() {
+	validate() {
 		if (
 			!this.data.every((obj) => {
 				const keys = Object.keys(obj);
