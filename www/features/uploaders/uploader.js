@@ -15,10 +15,6 @@ export class Uploader {
 		this.#onProgress = onProgress;
 	}
 
-	validate() {
-		throw new Error('Not implemented');
-	}
-
 	async upload() {
 		await this.convert();
 		await this.validate();
@@ -82,5 +78,23 @@ export class Uploader {
 				reject('Error while reading file');
 			});
 		});
+	}
+
+    validate() {
+		if (
+			!this.data.every((obj) => {
+				const keys = Object.keys(obj);
+				return (
+					keys.includes('name') &&
+					keys.includes('count') &&
+					keys.includes('purchaseValue')
+				);
+			})
+		) {
+			console.log(this.data);
+			throw new Error(
+				'Les données du fichier ne correspondent pas au format indiqué',
+			);
+		}
 	}
 }

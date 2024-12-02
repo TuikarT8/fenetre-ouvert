@@ -24,7 +24,7 @@ const columns = [
 	{ columnKey: 'condition', label: 'Condition' },
 	{ columnKey: 'quantity', label: 'Quantité' },
 	{ columnKey: 'value', label: 'Valeur' },
-	{ columnKey: 'Actions', label: 'action' },
+	{ columnKey: 'Actions', label: 'Actions' },
 ];
 
 function capitalizeFirstLetter(elem) {

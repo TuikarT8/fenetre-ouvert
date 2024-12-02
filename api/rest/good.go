@@ -134,7 +134,7 @@ func createManyGoods(goods []FormularyGood) ([]FormularyGood, error) {
 			Reason:     GoodChangeReason_Created,
 			At:         time.Now(),
 			CountDelta: good.Count,
-			Deleted:    false,
+			Deleted:    _good.Deleted,
 		})
 		inserts = append(inserts, good)
 	}

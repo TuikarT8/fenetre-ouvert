@@ -31,7 +31,18 @@ const config = {
         ],
     },
     resolve: {
-        extensions: ['.js', '.jsx']
+        extensions: ['.js', '.jsx'],
+        fallback: {
+            "fs": false,
+            "tls": false,
+            "net": false,
+            "path": false,
+            "zlib": false,
+            "http": false,
+            "https": false,
+            "crypto": false,
+            "stream": require.resolve("stream-browserify"),
+          } 
     },
     plugins: [
         new HotModuleReplacementPlugin(),

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { JSONUploader } from '../uploaders';
 import { useInventory } from '../../provider';
+import { XMLUploader } from '../uploaders/xml-uploader';
+import { CSVUploader } from '../uploaders/csv-uploader';
 
 export function useFileUploader() {
 	const { addGoods, addGood } = useInventory();
@@ -14,9 +16,9 @@ export function useFileUploader() {
 		if (fileNameLower.includes('.json')) {
 			return new JSONUploader(file);
 		} else if (fileNameLower.includes('.xml')) {
-			return null;
+			return new XMLUploader(file);
 		} else if (fileNameLower.includes('.csv')) {
-			return null;
+			return new CSVUploader(file);
 		}
 
 		return null;

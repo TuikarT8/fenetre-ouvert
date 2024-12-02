@@ -14,6 +14,13 @@ const (
 	GoodChangeReason_Deleted  = "deleted"
 )
 
+const (
+	GoodCondition_Bien        = "bien"
+	GoodCondition_Excellent   = "excellent"
+	GoodCondition_Mauvais     = "mauvais"
+	GoodCondition_TresMauvais = "tres-mauvais"
+)
+
 type User struct {
 	Id           interface{}    `bson:"_id,omitempty" json:"id"`
 	FirstName    string         `bson:"fistname,omitempty" json:"firstname"`
