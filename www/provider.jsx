@@ -9,7 +9,7 @@ const pageSize = 10;
 export function InventoryProvider({ children }) {
 	const [goods, setGoods] = useState([]);
 	const [sessions, setSessions] = useState([]);
-	const [activeSession, setActiveSession] = useState([]);
+	const [activeSession, setActiveSession] = useState();
 
 	function addGood(good) {
 		setGoods([...goods, good]);
@@ -43,7 +43,7 @@ export function InventoryProvider({ children }) {
 	}, []);
 
 	return (
-		<Context
+		<Context.Provider
 			value={{
 				goods,
 				sessions,
@@ -59,7 +59,7 @@ export function InventoryProvider({ children }) {
 				addSession,
 			}}>
 			{children}
-		</Context>
+		</Context.Provider>
 	);
 }
 

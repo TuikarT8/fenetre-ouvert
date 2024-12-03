@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HistoryFilled, LauncherSettingsRegular } from '@fluentui/react-icons';
 import { makeStyles, Toolbar, ToolbarButton } from '@fluentui/react-components';
-import { CreateMenuButton } from './create.menu';
+import { CreateMenuButton } from './create-menu';
 import { GoodCreationDialog } from './dialogs/good-creation.dialog';
 import { SessionCreationDialog } from './dialogs/session-creation-dialog';
 

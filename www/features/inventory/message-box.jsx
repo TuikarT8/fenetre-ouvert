@@ -9,6 +9,7 @@ import {
 	Link,
 	makeStyles,
 } from '@fluentui/react-components';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles({
 	main: {
@@ -18,14 +19,23 @@ const useStyles = makeStyles({
 	},
 });
 
-export function InventoryMessageBox() {
+export function InventoryMessageBox({ onShowGoods, count }) {
 	const styles = useStyles();
+
 	return (
 		<MessageBar className={styles.main}>
 			<MessageBarBody>
 				<MessageBarTitle>Biens non inclus</MessageBarTitle>
-				Il y a <Link>{'123'}</Link> biens issus {"d'inventaires"} précédents non
-				encore inclus dans cet inventaire.
+				Il y a{' '}
+				<Link
+					to="/message"
+					onClick={() => {
+						onShowGoods();
+					}}>
+					{count}
+				</Link>{' '}
+				biens issus {"d'inventaires"} précédents non encore inclus dans cet
+				inventaire.
 			</MessageBarBody>
 			<MessageBarActions
 				containerAction={
@@ -34,10 +44,12 @@ export function InventoryMessageBox() {
 						appearance="transparent"
 						icon={<DismissRegular />}
 					/>
-				}>
-				<Button>Action</Button>
-				<Button>Action</Button>
-			</MessageBarActions>
+				}></MessageBarActions>
 		</MessageBar>
 	);
 }
+
+InventoryMessageBox.propTypes = {
+	onShowGoods: PropTypes.func.isRequired,
+	count: PropTypes.number.isRequired,
+};

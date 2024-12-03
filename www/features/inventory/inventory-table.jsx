@@ -17,6 +17,11 @@ import _ from 'lodash';
 import { useParams } from 'react-router-dom';
 import { InventoryDrawer } from './inventory-drawer';
 import { ConfimationDialog } from '../../common/dialogs/confimation-dialog';
+import { InventoryMessageBox } from './message-box';
+import { InventoryToolbar } from './inventory-toolbar';
+import { GoodsNotInSessionDrawer } from './missing-good-product';
+import { capitalizeFirstLetter, convertStringToDate } from '../../common';
+import { useInventory } from '../../provider';
 
 const columns = [
 	{ columnKey: 'good', label: 'Bien' },
@@ -27,34 +32,18 @@ const columns = [
 	{ columnKey: 'Actions', label: 'Actions' },
 ];
 
-function capitalizeFirstLetter(elem) {
-	if (elem == undefined || elem == null) {
-		return;
-	} else {
-		return elem.charAt(0).toUpperCase() + elem.slice(1);
-	}
-}
-
-function convertStringToDate(dateString) {
-	if (dateString === undefined || dateString === null) {
-		return '';
-	}
-
-	const date = new Date(dateString);
-	return date.toDateString();
-}
-
 export const InventoryTable = () => {
+	const { setActiveSession, session } = useInventory();
 	const [isGoodDrawerOpen, setIsGoodDrawerOpen] = useState(false);
+	const [isGoodsNotInSessionDrawerOpen, setIsGoodsNotInSessionDrawerOpen] =
+		useState(false);
 	const [isDisabled, setIsDisabled] = useState(false);
 	const [selectedGood, setSelectedGood] = useState(null);
 	const [goodToDelete, setGoodToDelete] = useState(null);
-	const [sessionId, setSessionId] = useState('');
 	const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
 	});
-	const [goods, setGoods] = useState([]);
 	const { inventoryId } = useParams();
 
 	useEffect(() => {
@@ -63,10 +52,7 @@ export const InventoryTable = () => {
 		axios
 			.get(`/api/sessions/${inventoryId}/goods`)
 			.then(({ data }) => {
-				setGoods(data.goods);
-				if (data.goods.length) {
-					setSessionId(data.sessionId);
-				}
+				setActiveSession(data);
 			})
 			.catch((e) => {
 				console.error(e);
@@ -75,9 +61,13 @@ export const InventoryTable = () => {
 
 	const handleDeleteGood = () => {
 		axios
-			.delete(`/api/goods/${goodToDelete.id}/changes/${sessionId}`)
+			.delete(`/api/goods/${goodToDelete.id}/changes/${session?.sessionId}`)
 			.then(function () {
 				setGoodToDelete(undefined);
+				setActiveSession({
+					...session,
+					goods: (session.goods || []).filter(g => g.id !== goodToDelete.id),
+				});
 			})
 			.catch((e) => {
 				console.error(e);
@@ -86,6 +76,11 @@ export const InventoryTable = () => {
 
 	return (
 		<div>
+			<InventoryMessageBox
+				count={session?.goodsNotInSession?.length || 0}
+				onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
+			/>
+			<InventoryToolbar />
 			<Table
 				{...keyboardNavAttr}
 				role="grid"
@@ -101,7 +96,7 @@ export const InventoryTable = () => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{goods.map((item) => {
+					{(session?.goods || []).map((item) => {
 						const change = _.last(item.changes);
 						return (
 							<TableRow key={item.id}>
@@ -172,12 +167,17 @@ export const InventoryTable = () => {
 				/>
 			)}
 
-			<InventoryDrawer
+			{!!session && <InventoryDrawer
 				isOpen={isGoodDrawerOpen}
 				selectedGood={selectedGood}
 				isDisabled={isDisabled}
 				onClose={() => setIsGoodDrawerOpen(false)}
-				sessionId={sessionId}
+				sessionId={session.id}
+			/>}
+
+			<GoodsNotInSessionDrawer
+				open={isGoodsNotInSessionDrawerOpen}
+				onClose={() => setIsGoodsNotInSessionDrawerOpen(false)}
 			/>
 		</div>
 	);

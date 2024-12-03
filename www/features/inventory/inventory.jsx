@@ -1,14 +1,11 @@
 import React from 'react';
 import { InventoryTable } from './inventory-table';
-import { InventoryToolbar } from './inventory-toolbar';
-import { InventoryMessageBox } from './message-box';
+import { Title3 } from '@fluentui/react-components';
 
 export function Inventory() {
 	return (
 		<div>
-			<h1>{"Table d'inventaire"}</h1>
-			<InventoryMessageBox />
-			<InventoryToolbar />
+			<Title3>{"Table d'inventaire"}</Title3>
 			<InventoryTable />
 		</div>
 	);

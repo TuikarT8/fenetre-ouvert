@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	DrawerBody,
 	DrawerHeader,
@@ -7,8 +7,26 @@ import {
 	Button,
 	makeStyles,
 	useRestoreFocusSource,
+	TableRow,
+	TableCell,
+	TableCellLayout,
 } from '@fluentui/react-components';
-import { Dismiss24Regular } from '@fluentui/react-icons';
+import {
+	AddFilled,
+	Dismiss24Regular,
+	EditRegular,
+} from '@fluentui/react-icons';
+import PropTypes from 'prop-types';
+import { PreviousSessionGoodDeleteConfirmationPopover } from './delete-popOver';
+import { useInventory } from '../../provider';
+
+function capitalizeFirstLetter(elem) {
+	if (elem == undefined || elem == null) {
+		return;
+	} else {
+		return elem.charAt(0).toUpperCase() + elem.slice(1);
+	}
+}
 
 const useStyles = makeStyles({
 	root: {
@@ -19,21 +37,35 @@ const useStyles = makeStyles({
 		height: '480px',
 		backgroundColor: '#fff',
 	},
+
+	button: {
+		margin: '8px',
+	},
 });
 
-export function MissingGoodProduct() {
+export function GoodsNotInSessionDrawer({ open, onClose }) {
+	const { session } = useInventory();
 	const styles = useStyles();
-	const [isOpen, setIsOpen] = React.useState(false);
-
 	const restoreFocusSourceAttributes = useRestoreFocusSource();
+	const [goods, setGoods] = useState([]);
+
+	useEffect(() => {
+		if (session?.goodsNotInSession) {
+			setGoods(session.goodsNotInSession);
+		}
+	}, [JSON.stringify(session?.goodsNotInSession)]);
 
 	return (
 		<div className={styles.root}>
 			<Drawer
 				{...restoreFocusSourceAttributes}
 				separator
-				open={isOpen}
-				onOpenChange={(_, { open }) => setIsOpen(open)}>
+				size={'medium'}
+				position={'end'}
+				open={open}
+				onOpenChange={(_, { open }) => {
+					if (!open) onClose();
+				}}>
 				<DrawerHeader>
 					<DrawerHeaderTitle
 						action={
@@ -41,7 +73,7 @@ export function MissingGoodProduct() {
 								appearance="subtle"
 								aria-label="Close"
 								icon={<Dismiss24Regular />}
-								onClick={() => setIsOpen(false)}
+								onClick={() => onClose()}
 							/>
 						}>
 						Missing Goods Product
@@ -49,9 +81,34 @@ export function MissingGoodProduct() {
 				</DrawerHeader>
 
 				<DrawerBody>
-					<p>Drawer content</p>
+					{(goods || []).map((item) => {
+						return (
+							<TableRow key={item.id}>
+								<TableCell>
+									<TableCellLayout>
+										{capitalizeFirstLetter(item.name)}
+									</TableCellLayout>
+								</TableCell>
+								<TableCell>
+									<TableCellLayout key={item.id}></TableCellLayout>
+								</TableCell>
+								<TableCell role="gridcell" tabIndex={0}>
+									<TableCellLayout>
+										<PreviousSessionGoodDeleteConfirmationPopover />
+										<Button icon={<EditRegular />} aria-label="Modifier" />
+										<Button icon={<AddFilled />} aria-label="Ajouter" />
+									</TableCellLayout>
+								</TableCell>
+							</TableRow>
+						);
+					})}
 				</DrawerBody>
 			</Drawer>
 		</div>
 	);
 }
+
+GoodsNotInSessionDrawer.propTypes = {
+	open: PropTypes.bool.isRequired,
+	onClose: PropTypes.func.isRequired,
+};
