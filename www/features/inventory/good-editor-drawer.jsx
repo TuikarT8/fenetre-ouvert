@@ -45,7 +45,7 @@ function capitalizeFirstLetter(elem) {
 	}
 }
 
-export const InventoryDrawer = ({
+export const GoodEditorDrawer = ({
 	isOpen,
 	selectedGood,
 	onClose,
@@ -224,10 +224,9 @@ export const InventoryDrawer = ({
 	);
 };
 
-InventoryDrawer.propTypes = {
+GoodEditorDrawer.propTypes = {
 	isOpen: PropTypes.bool.isRequired,
 	isDisabled: PropTypes.bool.isRequired,
-
 	selectedGood: PropTypes.object,
 	onClose: PropTypes.func.isRequired,
 	sessionId: PropTypes.string,

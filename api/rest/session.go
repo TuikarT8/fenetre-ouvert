@@ -185,7 +185,22 @@ func (session *Session) saveSessionInDb() (string, error) {
 
 func getGoodsMatchingSession(sessionId string) (SessionGoodsLookupResponse, error) {
 	if sessionId == "active" {
-		return getGoodsMatchingActiveSession()
+		session, err := findActiveSession()
+		if err != nil {
+			return SessionGoodsLookupResponse{}, err
+		}
+
+		response, err := getGoodsMatchingActiveSession()
+		if err != nil {
+			return SessionGoodsLookupResponse{}, err
+		}
+
+		response.GoodsNotInSession, err = findGoodsNotInActiveSession(session)
+		if err != nil {
+			return SessionGoodsLookupResponse{}, err
+		}
+
+		return response, nil
 	}
 
 	return getGoodsMatchingAnySession(sessionId)
@@ -237,6 +252,7 @@ func getGoodsMatchingActiveSession() (SessionGoodsLookupResponse, error) {
 			},
 		}},
 	})
+
 	if err != nil {
 		return response, err
 	}
@@ -249,6 +265,24 @@ func getGoodsMatchingActiveSession() (SessionGoodsLookupResponse, error) {
 		return sessions[0], nil
 	}
 	return response, nil
+}
+
+func findGoodsNotInActiveSession(activeSession Session) ([]Good, error) {
+	goods := make([]Good, 0)
+	cursor, err := database.Goods.Find(database.Ctx, bson.M{
+		"deleted":         false,
+		"changes.session": bson.M{"$ne": activeSession.Id},
+	})
+
+	if err != nil {
+		return goods, err
+	}
+
+	if err = cursor.All(database.Ctx, &goods); err != nil {
+		return goods, err
+	}
+
+	return goods, nil
 }
 
 func getSessionsFromDB(pagination PageQueryParams) ([]Session, error) {

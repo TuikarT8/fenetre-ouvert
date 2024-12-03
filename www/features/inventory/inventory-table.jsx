@@ -15,7 +15,7 @@ import {
 import axios from 'axios';
 import _ from 'lodash';
 import { useParams } from 'react-router-dom';
-import { InventoryDrawer } from './inventory-drawer';
+import { GoodEditorDrawer } from './good-editor-drawer';
 import { ConfimationDialog } from '../../common/dialogs/confimation-dialog';
 import { InventoryMessageBox } from './message-box';
 import { InventoryToolbar } from './inventory-toolbar';
@@ -34,7 +34,6 @@ const columns = [
 
 export const InventoryTable = () => {
 	const { setActiveSession, session } = useInventory();
-	const [isGoodDrawerOpen, setIsGoodDrawerOpen] = useState(false);
 	const [isGoodsNotInSessionDrawerOpen, setIsGoodsNotInSessionDrawerOpen] =
 		useState(false);
 	const [isDisabled, setIsDisabled] = useState(false);
@@ -103,7 +102,6 @@ export const InventoryTable = () => {
 								<TableCell>
 									<TableCellLayout
 										onClick={() => {
-											setIsGoodDrawerOpen(true);
 											setSelectedGood(item);
 											setIsDisabled(true);
 										}}>
@@ -133,7 +131,6 @@ export const InventoryTable = () => {
 											icon={<EditRegular />}
 											aria-label="Edit"
 											onClick={() => {
-												setIsGoodDrawerOpen(true);
 												setSelectedGood(item);
 												setIsDisabled(false);
 											}}
@@ -167,12 +164,12 @@ export const InventoryTable = () => {
 				/>
 			)}
 
-			{!!session && <InventoryDrawer
-				isOpen={isGoodDrawerOpen}
+			{!!selectedGood && <GoodEditorDrawer
+				isOpen={!!selectedGood}
 				selectedGood={selectedGood}
 				isDisabled={isDisabled}
-				onClose={() => setIsGoodDrawerOpen(false)}
-				sessionId={session.id}
+				onClose={() => setSelectedGood()}
+				sessionId={session?.id}
 			/>}
 
 			<GoodsNotInSessionDrawer
