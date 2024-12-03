@@ -1,11 +1,8 @@
 import * as React from 'react';
-import { DismissRegular } from '@fluentui/react-icons';
 import {
 	MessageBar,
-	MessageBarActions,
 	MessageBarTitle,
 	MessageBarBody,
-	Button,
 	Link,
 	makeStyles,
 } from '@fluentui/react-components';
@@ -37,14 +34,6 @@ export function InventoryMessageBox({ onShowGoods, count }) {
 				biens issus {"d'inventaires"} précédents non encore inclus dans cet
 				inventaire.
 			</MessageBarBody>
-			<MessageBarActions
-				containerAction={
-					<Button
-						aria-label="dismiss"
-						appearance="transparent"
-						icon={<DismissRegular />}
-					/>
-				}></MessageBarActions>
 		</MessageBar>
 	);
 }

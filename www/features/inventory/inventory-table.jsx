@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { EditRegular, DeleteRegular } from '@fluentui/react-icons';
+import { EditRegular, DeleteRegular, AddFilled } from '@fluentui/react-icons';
 import {
 	TableBody,
 	TableCell,
@@ -11,6 +11,9 @@ import {
 	Button,
 	useArrowNavigationGroup,
 	useFocusableGroup,
+	makeStyles,
+	themeToTokensObject,
+	webLightTheme,
 } from '@fluentui/react-components';
 import axios from 'axios';
 import _ from 'lodash';
@@ -32,7 +35,15 @@ const columns = [
 	{ columnKey: 'Actions', label: 'Actions' },
 ];
 
+const tokens = themeToTokensObject(webLightTheme);
+const useStyles = makeStyles({
+	foreignRow: {
+		color: tokens.colorStatusWarningForeground3
+	},
+});
+
 export const InventoryTable = () => {
+	const styles = useStyles()
 	const { setActiveSession, session } = useInventory();
 	const [isGoodsNotInSessionDrawerOpen, setIsGoodsNotInSessionDrawerOpen] =
 		useState(false);
@@ -65,7 +76,7 @@ export const InventoryTable = () => {
 				setGoodToDelete(undefined);
 				setActiveSession({
 					...session,
-					goods: (session.goods || []).filter(g => g.id !== goodToDelete.id),
+					goods: (session.goods || []).filter((g) => g.id !== goodToDelete.id),
 				});
 			})
 			.catch((e) => {
@@ -147,6 +158,62 @@ export const InventoryTable = () => {
 							</TableRow>
 						);
 					})}
+					
+					{(session?.goodsNotInSession || []).map((item) => {
+						return (
+							<TableRow key={item.id} className= {styles.foreignRow}>
+								<TableCell>
+									<TableCellLayout
+										onClick={() => {
+											setSelectedGood(item);
+											setIsDisabled(true);
+										}}>
+										{capitalizeFirstLetter(item.name)}
+									</TableCellLayout>
+								</TableCell>
+								<TableCell>
+									<TableCellLayout key={item.id}>
+										{}
+									</TableCellLayout>
+								</TableCell>
+								<TableCell>
+									<TableCellLayout>
+										{}
+									</TableCellLayout>
+								</TableCell>
+								<TableCell>
+									<TableCellLayout>{item.count}</TableCellLayout>
+								</TableCell>
+
+								<TableCell>
+									<TableCellLayout>{}</TableCellLayout>
+								</TableCell>
+								<TableCell role="gridcell" tabIndex={0} {...focusableGroupAttr}>
+									<TableCellLayout>
+										<Button
+											icon={<EditRegular />}
+											aria-label="Edit"
+											onClick={() => {
+												setSelectedGood(item);
+												setIsDisabled(false);
+											}}
+										/>
+										<Button
+											icon={<DeleteRegular />}
+											aria-label="Delete"
+											onClick={() => {
+												setGoodToDelete(item);
+											}}
+										/>
+										<Button
+											icon={<AddFilled />}
+											aria-label="Add"
+										/>
+									</TableCellLayout>
+								</TableCell>
+							</TableRow>	
+						)
+					})}
 				</TableBody>
 			</Table>
 
@@ -164,13 +231,15 @@ export const InventoryTable = () => {
 				/>
 			)}
 
-			{!!selectedGood && <GoodEditorDrawer
-				isOpen={!!selectedGood}
-				selectedGood={selectedGood}
-				isDisabled={isDisabled}
-				onClose={() => setSelectedGood()}
-				sessionId={session?.id}
-			/>}
+			{!!selectedGood && (
+				<GoodEditorDrawer
+					isOpen={!!selectedGood}
+					selectedGood={selectedGood}
+					isDisabled={isDisabled}
+					onClose={() => setSelectedGood()}
+					sessionId={session?.id}
+				/>
+			)}
 
 			<GoodsNotInSessionDrawer
 				open={isGoodsNotInSessionDrawerOpen}
