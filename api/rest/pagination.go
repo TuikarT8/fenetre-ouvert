@@ -4,36 +4,32 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 type PageQueryParams struct {
-	startAt int64
-	count   int64
+	skip  int64
+	count int64
 }
 
 func pageQueryFromRequestQueryParams(r *http.Request) (PageQueryParams, error) {
-	params := mux.Vars(r)
+	skip := r.URL.Query().Get("skip")
+	count := r.URL.Query().Get("count")
 
-	startAt := params["startAt"]
-	count := params["count"]
-
-	if startAt == "" {
-		startAt = "0"
+	if skip == "" {
+		skip = "0"
 	}
 
 	if count == "" {
 		count = "250"
 	}
 
-	return paramsToQueryParams(startAt, count)
+	return paramsToQueryParams(skip, count)
 }
 
-func paramsToQueryParams(startAt string, count string) (PageQueryParams, error) {
+func paramsToQueryParams(skip string, count string) (PageQueryParams, error) {
 	var params PageQueryParams
 
-	startAtInt, err := strconv.Atoi(startAt)
+	skipInt, err := strconv.Atoi(skip)
 	if err != nil {
 		return params, err
 	}
@@ -43,12 +39,12 @@ func paramsToQueryParams(startAt string, count string) (PageQueryParams, error) 
 		return params, err
 	}
 
-	if countInt < 0 || startAtInt < 0 {
+	if countInt < 0 || skipInt < 0 {
 		return params, fmt.Errorf("pagination parameters cannot be negative")
 	}
 
 	params.count = int64(countInt)
-	params.startAt = int64(startAtInt)
+	params.skip = int64(skipInt)
 
 	return params, nil
 }

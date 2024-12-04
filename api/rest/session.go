@@ -270,7 +270,7 @@ func getGoodsMatchingActiveSession() (SessionGoodsLookupResponse, error) {
 func findGoodsNotInActiveSession(activeSession Session) ([]Good, error) {
 	goods := make([]Good, 0)
 	cursor, err := database.Goods.Find(database.Ctx, bson.M{
-		"deleted":         false,
+		"deleted":         bson.M{"$ne": true},
 		"changes.session": bson.M{"$ne": activeSession.Id},
 	})
 
@@ -288,7 +288,7 @@ func findGoodsNotInActiveSession(activeSession Session) ([]Good, error) {
 func getSessionsFromDB(pagination PageQueryParams) ([]Session, error) {
 	sessions := make([]Session, 0)
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
-	opts.Skip = &pagination.startAt
+	opts.Skip = &pagination.skip
 	opts.Limit = &pagination.count
 	result, err := database.Sessions.Find(database.Ctx, bson.M{}, opts)
 

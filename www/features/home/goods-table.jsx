@@ -72,7 +72,7 @@ export const GoodsTable = () => {
 				aria-label="Increase Font Size"
 				appearance="secondary"
 				icon={<CaretLeftFilled />}
-				onClick={advanceGoodsPage}
+				onClick={retrogradeGoodsPage}
 			/>
 			<ToolbarDivider />
 			<Caption1>
@@ -83,7 +83,7 @@ export const GoodsTable = () => {
 				aria-label="More"
 				appearance="secondary"
 				icon={<CaretRightFilled />}
-				onClick={retrogradeGoodsPage}
+				onClick={advanceGoodsPage}
 			/>
 		</Toolbar>
 	);

@@ -143,7 +143,7 @@ func (notification *Notification) saveNotificationInDb() (string, error) {
 func getNotificationInDb(pagination PageQueryParams) ([]Notification, error) {
 	nts := make([]Notification, 0)
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
-	opts.Skip = &pagination.startAt
+	opts.Skip = &pagination.skip
 	opts.Limit = &pagination.count
 	result, err := database.Notifications.Find(database.Ctx, bson.M{}, opts)
 

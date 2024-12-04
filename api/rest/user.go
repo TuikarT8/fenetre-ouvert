@@ -139,7 +139,7 @@ func (User *User) saveUserInDb() (string, error) {
 func getUserInDb(pagination PageQueryParams) ([]User, error) {
 	usrs := make([]User, 0)
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
-	opts.Skip = &pagination.startAt
+	opts.Skip = &pagination.skip
 	opts.Limit = &pagination.count
 	result, err := database.Users.Find(database.Ctx, bson.M{}, opts)
 

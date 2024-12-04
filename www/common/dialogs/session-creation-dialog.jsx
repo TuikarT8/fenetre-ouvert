@@ -35,7 +35,6 @@ export const SessionCreationDialog = (props) => {
 
 	const handleSubmitSessionForm = (event) => {
 		event.preventDefault();
-		console.log(event.target);
 		var session = {
 			startDate: new Date(event.target.date.value),
 			description: event.target.description.value,
@@ -43,9 +42,7 @@ export const SessionCreationDialog = (props) => {
 
 		axios
 			.post('/api/sessions', session)
-			.then(function (response) {
-				console.log(response.state);
-				console.log(response.data);
+			.then(function () {
 				props.onClose?.();
 			})
 			.catch((e) => {

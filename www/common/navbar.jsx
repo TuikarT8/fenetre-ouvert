@@ -30,14 +30,12 @@ export const Navbar = (props) => {
 	const onCreateMenuOptionSelected = (option) => {
 		if (option === 'good') {
 			setIsCreateGoodDialogOpen(true);
-			console.log('Opening the' + `${option}` + 'dialog');
 		}
 	};
 
 	const onCreateMenuSessionSelected = (option) => {
 		if (option === 'session') {
 			setIsCreateSessionDialogOpen(true);
-			console.log('Opening the' + `${option}` + 'dialog');
 		}
 	};
 

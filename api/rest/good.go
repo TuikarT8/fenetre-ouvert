@@ -186,7 +186,6 @@ func DeleteGoodHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	goodId := mux.Vars(r)["id"]
-
 	err := deleteGood(goodId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -407,7 +406,7 @@ func deleteGood(id string) error {
 
 	activeSession, err := findActiveSession()
 	if err != nil {
-		log.Printf("deleteGood(): Cannot find actie session")
+		log.Printf("deleteGood(): Cannot find active session")
 	} else {
 		operations = append(
 			operations,
@@ -431,7 +430,7 @@ func getGoods(pagination PageQueryParams) (GetGoodResponse, error) {
 		Total: 0,
 	}
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
-	opts.Skip = &pagination.startAt
+	opts.Skip = &pagination.skip
 	opts.Limit = &pagination.count
 	result, err := database.Goods.Find(database.Ctx, bson.M{"deleted": bson.M{"$ne": true}}, opts)
 

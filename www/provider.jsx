@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Context } from './context';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { uniqBy } from 'lodash';
+import { uniq, uniqBy } from 'lodash';
+import { hashGoods } from './common';
 
 const pageSize = 10;
 
@@ -15,8 +16,8 @@ export function InventoryProvider({ children }) {
 		setGoods([...goods, good]);
 	}
 
-	function addGoods(goods) {
-		setGoods(uniqBy([...goods, ...goods], (good) => good.id));
+	function addGoods(newGoods) {
+		setGoods(uniq([...goods, ...(newGoods || [])]));
 	}
 
 	function addSession(session) {
@@ -33,7 +34,7 @@ export function InventoryProvider({ children }) {
 
 	useEffect(() => {
 		axios
-			.get('/api/goods')
+			.get('/api/goods?skip=0&count=10')
 			.then(({ data }) => {
 				addGoods(data.goods);
 			})
@@ -81,37 +82,45 @@ export function useGoodsPagination() {
 	const [pageGoods, setPageGoods] = useState(goods.slice(0, pageSize - 1));
 
 	function advanceGoodsPage() {
-		if (pageIndex >= pagesCount) return;
-		setPageIndex(pageIndex + 1);
+		if (pageIndex >= (pagesCount - 1)) return;
 
-		if (pageIndex <= pagesCacheCounter) {
-			const startIndex = (pageIndex + 1) * pageSize;
-			setPageGoods(goods.slice(startIndex, startIndex + pageSize - 1));
+		const newPageIndex = pageIndex + 1;
+		setPageIndex(newPageIndex);
+		
+		if (newPageIndex > pagesCacheCounter) {
+			setPagesCacheCounter(newPageIndex);	
 		} else {
-			setPagesCacheCounter(pagesCacheCounter + 1);
+			const startIndex = newPageIndex * pageSize;
+			setPageGoods(goods.slice(startIndex, startIndex + pageSize - 1));
 		}
 	}
 
 	function retrogradeGoodsPage() {
 		if (pageIndex <= 0) return;
-		setPageIndex(pageIndex - 1);
+		
+		const newPageIndex = pageIndex - 1;
+		setPageIndex(newPageIndex);
 
-		const startIndex = pageIndex * pageSize;
+		const startIndex = newPageIndex * pageSize;
 		setPageGoods(goods.slice(startIndex, startIndex + pageSize - 1));
 	}
 
 	useEffect(() => {
 		axios
-			.get(`/api/goods?startAt=${(pageIndex + 1) * pageSize}&count=${pageSize}`)
+			.get(`/api/goods?skip=${pageIndex * pageSize}&count=${pageSize}`)
 			.then(({ data }) => {
 				addGoods(data.goods);
-				setPageGoods(data.goods);
 				setPagesCount(Math.ceil(data.total / pageSize));
 			})
 			.catch((e) => {
 				console.error(e);
 			});
 	}, [pagesCacheCounter]);
+
+	useEffect(() => {
+		const startIndex = pageIndex * pageSize;
+		setPageGoods(goods.slice(startIndex, startIndex + pageSize - 1));
+	}, [hashGoods(goods), pageIndex]);
 
 	return {
 		retrogradeGoodsPage,

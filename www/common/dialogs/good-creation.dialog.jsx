@@ -43,9 +43,7 @@ export const GoodCreationDialog = (props) => {
 
 		axios
 			.post('/api/goods', good)
-			.then(function (response) {
-				console.log(response.state);
-				console.log(response.data);
+			.then(function () {
 				props.onClose?.();
 			})
 			.catch((e) => {

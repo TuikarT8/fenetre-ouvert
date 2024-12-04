@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { EditRegular, DeleteRegular, AddFilled } from '@fluentui/react-icons';
+import { EditRegular, DeleteRegular, AddFilled, WarningFilled } from '@fluentui/react-icons';
 import {
 	TableBody,
 	TableCell,
@@ -14,6 +14,7 @@ import {
 	makeStyles,
 	themeToTokensObject,
 	webLightTheme,
+	Tooltip,
 } from '@fluentui/react-components';
 import axios from 'axios';
 import _ from 'lodash';
@@ -40,13 +41,18 @@ const useStyles = makeStyles({
 	foreignRow: {
 		color: tokens.colorStatusWarningForeground3
 	},
+	tableCell: {
+		display: "flex",
+		flexDirection:"row",
+		height: 'fit-content',
+		width: 'fit-content',
+	}
 });
 
 export const InventoryTable = () => {
 	const styles = useStyles()
 	const { setActiveSession, session } = useInventory();
-	const [isGoodsNotInSessionDrawerOpen, setIsGoodsNotInSessionDrawerOpen] =
-		useState(false);
+	const [isGoodsNotInSessionDrawerOpen, setIsGoodsNotInSessionDrawerOpen] = useState(false);
 	const [isDisabled, setIsDisabled] = useState(false);
 	const [selectedGood, setSelectedGood] = useState(null);
 	const [goodToDelete, setGoodToDelete] = useState(null);
@@ -77,6 +83,7 @@ export const InventoryTable = () => {
 				setActiveSession({
 					...session,
 					goods: (session.goods || []).filter((g) => g.id !== goodToDelete.id),
+					goodsNotInSession: (session.goodsNotInSession || []).filter((g) => g.id !== goodToDelete.id),
 				});
 			})
 			.catch((e) => {
@@ -160,25 +167,29 @@ export const InventoryTable = () => {
 					})}
 					
 					{(session?.goodsNotInSession || []).map((item) => {
+							const change = _.last(item.changes);
 						return (
 							<TableRow key={item.id} className= {styles.foreignRow}>
-								<TableCell>
-									<TableCellLayout
-										onClick={() => {
-											setSelectedGood(item);
-											setIsDisabled(true);
-										}}>
-										{capitalizeFirstLetter(item.name)}
-									</TableCellLayout>
-								</TableCell>
-								<TableCell>
+									<TableCell className={styles.tableCell}>
+										<TableCellLayout
+											onClick={() => {
+												setSelectedGood(item);
+												setIsDisabled(true);
+											}}>
+											<Tooltip  content="Ce bien n'est pas encore inclut dans la session active" relationship="label">
+												<WarningFilled color="" style={{margin:"5px"}}/>
+											</Tooltip>
+											{capitalizeFirstLetter(item.name)}
+										</TableCellLayout>
+									</TableCell>
+									<TableCell>
 									<TableCellLayout key={item.id}>
-										{}
+										{convertStringToDate(change?.time||null)}
 									</TableCellLayout>
 								</TableCell>
 								<TableCell>
 									<TableCellLayout>
-										{}
+										{capitalizeFirstLetter(change?.condition||null)}
 									</TableCellLayout>
 								</TableCell>
 								<TableCell>
@@ -186,7 +197,7 @@ export const InventoryTable = () => {
 								</TableCell>
 
 								<TableCell>
-									<TableCellLayout>{}</TableCellLayout>
+									<TableCellLayout>{change?.saleValue}</TableCellLayout>
 								</TableCell>
 								<TableCell role="gridcell" tabIndex={0} {...focusableGroupAttr}>
 									<TableCellLayout>

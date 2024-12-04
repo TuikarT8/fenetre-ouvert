@@ -91,7 +91,6 @@ export class Uploader {
 				);
 			})
 		) {
-			console.log(this.data);
 			throw new Error(
 				'Les données du fichier ne correspondent pas au format indiqué',
 			);
