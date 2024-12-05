@@ -1,4 +1,4 @@
-import { uniqueId } from "lodash";
+import { uniqueId } from 'lodash';
 
 export function convertStringToDate(dateString) {
 	if (dateString === undefined || dateString === null) {
@@ -22,14 +22,14 @@ export function hashGood(good) {
 }
 
 /**
- * 
- * @param {{id: string}[]} goods 
- * @returns 
+ *
+ * @param {{id: string}[]} goods
+ * @returns
  */
 export function hashGoods(goods) {
 	const _goods = goods?.length
 		? goods
-		: [{id: uniqueId('good')}, {id: uniqueId('good')}];
+		: [{ id: uniqueId('good') }, { id: uniqueId('good') }];
 
 	return _goods.map(({ id }) => id).reduce((p, c) => p.concat(c));
 }

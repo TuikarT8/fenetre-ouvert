@@ -82,13 +82,13 @@ export function useGoodsPagination() {
 	const [pageGoods, setPageGoods] = useState(goods.slice(0, pageSize - 1));
 
 	function advanceGoodsPage() {
-		if (pageIndex >= (pagesCount - 1)) return;
+		if (pageIndex >= pagesCount - 1) return;
 
 		const newPageIndex = pageIndex + 1;
 		setPageIndex(newPageIndex);
-		
+
 		if (newPageIndex > pagesCacheCounter) {
-			setPagesCacheCounter(newPageIndex);	
+			setPagesCacheCounter(newPageIndex);
 		} else {
 			const startIndex = newPageIndex * pageSize;
 			setPageGoods(goods.slice(startIndex, startIndex + pageSize - 1));
@@ -97,7 +97,7 @@ export function useGoodsPagination() {
 
 	function retrogradeGoodsPage() {
 		if (pageIndex <= 0) return;
-		
+
 		const newPageIndex = pageIndex - 1;
 		setPageIndex(newPageIndex);
 

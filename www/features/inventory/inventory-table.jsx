@@ -17,7 +17,7 @@ import {
 	Tooltip,
 } from '@fluentui/react-components';
 import axios from 'axios';
-import _ from 'lodash';
+import _, { cloneDeep } from 'lodash';
 import { useParams } from 'react-router-dom';
 import { GoodEditorDrawer } from './good-editor-drawer';
 import { ConfimationDialog } from '../../common/dialogs/confimation-dialog';
@@ -74,6 +74,19 @@ export const InventoryTable = () => {
 				console.error(e);
 			});
 	}, [inventoryId]);
+
+	const contactTheServerToCreateAnAssetInTheCurrentSession = (good, lastChange) => {
+		const change = cloneDeep(lastChange);
+		change.sessionId = session.id;
+
+		axios
+			.post(`/api/goods/${good.id}/changes`, change)
+			.then(() => {
+			})
+			.catch((e) => {
+				console.error(e);
+		});
+	}
 
 	const handleDeleteGood = () => {
 		axios
@@ -195,7 +208,6 @@ export const InventoryTable = () => {
 								<TableCell>
 									<TableCellLayout>{item.count}</TableCellLayout>
 								</TableCell>
-
 								<TableCell>
 									<TableCellLayout>{change?.saleValue}</TableCellLayout>
 								</TableCell>
@@ -219,6 +231,13 @@ export const InventoryTable = () => {
 										<Button
 											icon={<AddFilled />}
 											aria-label="Add"
+											onClick={() => {
+												if(!change) {
+													contactTheServerToCreateAnAssetInTheCurrentSession(item, change);
+												} else {
+													setSelectedGood(item)
+												}
+											}}
 										/>
 									</TableCellLayout>
 								</TableCell>
