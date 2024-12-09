@@ -20,7 +20,7 @@ export function InventoryMessageBox({ onShowGoods, count }) {
 	const styles = useStyles();
 
 	return (
-		<MessageBar className={styles.main} intent='warning'>
+		<MessageBar className={styles.main} intent="warning">
 			<MessageBarBody>
 				<MessageBarTitle>Biens non inclus</MessageBarTitle>
 				Il y a{' '}

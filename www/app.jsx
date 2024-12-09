@@ -12,8 +12,8 @@ export function App() {
 			<InventoryProvider>
 				<BrowserRouter>
 					<Routes>
-						<Route path="/" element={<Home />} />
-						<Route path="/inventories/:inventoryId" element={<Inventory />} />
+						<Route index path="/" element={<Home />} />
+						<Route path="/inventories/:inventoryId" element={<Inventory />}  />
 					</Routes>
 				</BrowserRouter>
 			</InventoryProvider>

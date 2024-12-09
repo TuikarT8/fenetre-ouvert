@@ -92,7 +92,13 @@ export const GoodEditorDrawer = ({
 			axios
 				.post(`/api/goods/${selectedGood.id}/changes`, goodChange)
 				.then(function () {
-					onClose?.({...selectedGood, changes: [...(selectedGood.changes || []), goodChange]}, true);
+					onClose?.(
+						{
+							...selectedGood,
+							changes: [...(selectedGood.changes || []), goodChange],
+						},
+						true,
+					);
 				})
 				.catch((e) => {
 					console.error(e);

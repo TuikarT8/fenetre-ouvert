@@ -97,7 +97,7 @@ export const InventoryTable = () => {
 		axios
 			.post(`/api/goods/${good.id}/changes`, change)
 			.then(() => {
-				moveGoodNotInSessionToGoodsInSession(good, change)
+				moveGoodNotInSessionToGoodsInSession(good, change);
 			})
 			.catch((e) => {
 				console.error(e);
@@ -105,7 +105,7 @@ export const InventoryTable = () => {
 	};
 
 	const moveGoodNotInSessionToGoodsInSession = (good, change) => {
-		const changesToAdd = change ? [change] : []
+		const changesToAdd = change ? [change] : [];
 		setActiveSession({
 			...session,
 			goods: [
@@ -125,8 +125,8 @@ export const InventoryTable = () => {
 			goodsNotInSession: (session.goodsNotInSession || []).filter(
 				(g) => g.id !== good.id,
 			),
-		})
-	}
+		});
+	};
 
 	const handleDeleteGood = () => {
 		axios
@@ -294,8 +294,11 @@ export const InventoryTable = () => {
 					})}
 				</TableBody>
 			</Table>
-	
-		<Caption2 className={styles.captionText} >{session?.goods?.length || 0} biens dans la session / {session?.goodsNotInSession?.length || 0} biens peuvent être ajoutés.</Caption2>
+
+			<Caption2 className={styles.captionText}>
+				{session?.goods?.length || 0} biens dans la session /{' '}
+				{session?.goodsNotInSession?.length || 0} biens peuvent être ajoutés.
+			</Caption2>
 
 			{!!goodToDelete && (
 				<ConfimationDialog
@@ -318,21 +321,23 @@ export const InventoryTable = () => {
 					isDisabled={isDisabled}
 					onClose={(good, move) => {
 						if (move) {
-							moveGoodNotInSessionToGoodsInSession({...selectedGood, ...good});
+							moveGoodNotInSessionToGoodsInSession({
+								...selectedGood,
+								...good,
+							});
 						}
-						
+
 						setSelectedGood();
 					}}
 					sessionId={session?.id}
 				/>
 			)}
-		{!!isGoodsNotInSessionDrawerOpen && 
-			<GoodsNotInSessionDrawer
-			open={isGoodsNotInSessionDrawerOpen}
-			onClose={() => setIsGoodsNotInSessionDrawerOpen(false)}
-		/>
-		}
-			
+			{!!isGoodsNotInSessionDrawerOpen && (
+				<GoodsNotInSessionDrawer
+					open={isGoodsNotInSessionDrawerOpen}
+					onClose={() => setIsGoodsNotInSessionDrawerOpen(false)}
+				/>
+			)}
 		</div>
 	);
 };

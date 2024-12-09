@@ -1,12 +1,26 @@
 import React from 'react';
 import { InventoryTable } from './inventory-table';
-import { Title3 } from '@fluentui/react-components';
+
+import {
+	Breadcrumb,
+	BreadcrumbButton,
+	BreadcrumbDivider,
+	BreadcrumbItem,
+} from '@fluentui/react-components';
 
 export function Inventory() {
 	return (
 		<div>
-			<Title3>{"Table d'inventaire"}</Title3>
-			<InventoryTable />
+			<Breadcrumb aria-label="Breadcrumb default example">
+				<BreadcrumbItem>
+					<BreadcrumbButton href={'/'}>{'Accueil'}</BreadcrumbButton>
+				</BreadcrumbItem>
+				<BreadcrumbDivider />
+				<BreadcrumbItem>
+					<BreadcrumbButton>{"Table d'inventaire"}</BreadcrumbButton>
+				</BreadcrumbItem>
+			</Breadcrumb>
+			<InventoryTable/>
 		</div>
 	);
 }
