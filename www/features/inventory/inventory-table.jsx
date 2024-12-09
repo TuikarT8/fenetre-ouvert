@@ -20,6 +20,7 @@ import {
 	themeToTokensObject,
 	webLightTheme,
 	Tooltip,
+	Caption2,
 } from '@fluentui/react-components';
 import axios from 'axios';
 import _, { cloneDeep } from 'lodash';
@@ -46,6 +47,11 @@ const useStyles = makeStyles({
 	foreignRow: {
 		color: tokens.colorStatusWarningForeground3,
 	},
+
+	captionText: {
+		color: tokens.colorPaletteBeigeBorderActive,
+	},
+
 	tableCell: {
 		display: 'flex',
 		flexDirection: 'row',
@@ -140,7 +146,6 @@ export const InventoryTable = () => {
 			});
 	};
 
-	console.log('Session is ', session);
 	return (
 		<div>
 			<InventoryMessageBox
@@ -289,6 +294,8 @@ export const InventoryTable = () => {
 					})}
 				</TableBody>
 			</Table>
+	
+		<Caption2 className={styles.captionText} >{session?.goods?.length || 0} biens dans la session / {session?.goodsNotInSession?.length || 0} biens peuvent être ajoutés.</Caption2>
 
 			{!!goodToDelete && (
 				<ConfimationDialog
@@ -319,11 +326,13 @@ export const InventoryTable = () => {
 					sessionId={session?.id}
 				/>
 			)}
-
+		{!!isGoodsNotInSessionDrawerOpen && 
 			<GoodsNotInSessionDrawer
-				open={isGoodsNotInSessionDrawerOpen}
-				onClose={() => setIsGoodsNotInSessionDrawerOpen(false)}
-			/>
+			open={isGoodsNotInSessionDrawerOpen}
+			onClose={() => setIsGoodsNotInSessionDrawerOpen(false)}
+		/>
+		}
+			
 		</div>
 	);
 };
