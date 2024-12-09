@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { EditRegular, DeleteRegular, AddFilled, WarningFilled } from '@fluentui/react-icons';
+import {
+	EditRegular,
+	DeleteRegular,
+	AddFilled,
+	WarningFilled,
+} from '@fluentui/react-icons';
 import {
 	TableBody,
 	TableCell,
@@ -39,20 +44,21 @@ const columns = [
 const tokens = themeToTokensObject(webLightTheme);
 const useStyles = makeStyles({
 	foreignRow: {
-		color: tokens.colorStatusWarningForeground3
+		color: tokens.colorStatusWarningForeground3,
 	},
 	tableCell: {
-		display: "flex",
-		flexDirection:"row",
+		display: 'flex',
+		flexDirection: 'row',
 		height: 'fit-content',
 		width: 'fit-content',
-	}
+	},
 });
 
 export const InventoryTable = () => {
-	const styles = useStyles()
+	const styles = useStyles();
 	const { setActiveSession, session } = useInventory();
-	const [isGoodsNotInSessionDrawerOpen, setIsGoodsNotInSessionDrawerOpen] = useState(false);
+	const [isGoodsNotInSessionDrawerOpen, setIsGoodsNotInSessionDrawerOpen] =
+		useState(false);
 	const [isDisabled, setIsDisabled] = useState(false);
 	const [selectedGood, setSelectedGood] = useState(null);
 	const [goodToDelete, setGoodToDelete] = useState(null);
@@ -75,17 +81,45 @@ export const InventoryTable = () => {
 			});
 	}, [inventoryId]);
 
-	const contactTheServerToCreateAnAssetInTheCurrentSession = (good, lastChange) => {
+	const contactTheServerToCreateAnAssetInTheCurrentSession = (
+		good,
+		lastChange,
+	) => {
 		const change = cloneDeep(lastChange);
-		change.sessionId = session.id;
+		change.sessionId = session.sessionId;
 
 		axios
 			.post(`/api/goods/${good.id}/changes`, change)
 			.then(() => {
+				moveGoodNotInSessionToGoodsInSession(good, change)
 			})
 			.catch((e) => {
 				console.error(e);
+			});
+	};
+
+	const moveGoodNotInSessionToGoodsInSession = (good, change) => {
+		const changesToAdd = change ? [change] : []
+		setActiveSession({
+			...session,
+			goods: [
+				...session.goods,
+				{ ...good, changes: [...(good.changes || []), ...changesToAdd] },
+			],
+			goodsNotInSession: (session.goodsNotInSession || []).filter(
+				(g) => g.id !== good.id,
+			),
 		});
+		console.log({
+			...session,
+			goods: [
+				...session.goods,
+				{ ...good, changes: [...(good.changes || []), ...changesToAdd] },
+			],
+			goodsNotInSession: (session.goodsNotInSession || []).filter(
+				(g) => g.id !== good.id,
+			),
+		})
 	}
 
 	const handleDeleteGood = () => {
@@ -96,7 +130,9 @@ export const InventoryTable = () => {
 				setActiveSession({
 					...session,
 					goods: (session.goods || []).filter((g) => g.id !== goodToDelete.id),
-					goodsNotInSession: (session.goodsNotInSession || []).filter((g) => g.id !== goodToDelete.id),
+					goodsNotInSession: (session.goodsNotInSession || []).filter(
+						(g) => g.id !== goodToDelete.id,
+					),
 				});
 			})
 			.catch((e) => {
@@ -104,6 +140,7 @@ export const InventoryTable = () => {
 			});
 	};
 
+	console.log('Session is ', session);
 	return (
 		<div>
 			<InventoryMessageBox
@@ -178,31 +215,34 @@ export const InventoryTable = () => {
 							</TableRow>
 						);
 					})}
-					
+
 					{(session?.goodsNotInSession || []).map((item) => {
-							const change = _.last(item.changes);
+						const change = _.last(item.changes);
+
 						return (
-							<TableRow key={item.id} className= {styles.foreignRow}>
-									<TableCell className={styles.tableCell}>
-										<TableCellLayout
-											onClick={() => {
-												setSelectedGood(item);
-												setIsDisabled(true);
-											}}>
-											<Tooltip  content="Ce bien n'est pas encore inclut dans la session active" relationship="label">
-												<WarningFilled color="" style={{margin:"5px"}}/>
-											</Tooltip>
-											{capitalizeFirstLetter(item.name)}
-										</TableCellLayout>
-									</TableCell>
-									<TableCell>
+							<TableRow key={item.id} className={styles.foreignRow}>
+								<TableCell className={styles.tableCell}>
+									<TableCellLayout
+										onClick={() => {
+											setSelectedGood(item);
+											setIsDisabled(true);
+										}}>
+										<Tooltip
+											content="Ce bien n'est pas encore inclut dans la session active"
+											relationship="label">
+											<WarningFilled color="" style={{ margin: '5px' }} />
+										</Tooltip>
+										{capitalizeFirstLetter(item.name)}
+									</TableCellLayout>
+								</TableCell>
+								<TableCell>
 									<TableCellLayout key={item.id}>
-										{convertStringToDate(change?.time||null)}
+										{convertStringToDate(change?.time || null)}
 									</TableCellLayout>
 								</TableCell>
 								<TableCell>
 									<TableCellLayout>
-										{capitalizeFirstLetter(change?.condition||null)}
+										{capitalizeFirstLetter(change?.condition || null)}
 									</TableCellLayout>
 								</TableCell>
 								<TableCell>
@@ -232,17 +272,20 @@ export const InventoryTable = () => {
 											icon={<AddFilled />}
 											aria-label="Add"
 											onClick={() => {
-												if(!change) {
-													contactTheServerToCreateAnAssetInTheCurrentSession(item, change);
+												if (change) {
+													contactTheServerToCreateAnAssetInTheCurrentSession(
+														item,
+														change,
+													);
 												} else {
-													setSelectedGood(item)
+													setSelectedGood(item);
 												}
 											}}
 										/>
 									</TableCellLayout>
 								</TableCell>
-							</TableRow>	
-						)
+							</TableRow>
+						);
 					})}
 				</TableBody>
 			</Table>
@@ -266,7 +309,13 @@ export const InventoryTable = () => {
 					isOpen={!!selectedGood}
 					selectedGood={selectedGood}
 					isDisabled={isDisabled}
-					onClose={() => setSelectedGood()}
+					onClose={(good, move) => {
+						if (move) {
+							moveGoodNotInSessionToGoodsInSession({...selectedGood, ...good});
+						}
+						
+						setSelectedGood();
+					}}
 					sessionId={session?.id}
 				/>
 			)}

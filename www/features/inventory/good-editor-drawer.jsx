@@ -5,7 +5,6 @@ import {
 	DrawerHeaderTitle,
 	Drawer,
 	Button,
-	useRestoreFocusSource,
 	Input,
 	makeStyles,
 	Field,
@@ -52,9 +51,12 @@ export const GoodEditorDrawer = ({
 	isDisabled,
 	sessionId,
 }) => {
-	const restoreFocusSourceAttributes = useRestoreFocusSource();
 	const styles = useStyles();
-	const [goodChange, setGoodChange] = useState();
+	const [shouldCreateChange, setShouldCreateChange] = useState(false);
+	const [goodChange, setGoodChange] = useState({
+		sessionId,
+		saleValue: selectedGood.purchaseValue,
+	});
 	const [originalGoodChange, setOriginalGoodChange] = useState();
 	const [good, setGood] = useState(selectedGood);
 	const hasActiveChanges = useMemo(() => {
@@ -86,32 +88,49 @@ export const GoodEditorDrawer = ({
 			return;
 		}
 
-		axios
-			.patch(`/api/goods/${selectedGood.id}`, _good)
-			.then(function ({ data }) {
-				onClose?.(data);
-			})
-			.catch((e) => {
-				console.error(e);
-			});
+		if (shouldCreateChange) {
+			axios
+				.post(`/api/goods/${selectedGood.id}/changes`, goodChange)
+				.then(function () {
+					onClose?.({...selectedGood, changes: [...(selectedGood.changes || []), goodChange]}, true);
+				})
+				.catch((e) => {
+					console.error(e);
+				});
+		} else {
+			axios
+				.patch(`/api/goods/${selectedGood.id}`, _good)
+				.then(function ({ data }) {
+					onClose?.(data);
+				})
+				.catch((e) => {
+					console.error(e);
+				});
+		}
 	};
 
 	useEffect(() => {
-		setGoodChange(
-			selectedGood?.changes?.find((c) => c.sessionId === sessionId),
+		const defaultChange = { sessionId, saleValue: selectedGood.purchaseValue };
+		const sessionChange = selectedGood?.changes?.find(
+			(c) => c.sessionId === sessionId,
 		);
-		setOriginalGoodChange(
-			selectedGood?.changes?.find((c) => c.sessionId === sessionId),
-		);
+		if (!sessionChange) {
+			setShouldCreateChange(true);
+		}
+
+		setGoodChange(sessionChange || defaultChange);
+		setOriginalGoodChange(sessionChange || defaultChange);
 		setGood(selectedGood);
 	}, [sessionId, JSON.stringify(selectedGood)]);
 
-	if (!selectedGood || !goodChange) return null;
+	console.log('Avant le if');
+
+	if (!selectedGood) return null;
+
+	console.log('Apres le if');
 
 	return (
 		<Drawer
-			{...restoreFocusSourceAttributes}
-			separator
 			open={isOpen}
 			position="end"
 			size="medium"

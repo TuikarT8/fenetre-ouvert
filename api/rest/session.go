@@ -269,10 +269,62 @@ func getGoodsMatchingActiveSession() (SessionGoodsLookupResponse, error) {
 
 func findGoodsNotInActiveSession(activeSession Session) ([]Good, error) {
 	goods := make([]Good, 0)
-	cursor, err := database.Goods.Find(database.Ctx, bson.M{
-		"deleted":         bson.M{"$ne": true},
-		"changes.session": bson.M{"$ne": activeSession.Id},
-	})
+	cursor, err := database.Goods.Aggregate(
+		database.Ctx,
+		[]bson.M{
+			{
+				"$match": bson.M{
+					"deleted": bson.M{"$ne": true},
+				},
+			},
+			{
+				"$project": bson.M{
+					"name":          1,
+					"description":   1,
+					"count":         1,
+					"purchaseValue": 1,
+					"deleted":       1,
+					"condition":     1,
+					"changes":       1,
+					"changesForActiveSession": bson.M{
+						"$filter": bson.M{
+							"input": "$changes",
+							"as":    "change",
+							"cond": bson.M{
+								"$eq": []interface{}{
+									"$$change.sessionId",
+									activeSession.Id,
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				"$project": bson.M{
+					"name":          1,
+					"description":   1,
+					"count":         1,
+					"purchaseValue": 1,
+					"deleted":       1,
+					"condition":     1,
+					"changes":       1,
+					"activeSessionChangesCount": bson.M{
+						"$cond": bson.M{
+							"if":   bson.M{"$isArray": "$changesForActiveSession"},
+							"then": bson.M{"$size": "$changesForActiveSession"},
+							"else": 0,
+						},
+					},
+				},
+			},
+			{
+				"$match": bson.M{
+					"activeSessionChangesCount": bson.M{"$eq": 0},
+				},
+			},
+		},
+	)
 
 	if err != nil {
 		return goods, err
