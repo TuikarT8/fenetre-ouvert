@@ -26,33 +26,35 @@ func main() {
 	*/
 	r.HandleFunc("/api/goods", rest.GoodsHandler)
 	r.HandleFunc("/api/goods/{id}", rest.GoodHandler)
-	r.HandleFunc("/api/goods/{id}/changes", rest.CreateGoodChangeHandler)
+	r.HandleFunc("POST /api/goods/{id}/changes", rest.CreateGoodChangeHandler)
 	r.HandleFunc("/api/goods/{id}/changes/{sessionId}", rest.HandleGoodChangeOperation)
 
 	/*
 		Handle Notifications
 	*/
-	r.HandleFunc("/api/notification", rest.PostNotificationHandler)
-	r.HandleFunc("/api/notifications", rest.GetNotificationHandler)
-	r.HandleFunc("/api/notifications/{id}", rest.DeleteNotificationHandler)
-	r.HandleFunc("/api/notifications/{id}", rest.UpdateNotificationHandler)
+	r.HandleFunc("POST /api/notification", rest.PostNotificationHandler)
+	r.HandleFunc("GET /api/notifications", rest.GetNotificationHandler)
+	r.HandleFunc("DELETE /api/notifications/{id}", rest.DeleteNotificationHandler)
+	r.HandleFunc("PATCH /api/notifications/{id}", rest.UpdateNotificationHandler)
 
 	/*
 		Handle Users
 	*/
-	r.HandleFunc("/api/user", rest.PostUserHandler)
-	r.HandleFunc("/api/users", rest.GetUserHandler)
-	r.HandleFunc("/api/users/{id}", rest.DeleteUserHandler)
-	r.HandleFunc("/api/users/{id}", rest.UpdateUserHandler)
+	r.HandleFunc("POST /api/users", rest.HandleCreateUser)
+	r.HandleFunc("GET /api/users", rest.HandleGetUsers)
+	r.HandleFunc("DELETE /api/users/{id}", rest.HandleDeleteUser)
+	r.HandleFunc("PATCH /api/users/{id}", rest.HandleUpdateUser)
 
 	/*
 		Handle Sessions
 	*/
 	r.HandleFunc("/api/sessions", rest.SessionsHandler)
-	r.HandleFunc("/api/sessions/{id}", rest.DeleteSessionHandler)
-	r.HandleFunc("/api/sessions/{id}", rest.UpdateSessionHandler)
-	r.HandleFunc("/api/sessions/{id}/activate", rest.ActiveSessionHandler)
-	r.HandleFunc("/api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
+	r.HandleFunc("DELETE /api/sessions/{id}", rest.DeleteSessionHandler)
+	r.HandleFunc("PATCH /api/sessions/{id}", rest.UpdateSessionHandler)
+	r.HandleFunc("POST /api/sessions/{id}/activate", rest.HandleActivateSession)
+	r.HandleFunc("GET /api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
+	r.HandleFunc("POST /api/sessions/{id}/close", rest.CloseSessionHandler)
+	r.HandleFunc("/api/hasActiveSession", rest.HasActiveSessionHandler)
 
 	database.ConnectTodataBase()
 

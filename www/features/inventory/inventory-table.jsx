@@ -152,7 +152,7 @@ export const InventoryTable = () => {
 				count={session?.goodsNotInSession?.length || 0}
 				onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
 			/>
-			<InventoryToolbar />
+			<InventoryToolbar sessionId={inventoryId} />
 			<Table
 				{...keyboardNavAttr}
 				role="grid"

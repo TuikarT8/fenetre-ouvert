@@ -3,9 +3,11 @@ package rest
 import (
 	"encoding/json"
 	"fenetre-ouverte/database"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -137,7 +139,7 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func ActiveSessionHandler(w http.ResponseWriter, r *http.Request) {
+func HandleActivateSession(w http.ResponseWriter, r *http.Request) {
 	if !checkMethod(w, r, http.MethodPatch) {
 		return
 	}
@@ -145,8 +147,50 @@ func ActiveSessionHandler(w http.ResponseWriter, r *http.Request) {
 	sessionId := mux.Vars(r)["id"]
 	if _, err := updateActiveSessionFromDB(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("ActiveSessionHandler() => Errors while Active session"))
-		log.Print("ActiveSessionHandler() => Errors while active session", err)
+		w.Write([]byte("HandleActivateSession() => Errors while Active session"))
+		log.Print("HandleActivateSession() => Errors while active session", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func HasActiveSessionHandler(w http.ResponseWriter, r *http.Request) {
+	if !checkMethod(w, r, http.MethodGet) {
+		return
+	}
+	var session Session
+	var err error
+	var exists = false
+
+	if session, err = getActiveSessionFromDB(); err != nil && err != mongo.ErrNoDocuments {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HAsActiveSessionHandler() => Errors while get session "))
+		log.Printf("HAsActiveSessionHandler() => Error while get session err=[%v]", err)
+		return
+	}
+
+	if session.Id != nil {
+		exists = true
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Add("Content-Type", "application/json")
+	w.Write([]byte(fmt.Sprintf("{\"exists\": %t}", exists)))
+}
+
+func CloseSessionHandler(w http.ResponseWriter, r *http.Request) {
+	if !checkMethod(w, r, http.MethodPost) {
+		return
+	}
+
+	sessionId := mux.Vars(r)["id"]
+	var err error
+
+	if err = DisableCurrentActiveSession(sessionId); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("CloseSessionHandler() => Errors while disactive session goods"))
+		log.Printf("CloseSessionHandler() => Error while disactive session goods err=[%v]", err)
 		return
 	}
 
@@ -181,6 +225,29 @@ func (session *Session) saveSessionInDb() (string, error) {
 		return "", err
 	}
 	return "", nil
+}
+
+func DisableCurrentActiveSession(sessionId string) error {
+	if sessionId == "active" {
+		session, _ := findActiveSession()
+
+		_, err := database.Sessions.UpdateOne(
+			database.Ctx,
+			primitive.M{
+				"_id": session.Id,
+			},
+			primitive.M{
+				"$set": primitive.M{
+					"active":    false,
+					"closeDate": time.Now(),
+				},
+			},
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func getGoodsMatchingSession(sessionId string) (SessionGoodsLookupResponse, error) {

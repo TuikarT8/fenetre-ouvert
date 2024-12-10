@@ -1,17 +1,38 @@
 import React, { useRef, useState } from 'react';
 import { Toolbar, ToolbarButton, Tooltip } from '@fluentui/react-components';
 import { GoodCreationDialog } from '../../common/dialogs/good-creation.dialog';
-import { AddFilled, ArrowUploadFilled } from '@fluentui/react-icons';
+import {
+	AddFilled,
+	ArrowUploadFilled,
+	LockClosedFilled,
+} from '@fluentui/react-icons';
 import { useFileUploader } from './use-file-uploader';
+import { ConfimationDialog } from '../../common';
+import axios from 'axios';
+import PropTypes from 'prop-types';
 
-export const InventoryToolbar = () => {
+export const InventoryToolbar = ({ sessionId }) => {
 	const [isCreateGoodDialogOpen, setIsCreateGoodDialogOpen] = useState(false);
 	const fileInputRef = useRef(null);
 	const { onFileUpload } = useFileUploader();
+	const [desabledSession, setDesabledSession] = useState(false);
 
 	function handleFileUploadClick() {
 		fileInputRef.current?.click();
 	}
+
+	const desableCurrentSession = () => {
+		axios
+			.post(`/api/sessions/${sessionId}/close`)
+			.then(function () {})
+			.catch((e) => {
+				console.error(e);
+			});
+	};
+
+	const onDesabledCurrentSession = () => {
+		setDesabledSession(true);
+	};
 
 	const onCreateMenuOptionSelected = () => {
 		setIsCreateGoodDialogOpen(true);
@@ -39,7 +60,30 @@ export const InventoryToolbar = () => {
 						Importer
 					</ToolbarButton>
 				</Tooltip>
+
+				<Tooltip content={'Clôturer cette session'} relationship="description">
+					<ToolbarButton
+						vertical
+						onClick={onDesabledCurrentSession}
+						icon={<LockClosedFilled />}>
+						Clôturer
+					</ToolbarButton>
+				</Tooltip>
 			</Toolbar>
+
+			{!!desabledSession && (
+				<ConfimationDialog
+					open={!!desabledSession}
+					title={'Desactive la session'}
+					content={'voulez vous clôturer cette session.'}
+					risky
+					onClose={() => {
+						desableCurrentSession();
+						setDesabledSession(false);
+					}}
+				/>
+			)}
+
 			<GoodCreationDialog
 				title="Ajouter un bien"
 				open={isCreateGoodDialogOpen}
@@ -56,4 +100,8 @@ export const InventoryToolbar = () => {
 			/>
 		</div>
 	);
+};
+
+InventoryToolbar.propTypes = {
+	sessionId: PropTypes.string.isRequired,
 };

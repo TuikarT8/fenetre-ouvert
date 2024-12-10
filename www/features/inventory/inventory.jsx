@@ -20,7 +20,7 @@ export function Inventory() {
 					<BreadcrumbButton>{"Table d'inventaire"}</BreadcrumbButton>
 				</BreadcrumbItem>
 			</Breadcrumb>
-			<InventoryTable/>
+			<InventoryTable />
 		</div>
 	);
 }

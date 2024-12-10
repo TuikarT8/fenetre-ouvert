@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './dashboard.scss';
 import { Caption1, Title1, Title2 } from '@fluentui/react-components';
 import {
@@ -8,8 +8,22 @@ import {
 } from '@fluentui/react-icons';
 import { GoodsTable } from './goods-table';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export const Home = () => {
+	const [hasActiveSession, setHasActiveSession] = useState(false);
+
+	useEffect(() => {
+		axios
+			.get(`/api/hasActiveSession`)
+			.then(({ data }) => {
+				setHasActiveSession(data.exists);
+			})
+			.catch((e) => {
+				console.error(e);
+			});
+	}, []);
+
 	return (
 		<div className="main">
 			<Title1>Acceuil</Title1>
@@ -45,9 +59,11 @@ export const Home = () => {
 					<Caption1>{`Valeur marchande de l'inventaire`}</Caption1>
 				</div>
 			</div>
-			<Link
-				to="/inventories/active"
-				replace={true}>{`Continuer l'inventaire en cours`}</Link>
+			{hasActiveSession && (
+				<Link
+					to="/inventories/active"
+					replace={true}>{`Continuer l'inventaire en cours`}</Link>
+			)}
 			<GoodsTable />
 		</div>
 	);

@@ -79,6 +79,7 @@ type Session struct {
 	EndDate   time.Time   `bson:"endDate,omitempty" json:"endDate"`
 	Author    interface{} `bson:"author,omitempty" json:"author"`
 	Active    bool        `bson:"active" json:"active"`
+	CloseDate time.Time   `bson:"closeDate,omitempty" json:"closeDate"`
 }
 
 type SessionWithGoods struct {

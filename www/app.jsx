@@ -13,7 +13,7 @@ export function App() {
 				<BrowserRouter>
 					<Routes>
 						<Route index path="/" element={<Home />} />
-						<Route path="/inventories/:inventoryId" element={<Inventory />}  />
+						<Route path="/inventories/:inventoryId" element={<Inventory />} />
 					</Routes>
 				</BrowserRouter>
 			</InventoryProvider>
