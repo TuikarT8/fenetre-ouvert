@@ -4,6 +4,8 @@ import { makeStyles, Toolbar, ToolbarButton } from '@fluentui/react-components';
 import { CreateMenuButton } from './create-menu';
 import { GoodCreationDialog } from './dialogs/good-creation.dialog';
 import { SessionCreationDialog } from './dialogs/session-creation-dialog';
+import { Hamburger } from '@fluentui/react-nav-preview';
+import PropTypes from 'prop-types';
 
 const Logo = () => {
 	return (
@@ -41,6 +43,8 @@ export const Navbar = (props) => {
 
 	return (
 		<div className={styles.container}>
+			<Hamburger onClick={() => props.onToggleAppNavDrawer()} />
+
 			<Logo />
 			<span className="flex-expand"></span>
 			<Toolbar aria-label="Vertical Button" {...props}>
@@ -71,4 +75,8 @@ export const Navbar = (props) => {
 			</Toolbar>
 		</div>
 	);
+};
+
+Navbar.propTypes = {
+	onToggleAppNavDrawer: PropTypes.func.isRequired,
 };

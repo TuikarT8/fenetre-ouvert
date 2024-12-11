@@ -25,7 +25,7 @@ export const Home = () => {
 	}, []);
 
 	return (
-		<div className="main">
+		<section>
 			<Title1>Acceuil</Title1>
 			<div className="container">
 				<div className="card">
@@ -65,6 +65,6 @@ export const Home = () => {
 					replace={true}>{`Continuer l'inventaire en cours`}</Link>
 			)}
 			<GoodsTable />
-		</div>
+		</section>
 	);
 };
