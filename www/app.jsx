@@ -38,24 +38,22 @@ export function App() {
 
 	return (
 		<BrowserRouter>
-		<section className={styles.main}>
-			<NavigationDrawer
-				open={isAppNavDrawerOpen}
-				onToggleDrawerOpenState={(open) => setIsAppNavDrawerOpen(open)}
-			/>
-			<section className={styles.rightContent}>
-				<Navbar onToggleAppNavDrawer={() => toggleAppNavDrawerOpen()} />
-				<InventoryProvider>
-					
+			<section className={styles.main}>
+				<NavigationDrawer
+					open={isAppNavDrawerOpen}
+					onToggleDrawerOpenState={(open) => setIsAppNavDrawerOpen(open)}
+				/>
+				<section className={styles.rightContent}>
+					<Navbar onToggleAppNavDrawer={() => toggleAppNavDrawerOpen()} />
+					<InventoryProvider>
 						<Routes>
 							<Route index path="/" element={<Home />} />
 							<Route path="/inventories/:inventoryId" element={<Inventory />} />
 							<Route path="/inventories" element={<InventoriesTable />} />
-
 						</Routes>
-				</InventoryProvider>
+					</InventoryProvider>
+				</section>
 			</section>
-		</section>
 		</BrowserRouter>
 	);
 }

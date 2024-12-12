@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"fenetre-ouverte/api/rest/errors"
 	"fenetre-ouverte/database"
 	"fmt"
 	"io"
@@ -95,7 +96,15 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	SessionId := mux.Vars(r)["id"]
-
+	if count, _ := countSessionGood(SessionId); count > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		payload, _ := json.Marshal(errors.WebError{
+			Code:        errors.ErrorSessionHasGoodChanges,
+			Description: "Vous ne pouvez pas supprimer cette session car elle contient des changements.",
+		})
+		_, _ = w.Write(payload)
+		return
+	}
 	err := deleteSessionInDb(SessionId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -523,4 +532,21 @@ func getOneSessionFromDB(id string) (Session, error) {
 	return getOneSessionFromDBWithQuery(bson.M{
 		"_id": hexId,
 	})
+}
+
+func countSessionGood(stringSessionId string) (int64, error) {
+	sessonId, err := primitive.ObjectIDFromHex(stringSessionId)
+
+	if err != nil {
+		return 0, err
+	}
+
+	count, err := database.Goods.CountDocuments(ctx, bson.M{
+		"changes.sessionId": sessonId,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

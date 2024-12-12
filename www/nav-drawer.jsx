@@ -14,10 +14,10 @@ const useStyles = makeStyles({
 	drawer: {
 		height: '100%',
 	},
-    link: {
-        textDecoration: 'none',
-        color: tokens.colorNeutralForeground2Link
-    }
+	link: {
+		textDecoration: 'none',
+		color: tokens.colorNeutralForeground2Link,
+	},
 });
 
 export function NavigationDrawer({ open, onToggleDrawerOpenState }) {
@@ -34,9 +34,15 @@ export function NavigationDrawer({ open, onToggleDrawerOpenState }) {
 				<Hamburger onClick={() => onToggleDrawerOpenState(false)} />
 			</NavDrawerHeader>
 			<NavDrawerBody className={styles.drawer}>
-				<Link to="/" replace={true} className={styles.link}><NavItem value="1">Accueil</NavItem></Link>
-				<Link to="/inventories/active" replace={true} className={styles.link}><NavItem value="2">Inventaire</NavItem></Link>
-                <Link to="/inventories" replace={true} className={styles.link}><NavItem value="3">Inventaires</NavItem></Link>
+				<Link to="/" replace={true} className={styles.link}>
+					<NavItem value="1">Accueil</NavItem>
+				</Link>
+				<Link to="/inventories/active" replace={true} className={styles.link}>
+					<NavItem value="2">Inventaire</NavItem>
+				</Link>
+				<Link to="/inventories" replace={true} className={styles.link}>
+					<NavItem value="3">Inventaires</NavItem>
+				</Link>
 			</NavDrawerBody>
 		</NavDrawer>
 	);

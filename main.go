@@ -49,7 +49,7 @@ func main() {
 		Handle Sessions
 	*/
 	r.HandleFunc("/api/sessions", rest.SessionsHandler)
-	r.HandleFunc("DELETE /api/sessions/{id}", rest.DeleteSessionHandler)
+	r.HandleFunc("/api/sessions/{id}", rest.DeleteSessionHandler)
 	r.HandleFunc("PATCH /api/sessions/{id}", rest.UpdateSessionHandler)
 	r.HandleFunc("POST /api/sessions/{id}/activate", rest.HandleActivateSession)
 	r.HandleFunc("GET /api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
