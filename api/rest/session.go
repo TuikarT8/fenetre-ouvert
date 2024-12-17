@@ -130,6 +130,8 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("This is the", sessionId)
+
 	var session Session
 
 	err = json.Unmarshal(body, &session)
@@ -137,6 +139,7 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 		handleUnmarshallingError(err.Error(), w)
 		return
 	}
+	log.Println(session)
 
 	if _, err := session.UpdateSessionInDb(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -443,21 +446,24 @@ func (session *Session) UpdateSessionInDb(id string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	_, err = database.Sessions.UpdateOne(
 		ctx,
 		primitive.M{"_id": bsonId},
 		primitive.M{
-			"$set": session,
+			"$set": primitive.M{
+				"author":    session.Author,
+				"startDate": session.StartDate,
+				"endDate":   session.EndDate,
+			},
 		},
 	)
+
 	if err != nil {
 		log.Printf("Error while updating Session, error=%v", err)
 		return "", err
 	}
 
-	return "", err
-
+	return "", nil
 }
 
 func deleteSessionInDb(id string) error {

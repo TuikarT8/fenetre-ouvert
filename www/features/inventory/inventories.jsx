@@ -11,9 +11,6 @@ import {
 	Button,
 	useArrowNavigationGroup,
 	useFocusableGroup,
-	makeStyles,
-	themeToTokensObject,
-	webLightTheme,
 	Tooltip,
 	ToolbarButton,
 	Toolbar,
@@ -26,30 +23,13 @@ import {
 	SessionCreationDialog,
 } from '../../common';
 import { useInventory } from '../../provider';
+import { SessionDrawer } from './session-editor-drawer';
 
 const columns = [
 	{ columnKey: 'author', label: 'Author' },
 	{ columnKey: 'startDate', label: 'Start Date' },
 	{ columnKey: 'closeDate', label: 'Close Date' },
 ];
-
-const tokens = themeToTokensObject(webLightTheme);
-const useStyles = makeStyles({
-	foreignRow: {
-		color: tokens.colorStatusWarningForeground3,
-	},
-
-	captionText: {
-		color: tokens.colorPaletteBeigeBorderActive,
-	},
-
-	tableCell: {
-		display: 'flex',
-		flexDirection: 'row',
-		height: 'fit-content',
-		width: 'fit-content',
-	},
-});
 
 export const InventoriesTable = () => {
 	const { setSessions, sessions } = useInventory();
@@ -60,8 +40,9 @@ export const InventoriesTable = () => {
 	const [isCreateSessionDialogOpen, setCreateSessionDialogOpen] =
 		useState(false);
 	const [hasActiveSession, setHasActiveSession] = useState(false);
-	const [sessionToDelete, setSessionToDelete] = useState(undefined);
-	const [sessionId, setIdSession] = useState(null)
+	const [selectedSession, setSelectedSession] = useState();
+	const [action, setAction] = useState('');
+
 	useEffect(() => {
 		axios
 			.get(`/api/sessions`)
@@ -74,16 +55,19 @@ export const InventoriesTable = () => {
 			});
 	}, []);
 
-	const handleDeleteSession =()=>  {
+	const handleDeleteSession = () => {
+		if (!selectedSession) return;
+
 		axios
-			.delete(`/api/sessions/${sessionId}`)
+			.delete(`/api/sessions/${selectedSession.id}`)
 			.then(() => {
-				setSessionToDelete(undefined)
+				setSelectedSession();
 			})
 			.catch((e) => {
+				setSelectedSession();
 				console.error(e);
 			});
-		}
+	};
 
 	return (
 		<div>
@@ -144,7 +128,17 @@ export const InventoriesTable = () => {
 								</TableCell>
 								<TableCell role="gridcell" tabIndex={0} {...focusableGroupAttr}>
 									<TableCellLayout>
-										<Button icon={<EditRegular />} aria-label="Edit" />
+										<Tooltip content="Modifier la session" relationship="label">
+											<Button
+												icon={<EditRegular />}
+												aria-label="Edit"
+												disabled={!item.active}
+												onClick={() => {
+													setSelectedSession(item);
+													setAction('edit');
+												}}
+											/>
+										</Tooltip>
 
 										<Tooltip
 											content="Vous ne pouviez pas supprimer une session active"
@@ -153,9 +147,9 @@ export const InventoriesTable = () => {
 												icon={<DeleteRegular />}
 												aria-label="Delete"
 												disabled={item.active}
-												onClick= {()=> {
-													setSessionToDelete(true)
-													setIdSession(item.id)
+												onClick={() => {
+													setSelectedSession(item);
+													setAction('delete');
 												}}
 											/>
 										</Tooltip>
@@ -166,6 +160,7 @@ export const InventoriesTable = () => {
 					})}
 				</TableBody>
 			</Table>
+
 			<SessionCreationDialog
 				open={isCreateSessionDialogOpen}
 				onClose={() => {
@@ -173,17 +168,26 @@ export const InventoriesTable = () => {
 				}}
 			/>
 
-			{!!sessionToDelete && (
+			{!!selectedSession && action === 'delete' && (
 				<ConfimationDialog
-					open={!!sessionToDelete}
+					open={!!selectedSession}
 					title={'Suppression de session'}
-					content={
-						"Voulez-vous vraiment supprimer la session ?"
-					}
+					content={'Voulez-vous vraiment supprimer la session ?'}
 					risky
 					onClose={(confirmed) =>
-						confirmed ? handleDeleteSession() : setSessionToDelete(undefined)
+						confirmed ? handleDeleteSession() : setSelectedSession()
 					}
+				/>
+			)}
+
+			{!!selectedSession && action === 'edit' && (
+				<SessionDrawer
+					isOpen={!!selectedSession}
+					sessionId={selectedSession?.id}
+					onClose={() => {
+						setSelectedSession();
+					}}
+					session={selectedSession}
 				/>
 			)}
 		</div>

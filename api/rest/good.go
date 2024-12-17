@@ -332,8 +332,8 @@ func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleUnmarshallingError(err string, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusBadRequest)
-	w.Write([]byte("Erreur lors de  la conversion du corps de la requette"))
-	log.Print("Erreur lors de  la conversion  du corps de la requette", err)
+	w.Write([]byte("Errors while unmurshaling resquestBody"))
+	log.Print("Errors while unmurshaling resquestBody", err)
 }
 
 func deleteGoodChange(goodId string, idSession string) error {

@@ -1,6 +1,6 @@
 package errors
 
-type webError struct {
+type WebError struct {
 	Description string
-	Code        int
+	Code        int64
 }
