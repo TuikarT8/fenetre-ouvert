@@ -12,19 +12,19 @@ import {
 import { Dismiss24Regular } from '@fluentui/react-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { convertStringToDate } from '../../common';
+import { convertStringToDate, isZeroDate } from '../../common';
+import { DatePicker } from '@fluentui/react-datepicker-compat';
 
 export const SessionDrawer = ({ isOpen, onClose, sessionId, session }) => {
 	const form = useRef(null);
 	const handleSubmitForm = (_form) => {
 		var session = {
-			author: _form.author?.value,
-			startDate: _form.startDate?.value
-				? new Date(_form.startDate?.value)
-				: undefined,
-			endDate: _form.endDate?.value
-				? new Date(_form.endDate?.value)
-				: undefined,
+			startDate: isZeroDate(_form.startDate?.value)
+				? undefined
+				: new Date(_form.startDate?.value),
+			endDate: isZeroDate(_form.endDate?.value)
+				? undefined
+				: new Date(_form.endDate?.value)
 		};
 
 		axios
@@ -63,31 +63,28 @@ export const SessionDrawer = ({ isOpen, onClose, sessionId, session }) => {
 							required
 							type="string"
 							name="author"
-							defaultValue={session?.author || 'Non defini'}
+							defaultValue={session.author || 'Non defini'}
 						/>
 					</Field>
 
 					<Field label={'Start Date'}>
-						<Input
-							type="date"
+						<DatePicker
 							name="startDate"
-							defaultValue={
-								session?.endDate
-									? convertStringToDate(session?.startDate)
-									: undefined
-							}
+							placeholder="Select a date..."
+							value = {isZeroDate(session.startDate)
+								? undefined
+								: convertStringToDate(session.startDate)}
+							
 						/>
 					</Field>
 
 					<Field label={'End Date'}>
-						<Input
-							type="date"
-							name="endDate"
-							defaultValue={
-								session?.endDate
-									? convertStringToDate(session?.endDate)
-									: undefined
-							}
+						<DatePicker
+							name="EndDate"
+							placeholder="Select a date..."
+							value = {isZeroDate(session.endDate)
+								? undefined
+								: convertStringToDate(session.endDate)}
 						/>
 					</Field>
 				</form>

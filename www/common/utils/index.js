@@ -1,12 +1,11 @@
 import { uniqueId } from 'lodash';
 
 export function convertStringToDate(dateString) {
-	if (dateString === undefined || dateString === null) {
-		return '';
+	if (!dateString) {
+		return undefined;
 	}
 
-	const date = new Date(dateString);
-	return date.toDateString();
+	return new Date(dateString);
 }
 
 export function capitalizeFirstLetter(elem) {
@@ -32,6 +31,31 @@ export function hashGoods(goods) {
 		: [{ id: uniqueId('good') }, { id: uniqueId('good') }];
 
 	return _goods.map(({ id }) => id).reduce((p, c) => p.concat(c));
+}
+
+export function isZeroDate(date) {
+    if (!date) {
+        return true;
+    }
+
+    // Regexp to match 0001-01-01T00:00:00Z
+    const regexp = /^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z/
+    const matches = regexp.exec(date);
+	if (!matches || matches.length === 1) {
+		return false;
+	}
+	
+    const [, year] = matches;
+	
+    if (!year) {
+        return true;
+    }
+
+    if (Number(year) < 1970) {
+        return true;
+    }
+
+    return false;
 }
 
 export * from './use-depencency-observer';

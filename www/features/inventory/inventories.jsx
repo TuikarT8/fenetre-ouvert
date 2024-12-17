@@ -116,13 +116,13 @@ export const InventoriesTable = () => {
 
 								<TableCell>
 									<TableCellLayout>
-										{convertStringToDate(item.startDate)}
+										{convertStringToDate(item.startDate)?.toDateString()}
 									</TableCellLayout>
 								</TableCell>
 								<TableCell>
 									<TableCellLayout>
 										{!item.closeDate?.includes('0001')
-											? convertStringToDate(item.closeDate)
+											? convertStringToDate(item.closeDate)?.toDateString()
 											: 'Non clôturé'}
 									</TableCellLayout>
 								</TableCell>
@@ -132,7 +132,6 @@ export const InventoriesTable = () => {
 											<Button
 												icon={<EditRegular />}
 												aria-label="Edit"
-												disabled={!item.active}
 												onClick={() => {
 													setSelectedSession(item);
 													setAction('edit');
@@ -141,7 +140,7 @@ export const InventoriesTable = () => {
 										</Tooltip>
 
 										<Tooltip
-											content="Vous ne pouviez pas supprimer une session active"
+											content={item.active ? "Vous ne pouvez pas supprimer une session active": "Supprimer la session"}
 											relationship="label">
 											<Button
 												icon={<DeleteRegular />}
