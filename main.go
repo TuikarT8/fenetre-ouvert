@@ -52,7 +52,7 @@ func main() {
 	r.HandleFunc("/api/sessions/{id}", rest.DeleteSessionHandler)
 	r.HandleFunc("/api/sessions/{id}/session", rest.UpdateSessionHandler)
 	r.HandleFunc("POST /api/sessions/{id}/activate", rest.HandleActivateSession)
-	r.HandleFunc("GET /api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
+	r.HandleFunc("/api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
 	r.HandleFunc("POST /api/sessions/{id}/close", rest.CloseSessionHandler)
 	r.HandleFunc("/api/hasActiveSession", rest.HasActiveSessionHandler)
 

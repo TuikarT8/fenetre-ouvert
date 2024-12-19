@@ -16,6 +16,7 @@ import { Dismiss24Regular } from '@fluentui/react-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import _ from 'lodash';
+import QRCode from 'react-qr-code';
 
 const useStyles = makeStyles({
 	content: {
@@ -231,6 +232,21 @@ export const GoodEditorDrawer = ({
 						/>
 					</Field>
 				</form>
+				
+			<div>
+				{selectedGood?.code ? (
+					<QRCode
+						title="goodQrCode"
+						value={selectedGood?.code}
+						bgColor={'#FFFFFF'}
+						fgColor={'#000000'}
+						size={128}
+					/>
+				) : (
+					"Le Qr code n'est pas disponible veuillez le fournir"
+				)}
+			</div>
+				
 			</DrawerBody>
 			<DrawerFooter>
 				<Button appearance="secondary" onClick={() => onClose?.()}>

@@ -19,7 +19,6 @@ import {
 import _ from 'lodash';
 import { GoodDrawer } from './good-drawer';
 import { useGoodsPagination } from '../../provider';
-import QRCode from 'react-qr-code';
 
 const columns = [
 	{ columnKey: 'good', label: 'Bien' },

@@ -33,7 +33,6 @@ import { InventoryToolbar } from './inventory-toolbar';
 import { GoodsNotInSessionDrawer } from './missing-good-product';
 import { capitalizeFirstLetter, convertStringToDate } from '../../common';
 import { useInventory } from '../../provider';
-import QRCode from 'react-qr-code';
 
 const columns = [
 	{ columnKey: 'good', label: 'Bien' },
@@ -42,7 +41,6 @@ const columns = [
 	{ columnKey: 'quantity', label: 'Quantité' },
 	{ columnKey: 'value', label: 'Valeur' },
 	{ columnKey: 'Actions', label: 'Actions' },
-	{ columnKey: 'Qrcode', label: 'Qrcode' },
 ];
 
 const tokens = themeToTokensObject(webLightTheme);
@@ -84,6 +82,7 @@ export const InventoryTable = () => {
 			.get(`/api/sessions/${inventoryId}/goods`)
 			.then(({ data }) => {
 				setActiveSession(data);
+				console.log('sessions actives', data);
 			})
 			.catch((e) => {
 				console.error(e);
@@ -151,16 +150,18 @@ export const InventoryTable = () => {
 
 	return (
 		<div>
-			{!!session?.active || <Title1>{"Aucune session n'est active"}</Title1>}
+			{!!session?.goods?.length || (
+				<Title1>{"Aucune session n'est active"}</Title1>
+			)}
 
-			{!!session?.goodsNotInSession?.length && (
+			{!!session?.goods?.length && (
 				<InventoryMessageBox
 					count={session?.goodsNotInSession?.length || 0}
 					onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
 				/>
 			)}
-			{!!session?.active && <InventoryToolbar sessionId={inventoryId} />}
-			{!!session?.active && (
+			{!!session?.goods?.length && <InventoryToolbar sessionId={inventoryId} />}
+			{!!session?.goods?.length && (
 				<Table
 					{...keyboardNavAttr}
 					role="grid"
@@ -191,7 +192,7 @@ export const InventoryTable = () => {
 									</TableCell>
 									<TableCell>
 										<TableCellLayout key={item.id}>
-											{convertStringToDate(change.time)}
+											{convertStringToDate(change.time)?.toLocaleDateString()}
 										</TableCellLayout>
 									</TableCell>
 									<TableCell>
@@ -253,7 +254,9 @@ export const InventoryTable = () => {
 									</TableCell>
 									<TableCell>
 										<TableCellLayout key={item.id}>
-											{convertStringToDate(change?.time || null)}
+											{convertStringToDate(
+												change?.time || null,
+											)?.toLocaleDateString()}
 										</TableCellLayout>
 									</TableCell>
 									<TableCell>
@@ -266,21 +269,6 @@ export const InventoryTable = () => {
 									</TableCell>
 									<TableCell>
 										<TableCellLayout>{change?.saleValue}</TableCellLayout>
-									</TableCell>
-									<TableCell>
-										<TableCellLayout>
-										{item?.code ? (
-											<QRCode
-												title="goodQrCode"
-												value={selectedGood.code}
-												bgColor={'#FFFFFF'}
-												fgColor={'#000000'}
-												size={128}
-												/>
-											) : (
-												"Le Qr code n'est pas disponible veuillez le fournir"
-											)}
-										</TableCellLayout>
 									</TableCell>
 									<TableCell
 										role="gridcell"
@@ -324,8 +312,7 @@ export const InventoryTable = () => {
 					</TableBody>
 				</Table>
 			)}
-
-			{!!session?.active && (
+			{!!session?.goods?.length && (
 				<Caption2 className={styles.captionText}>
 					{session?.goods?.length || 0} biens dans la session /{' '}
 					{session?.goodsNotInSession?.length || 0} biens peuvent être ajoutés.
