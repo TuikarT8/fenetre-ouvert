@@ -34,28 +34,29 @@ export function hashGoods(goods) {
 }
 
 export function isZeroDate(date) {
-    if (!date) {
-        return true;
-    }
+	if (!date) {
+		return true;
+	}
 
-    // Regexp to match 0001-01-01T00:00:00Z
-    const regexp = /^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z/
-    const matches = regexp.exec(date);
+	// Regexp to match 0001-01-01T00:00:00Z
+	const regexp =
+		/^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z/;
+	const matches = regexp.exec(date);
 	if (!matches || matches.length === 1) {
 		return false;
 	}
-	
-    const [, year] = matches;
-	
-    if (!year) {
-        return true;
-    }
 
-    if (Number(year) < 1970) {
-        return true;
-    }
+	const [, year] = matches;
 
-    return false;
+	if (!year) {
+		return true;
+	}
+
+	if (Number(year) < 1970) {
+		return true;
+	}
+
+	return false;
 }
 
 export * from './use-depencency-observer';

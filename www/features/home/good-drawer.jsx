@@ -11,6 +11,7 @@ import { Dismiss24Regular } from '@fluentui/react-icons';
 import PropTypes from 'prop-types';
 import './good-drawer.scss';
 import { GoodCard } from '../../common/good-card';
+import QRCode from 'react-qr-code';
 
 export const GoodDrawer = ({ isOpen, selectedGood, onClose }) => {
 	// Overlay Drawer will handle focus by default, but inline Drawers need manual focus restoration attributes, if applicable
@@ -45,6 +46,17 @@ export const GoodDrawer = ({ isOpen, selectedGood, onClose }) => {
 			<DrawerBody>
 				<p>{selectedGood.description}</p>
 				<GoodCard></GoodCard>
+				{selectedGood?.code ? (
+					<QRCode
+						title="goodQrCode"
+						value={selectedGood.code}
+						bgColor={'#FFFFFF'}
+						fgColor={'#000000'}
+						size={128}
+					/>
+				) : (
+					"Le Qr code n'est pas disponible veuillez le fournir"
+				)}
 			</DrawerBody>
 		</Drawer>
 	);

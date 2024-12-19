@@ -24,7 +24,7 @@ export const SessionDrawer = ({ isOpen, onClose, sessionId, session }) => {
 				: new Date(_form.startDate?.value),
 			endDate: isZeroDate(_form.endDate?.value)
 				? undefined
-				: new Date(_form.endDate?.value)
+				: new Date(_form.endDate?.value),
 		};
 
 		axios
@@ -71,10 +71,11 @@ export const SessionDrawer = ({ isOpen, onClose, sessionId, session }) => {
 						<DatePicker
 							name="startDate"
 							placeholder="Select a date..."
-							value = {isZeroDate(session.startDate)
-								? undefined
-								: convertStringToDate(session.startDate)}
-							
+							value={
+								isZeroDate(session.startDate)
+									? undefined
+									: convertStringToDate(session.startDate)
+							}
 						/>
 					</Field>
 
@@ -82,9 +83,11 @@ export const SessionDrawer = ({ isOpen, onClose, sessionId, session }) => {
 						<DatePicker
 							name="EndDate"
 							placeholder="Select a date..."
-							value = {isZeroDate(session.endDate)
-								? undefined
-								: convertStringToDate(session.endDate)}
+							value={
+								isZeroDate(session.endDate)
+									? undefined
+									: convertStringToDate(session.endDate)
+							}
 						/>
 					</Field>
 				</form>

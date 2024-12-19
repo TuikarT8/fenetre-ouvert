@@ -38,6 +38,7 @@ type Good struct {
 	PurchaseValue float64      `bson:"purchaseValue,omitempty" json:"purchaseValue"`
 	Changes       []GoodChange `bson:"changes,omitempty" json:"changes"`
 	Deleted       bool         `bson:"deleted,omitempty" json:"deleted"`
+	Code          string       `bson:"code,omitempty" json:"code"`
 }
 
 type GoodUpdateRequest struct {

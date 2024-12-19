@@ -19,6 +19,7 @@ import {
 import _ from 'lodash';
 import { GoodDrawer } from './good-drawer';
 import { useGoodsPagination } from '../../provider';
+import QRCode from 'react-qr-code';
 
 const columns = [
 	{ columnKey: 'good', label: 'Bien' },
@@ -111,6 +112,7 @@ export const GoodsTable = () => {
 									onClick={() => {
 										setIsGoodDrawerOpen(true);
 										setSelectedGood(item);
+										console.log(item);
 									}}>
 									{capitalizeFirstLetter(item.name)}
 								</TableCellLayout>

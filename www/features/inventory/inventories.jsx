@@ -140,7 +140,11 @@ export const InventoriesTable = () => {
 										</Tooltip>
 
 										<Tooltip
-											content={item.active ? "Vous ne pouvez pas supprimer une session active": "Supprimer la session"}
+											content={
+												item.active
+													? 'Vous ne pouvez pas supprimer une session active'
+													: 'Supprimer la session'
+											}
 											relationship="label">
 											<Button
 												icon={<DeleteRegular />}
