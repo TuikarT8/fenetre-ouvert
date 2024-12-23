@@ -22,24 +22,24 @@ func HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 
 	params, err := pageQueryFromRequestQueryParams(r)
 	if err != nil {
-		w.Write([]byte("HandleGetUsers () => Errors while gettig params"))
-		log.Print("HandleGetUsers () => Errors while getting params", err)
+		w.Write([]byte("HandleGetUsers () => Error while gettig params"))
+		log.Print("HandleGetUsers () => Error while getting params", err)
 		return
 	}
 
 	Users, err := getUserInDb(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleGetUsers () => Errors while gettig good"))
-		log.Print("HandleGetUsers () => Errors while getting good", err)
+		w.Write([]byte("HandleGetUsers () => Error while gettig good"))
+		log.Print("HandleGetUsers () => Error while getting good", err)
 		return
 	}
 
 	jsondata, err := json.Marshal(Users)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleGetUsers () => Errors while marsalling good"))
-		log.Print("HandleGetUsers () => Errors while marshalling good", err)
+		w.Write([]byte("HandleGetUsers () => Error while marsalling good"))
+		log.Print("HandleGetUsers () => Error while marshalling good", err)
 		return
 	}
 	w.Write(jsondata)
@@ -69,8 +69,8 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	_, err = User.saveUserInDb()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleCreateUser () => Errors while creating good"))
-		log.Print("HandleCreateUser () => Errors while creating good", err)
+		w.Write([]byte("HandleCreateUser () => Error while creating good"))
+		log.Print("HandleCreateUser () => Error while creating good", err)
 		return
 	}
 
@@ -88,8 +88,8 @@ func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	err := deleteUserInDb(UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleDeleteUser() => Errors while deleting good"))
-		log.Print("HandleDeleteUser() => Errors while deleting good", err)
+		w.Write([]byte("HandleDeleteUser() => Error while deleting good"))
+		log.Print("HandleDeleteUser() => Error while deleting good", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -121,8 +121,8 @@ func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := User.UpdateUserInDb(UserId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("UpdateGoodHandler() => Errors while Updating good"))
-		log.Print("UpdateGoodHandler() => Errors while Updating good", err)
+		w.Write([]byte("UpdateGoodHandler() => Error while Updating good"))
+		log.Print("UpdateGoodHandler() => Error while Updating good", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)

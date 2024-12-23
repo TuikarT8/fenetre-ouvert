@@ -2,6 +2,7 @@ package main
 
 import (
 	"fenetre-ouverte/api/rest"
+	"fenetre-ouverte/api/rest/assets"
 	"fenetre-ouverte/database"
 	"fmt"
 	"log"
@@ -51,16 +52,18 @@ func main() {
 	r.HandleFunc("/api/sessions", rest.SessionsHandler)
 	r.HandleFunc("/api/sessions/{id}", rest.DeleteSessionHandler)
 	r.HandleFunc("/api/sessions/{id}/session", rest.UpdateSessionHandler)
-	r.HandleFunc("POST /api/sessions/{id}/activate", rest.HandleActivateSession)
+	r.HandleFunc("/api/sessions/{id}/activate", rest.HandleActivateSession)
 	r.HandleFunc("/api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
-	r.HandleFunc("POST /api/sessions/{id}/close", rest.CloseSessionHandler)
+	r.HandleFunc("/api/sessions/{id}/close", rest.CloseSessionHandler)
 	r.HandleFunc("/api/hasActiveSession", rest.HasActiveSessionHandler)
 
 	/*
 		Labels
 	*/
 	r.HandleFunc("/api/goods/{id}/print", rest.HandlePrintLabel)
-	r.HandleFunc("/assets/goods/{id}/qrcode", rest.HandleGenerateQrCode)
+
+	/* Assets */
+	r.HandleFunc("/assets/goods/{id}/qrcode", assets.HandleGenerateQrCode)
 
 	database.ConnectTodataBase()
 

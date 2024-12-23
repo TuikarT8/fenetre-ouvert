@@ -35,6 +35,7 @@ type Good struct {
 	Changes       []GoodChange `bson:"changes,omitempty" json:"changes"`
 	Deleted       bool         `bson:"deleted,omitempty" json:"deleted"`
 	Code          string       `bson:"code,omitempty" json:"code"`
+	StringId      string       `bson:"stringId,omitempty" json:"StringId"`
 }
 
 type GoodUpdateRequest struct {

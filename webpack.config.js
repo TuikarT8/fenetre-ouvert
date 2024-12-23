@@ -24,7 +24,7 @@ const config = {
         port: 'auto',
         proxy:[
             {
-                context: ['/api'],
+                context: ['/api', '/assets'],
                 target: 'http://localhost:3100',
                 secure: false,
             },

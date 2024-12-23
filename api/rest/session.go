@@ -35,24 +35,24 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	params, err := pageQueryFromRequestQueryParams(r)
 	if err != nil {
-		w.Write([]byte("GetSessionHandler () => Errors while gettig params"))
-		log.Print("GetSessionHandler () => Errors while getting params", err)
+		w.Write([]byte("GetSessionHandler () => Error while gettig params"))
+		log.Print("GetSessionHandler () => Error while getting params", err)
 		return
 	}
 
 	Sessions, err := getSessionsFromDB(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetSessionHandler () => Errors while gettig good"))
-		log.Print("GetSessionHandler () => Errors while getting good", err)
+		w.Write([]byte("GetSessionHandler () => Error while gettig good"))
+		log.Print("GetSessionHandler () => Error while getting good", err)
 		return
 	}
 
 	jsondata, err := json.Marshal(Sessions)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetSessionHandler () => Errors while marsalling good"))
-		log.Print("GetSessionHandler () => Errors while marshalling good", err)
+		w.Write([]byte("GetSessionHandler () => Error while marsalling good"))
+		log.Print("GetSessionHandler () => Error while marshalling good", err)
 		return
 	}
 	w.Write(jsondata)
@@ -82,8 +82,8 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = Session.saveSessionInDb()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("postSessionHandler () => Errors while creating good"))
-		log.Print("postSessionHandler () => Errors while creating good", err)
+		w.Write([]byte("postSessionHandler () => Error while creating good"))
+		log.Print("postSessionHandler () => Error while creating good", err)
 		return
 	}
 
@@ -109,8 +109,8 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 	err := deleteSessionInDb(SessionId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("deleteSessionHandler() => Errors while deleting good"))
-		log.Print("deleteSessionHandler() => Errors while deleting good", err)
+		w.Write([]byte("deleteSessionHandler() => Error while deleting good"))
+		log.Print("deleteSessionHandler() => Error while deleting good", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -144,8 +144,8 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := session.UpdateSessionInDb(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("UpdateSessionHandler() => Errors while Updating session"))
-		log.Print("UpdateSessionHandler() => Errors while Updating session", err)
+		w.Write([]byte("UpdateSessionHandler() => Error while Updating session"))
+		log.Print("UpdateSessionHandler() => Error while Updating session", err)
 		return
 	}
 
@@ -160,8 +160,8 @@ func HandleActivateSession(w http.ResponseWriter, r *http.Request) {
 	sessionId := mux.Vars(r)["id"]
 	if _, err := updateActiveSessionFromDB(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleActivateSession() => Errors while Active session"))
-		log.Print("HandleActivateSession() => Errors while active session", err)
+		w.Write([]byte("HandleActivateSession() => Error while Active session"))
+		log.Print("HandleActivateSession() => Error while active session", err)
 		return
 	}
 
@@ -178,7 +178,7 @@ func HasActiveSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	if session, err = getActiveSessionFromDB(); err != nil && err != mongo.ErrNoDocuments {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HAsActiveSessionHandler() => Errors while get session "))
+		w.Write([]byte("HAsActiveSessionHandler() => Error while get session "))
 		log.Printf("HAsActiveSessionHandler() => Error while get session err=[%v]", err)
 		return
 	}
@@ -202,7 +202,7 @@ func CloseSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err = DisableCurrentActiveSession(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("CloseSessionHandler() => Errors while disactive session goods"))
+		w.Write([]byte("CloseSessionHandler() => Error while disactive session goods"))
 		log.Printf("CloseSessionHandler() => Error while disactive session goods err=[%v]", err)
 		return
 	}
@@ -221,7 +221,7 @@ func GetSessionGoodsHandler(w http.ResponseWriter, r *http.Request) {
 
 	if response, err = getGoodsMatchingSession(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetSessionGoodsHandler() => Errors while retrieving session goods"))
+		w.Write([]byte("GetSessionGoodsHandler() => Error while retrieving session goods"))
 		log.Printf("GetSessionGoodsHandler() => Error while retrieving session goods err=[%v]", err)
 		return
 	}

@@ -4,9 +4,11 @@ import (
 	"fenetre-ouverte/api/rest"
 	"fenetre-ouverte/api/tplt"
 	"fenetre-ouverte/api/utils"
-	"log"
+	"image/png"
 	"net/http"
 
+	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/qr"
 	"github.com/gorilla/mux"
 )
 
@@ -14,18 +16,18 @@ func HandleGenerateQrCode(w http.ResponseWriter, r *http.Request) {
 	if !utils.AssertMethod(w, r, http.MethodGet) {
 		return
 	}
-	goodId := mux.Vars(r)["id"]
 
+	goodId := mux.Vars(r)["id"]
 	good, err := rest.GetGoodById(goodId)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		log.Printf("HandleGenerateQrCode() => Errors while while retreiving good err=[%v]", err)
+		tplt.RenderNotFoundPage(w)
 		return
 	}
-	err = tplt.RenderTemplate(w, "index", good)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("HandleGenerateQrCode() => Errors while while rendering template err=[%v]", err)
-		return
-	}
+
+	qrCode, _ := qr.Encode(good.Code, qr.L, qr.Auto)
+	qrCode, _ = barcode.Scale(qrCode, 256, 256)
+
+	// Generate the qr code and send it over the network
+	w.Header().Set("Content-Type", "image/png")
+	png.Encode(w, qrCode)
 }

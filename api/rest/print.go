@@ -3,6 +3,7 @@ package rest
 import (
 	"fenetre-ouverte/api/tplt"
 	"fenetre-ouverte/api/utils"
+	"fenetre-ouverte/database"
 	"log"
 	"net/http"
 
@@ -13,19 +14,20 @@ func HandlePrintLabel(w http.ResponseWriter, r *http.Request) {
 	if !utils.AssertMethod(w, r, http.MethodGet) {
 		return
 	}
-	goodId := mux.Vars(r)["id"]
 
+	goodId := mux.Vars(r)["id"]
 	good, err := GetGoodById(goodId)
 	if err != nil {
-		_ = tplt.RenderTemplate(w, "error", nil)
-		w.WriteHeader(http.StatusNotFound)
-		log.Printf("HandlePrintLabel() => Errors while while retreiving good err=[%v]", err)
+		log.Printf("HandlePrintLabel() => Error while while retreiving good err=[%v]", err)
+		tplt.RenderNotFoundPage(w)
 		return
 	}
-	err = tplt.RenderTemplate(w, "index", good)
+
+	good.StringId = database.BsonToString(goodId)
+	err = tplt.RenderTemplate(w, "label", good)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("HandlePrintLabel() => Errors while while rendering template err=[%v]", err)
+		log.Printf("HandleGenerateQrCode() => Error while while rendering template err=[%v]", err)
+		tplt.RenderInternalErrorPage(w)
 		return
 	}
 }

@@ -150,9 +150,7 @@ export const InventoryTable = () => {
 
 	return (
 		<div>
-			{!!session?.goods?.length || (
-				<Title1>{"Aucune session n'est active"}</Title1>
-			)}
+			{!!session || <Title1>{"Aucune session n'est active"}</Title1>}
 
 			{!!session?.goods?.length && (
 				<InventoryMessageBox

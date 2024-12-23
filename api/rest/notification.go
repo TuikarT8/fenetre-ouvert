@@ -23,16 +23,16 @@ func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	params, err := pageQueryFromRequestQueryParams(r)
 
 	if err != nil {
-		w.Write([]byte("GetNotificationHandler () => Errors while gettig params"))
-		log.Print("GetNotificationHandler () => Errors while getting params", err)
+		w.Write([]byte("GetNotificationHandler () => Error while gettig params"))
+		log.Print("GetNotificationHandler () => Error while getting params", err)
 		return
 	}
 
 	notifications, err := getNotificationInDb(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetNotificationHandler () => Errors while gettig "))
-		log.Print("GetNotificationHandler () => Errors while getting ", err)
+		w.Write([]byte("GetNotificationHandler () => Error while gettig "))
+		log.Print("GetNotificationHandler () => Error while getting ", err)
 		return
 	}
 
@@ -41,8 +41,8 @@ func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	jsondata, err := json.Marshal(notifications)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetNotificationHandler () => Errors while marsalling notification"))
-		log.Print("GetNotificationHandler () => Errors while marshalling notification", err)
+		w.Write([]byte("GetNotificationHandler () => Error while marsalling notification"))
+		log.Print("GetNotificationHandler () => Error while marshalling notification", err)
 		return
 	}
 	w.Write(jsondata)
@@ -72,8 +72,8 @@ func HandleCreateNotificatio(w http.ResponseWriter, r *http.Request) {
 	_, err = notification.saveNotificationInDb()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleCreateNotificatio () => Errors while creating notification"))
-		log.Print("HandleCreateNotificatio () => Errors while creating notification", err)
+		w.Write([]byte("HandleCreateNotificatio () => Error while creating notification"))
+		log.Print("HandleCreateNotificatio () => Error while creating notification", err)
 		return
 	}
 
@@ -91,8 +91,8 @@ func HandleDeleteNotification(w http.ResponseWriter, r *http.Request) {
 	err := deleteNotificationInDb(notificationId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleDeleteNotification() => Errors while deleting notification"))
-		log.Print("HandleDeleteNotification() => Errors while deleting notification", err)
+		w.Write([]byte("HandleDeleteNotification() => Error while deleting notification"))
+		log.Print("HandleDeleteNotification() => Error while deleting notification", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -124,8 +124,8 @@ func UpdateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := notification.UpdateNotificationInDb(notificationId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("UpdatenotificationHandler() => Errors while Updating notification"))
-		log.Print("UpdatenotificationHandler() => Errors while Updating notification", err)
+		w.Write([]byte("UpdatenotificationHandler() => Error while Updating notification"))
+		log.Print("UpdatenotificationHandler() => Error while Updating notification", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)

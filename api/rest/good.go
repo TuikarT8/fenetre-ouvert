@@ -48,24 +48,24 @@ func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
 	params, err := pageQueryFromRequestQueryParams(r)
 
 	if err != nil {
-		w.Write([]byte("GetGoodHandler () => Errors while gettig params"))
-		log.Print("GetGoodHandler () => Errors while getting params", err)
+		w.Write([]byte("GetGoodHandler () => Error while gettig params"))
+		log.Print("GetGoodHandler () => Error while getting params", err)
 		return
 	}
 
 	goods, err := getGoods(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetGoodHandler () => Errors while gettig good"))
-		log.Print("GetGoodHandler () => Errors while getting good", err)
+		w.Write([]byte("GetGoodHandler () => Error while gettig good"))
+		log.Print("GetGoodHandler () => Error while getting good", err)
 		return
 	}
 
 	jsondata, err := json.Marshal(goods)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetGoodHandler () => Errors while marsalling good"))
-		log.Print("GetGoodHandler () => Errors while marshalling good", err)
+		w.Write([]byte("GetGoodHandler () => Error while marsalling good"))
+		log.Print("GetGoodHandler () => Error while marshalling good", err)
 		return
 	}
 	w.Write(jsondata)
@@ -110,8 +110,8 @@ func handleCreateManyGoods(w http.ResponseWriter, r *http.Request) {
 	goods, err = createManyGoods(goods)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("handleCreateOneGood () => Errors while creating good"))
-		log.Print("handleCreateOneGood () => Errors while creating good", err)
+		w.Write([]byte("handleCreateOneGood () => Error while creating good"))
+		log.Print("handleCreateOneGood () => Error while creating good", err)
 		return
 	}
 
@@ -183,8 +183,8 @@ func handleCreateOneGood(w http.ResponseWriter, r *http.Request) {
 	err = good.save(good.Condition)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("handleCreateOneGood () => Errors while creating good"))
-		log.Print("handleCreateOneGood () => Errors while creating good", err)
+		w.Write([]byte("handleCreateOneGood () => Error while creating good"))
+		log.Print("handleCreateOneGood () => Error while creating good", err)
 		return
 	}
 
@@ -201,8 +201,8 @@ func DeleteGoodHandler(w http.ResponseWriter, r *http.Request) {
 	err := deleteGood(goodId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("DeleteGoodHandler() => Errors while deleting good"))
-		log.Print("DeleteGoodHandler() => Errors while deleting good", err)
+		w.Write([]byte("DeleteGoodHandler() => Error while deleting good"))
+		log.Print("DeleteGoodHandler() => Error while deleting good", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -234,8 +234,8 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := request.Update(goodId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("UpdateGoodHandler() => Errors while Updating good"))
-		log.Print("UpdateGoodHandler() => Errors while Updating good", err)
+		w.Write([]byte("UpdateGoodHandler() => Error while Updating good"))
+		log.Print("UpdateGoodHandler() => Error while Updating good", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -251,8 +251,8 @@ func CreateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("CreateGoodChangeHandler() => Errors while reading good from body"))
-		log.Print("CreateGoodChangeHandler () => Errors while reading good from body ")
+		w.Write([]byte("CreateGoodChangeHandler() => Error while reading good from body"))
+		log.Print("CreateGoodChangeHandler () => Error while reading good from body ")
 		return
 	}
 
@@ -262,16 +262,16 @@ func CreateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("CreateGoodChangeHandler() => Errors while unmarsaling goodChange"))
-		log.Print("CreateGoodChangeHandler () =>  Errors while unmarsaling goodChange ")
+		w.Write([]byte("CreateGoodChangeHandler() => Error while unmarsaling goodChange"))
+		log.Print("CreateGoodChangeHandler () =>  Error while unmarsaling goodChange ")
 		return
 	}
 
 	_, err = goodChange.addToGood(goodId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("CreateGoodChangeHandler() => Errors while saving goodChange"))
-		log.Print("CreateGoodChangeHandler () => Errors while creating good", err)
+		w.Write([]byte("CreateGoodChangeHandler() => Error while saving goodChange"))
+		log.Print("CreateGoodChangeHandler () => Error while creating good", err)
 		return
 	}
 
@@ -315,7 +315,7 @@ func UpdateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	sessionId := mux.Vars(r)["sessionId"]
 	if err := UpdateGoodChange(goodId, sessionId, change); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("UpdateGoodChangeHandler () => Errors while retrieving session goods"))
+		w.Write([]byte("UpdateGoodChangeHandler () => Error while retrieving session goods"))
 		log.Printf("UpdateGoodChangeHandler () => Error while retrieving session goods err=[%v]", err)
 		return
 	}
@@ -335,8 +335,8 @@ func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	err := deleteGoodChange(goodId, idSession)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("deleteGoodChange() => Errors while deleting []goodChange"))
-		log.Print("deleteGoodChange() => Errors while deleting []goodChange", err)
+		w.Write([]byte("deleteGoodChange() => Error while deleting []goodChange"))
+		log.Print("deleteGoodChange() => Error while deleting []goodChange", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -344,8 +344,8 @@ func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleUnmarshallingError(err string, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusBadRequest)
-	w.Write([]byte("Errors while unmurshaling resquestBody"))
-	log.Print("Errors while unmurshaling resquestBody", err)
+	w.Write([]byte("Error while unmurshaling resquestBody"))
+	log.Print("Error while unmurshaling resquestBody", err)
 }
 
 func deleteGoodChange(goodId string, idSession string) error {

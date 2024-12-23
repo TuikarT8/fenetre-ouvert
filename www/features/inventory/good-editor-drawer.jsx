@@ -17,6 +17,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import _ from 'lodash';
 import QRCode from 'react-qr-code';
+import { PrintButton } from '../../common/print-button';
 
 const useStyles = makeStyles({
 	content: {
@@ -24,6 +25,12 @@ const useStyles = makeStyles({
 		flexDirection: 'column',
 		rowGap: '10px',
 	},
+
+	iconPositon: {
+		display: 'flex',
+		flexDirection: 'rows',
+	},
+
 	statImg: {
 		width: '100%',
 		height: '25%',
@@ -147,12 +154,15 @@ export const GoodEditorDrawer = ({
 			<DrawerHeader>
 				<DrawerHeaderTitle
 					action={
-						<Button
-							appearance="subtle"
-							aria-label="Close"
-							icon={<Dismiss24Regular />}
-							onClick={() => onClose()}
-						/>
+						<div className={styles.iconPositon}>
+							<PrintButton good={selectedGood} />
+							<Button
+								appearance="subtle"
+								aria-label="Close"
+								icon={<Dismiss24Regular />}
+								onClick={() => onClose()}
+							/>
+						</div>
 					}>
 					{capitalizeFirstLetter(selectedGood.name)}
 				</DrawerHeaderTitle>
@@ -232,21 +242,20 @@ export const GoodEditorDrawer = ({
 						/>
 					</Field>
 				</form>
-				
-			<div>
-				{selectedGood?.code ? (
-					<QRCode
-						title="goodQrCode"
-						value={selectedGood?.code}
-						bgColor={'#FFFFFF'}
-						fgColor={'#000000'}
-						size={128}
-					/>
-				) : (
-					"Le Qr code n'est pas disponible veuillez le fournir"
-				)}
-			</div>
-				
+
+				<div>
+					{selectedGood?.code ? (
+						<QRCode
+							title="goodQrCode"
+							value={selectedGood?.code}
+							bgColor={'#FFFFFF'}
+							fgColor={'#000000'}
+							size={128}
+						/>
+					) : (
+						"Le Qr code n'est pas disponible veuillez le fournir"
+					)}
+				</div>
 			</DrawerBody>
 			<DrawerFooter>
 				<Button appearance="secondary" onClick={() => onClose?.()}>
