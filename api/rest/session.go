@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fenetre-ouverte/api/rest/errors"
+	"fenetre-ouverte/api/utils"
 	"fenetre-ouverte/database"
 	"fmt"
 	"io"
@@ -23,12 +24,12 @@ func SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodPost {
 		PostSessionHandler(w, r)
 	} else {
-		reportWrongHttpMethod(w, r, r.Method)
+		utils.ReportWrongHttpMethod(w, r, r.Method)
 	}
 }
 
 func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodGet) {
+	if !utils.AssertMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -58,7 +59,7 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPost) {
+	if !utils.AssertMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -91,7 +92,7 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodDelete) {
+	if !utils.AssertMethod(w, r, http.MethodDelete) {
 		return
 	}
 
@@ -116,7 +117,7 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPatch) {
+	if !utils.AssertMethod(w, r, http.MethodPatch) {
 		return
 	}
 
@@ -152,7 +153,7 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleActivateSession(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPatch) {
+	if !utils.AssertMethod(w, r, http.MethodPatch) {
 		return
 	}
 
@@ -168,7 +169,7 @@ func HandleActivateSession(w http.ResponseWriter, r *http.Request) {
 }
 
 func HasActiveSessionHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodGet) {
+	if !utils.AssertMethod(w, r, http.MethodGet) {
 		return
 	}
 	var session Session
@@ -192,7 +193,7 @@ func HasActiveSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CloseSessionHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPost) {
+	if !utils.AssertMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -210,7 +211,7 @@ func CloseSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetSessionGoodsHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodGet) {
+	if !utils.AssertMethod(w, r, http.MethodGet) {
 		return
 	}
 

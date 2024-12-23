@@ -1,11 +1,7 @@
 package rest
 
 import (
-	"log"
-	"net/http"
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
@@ -92,30 +88,6 @@ type Notification struct {
 	Id          interface{} `bson:"_id,omitempty" json:"id"`
 	Title       string      `bson:"title,omitempty" json:"title"`
 	Description string      `bson:"description,omitempty" json:"description"`
-}
-
-func checkMethod(w http.ResponseWriter, r *http.Request, method string) bool {
-	if r.Method != method {
-		reportWrongHttpMethod(w, r, method)
-		return false
-	}
-	return true
-}
-
-func reportWrongHttpMethod(w http.ResponseWriter, r *http.Request, method string) {
-	log.Printf("Vous tentez d'utiliser un endpoint avec une méthode inapropriée %s", r.Method)
-	w.WriteHeader(http.StatusMethodNotAllowed)
-	w.Write([]byte("L'endpoint invalide"))
-}
-
-func ConvertStringToPrimitiveOBjectId(id string) (primitive.ObjectID, error) {
-	var hexId primitive.ObjectID
-
-	if hexId, err := primitive.ObjectIDFromHex(id); err != nil {
-		return hexId, err
-	}
-
-	return hexId, nil
 }
 
 func (good *FormularyGood) ToGood() Good {

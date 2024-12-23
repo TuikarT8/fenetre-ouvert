@@ -32,9 +32,9 @@ func main() {
 	/*
 		Handle Notifications
 	*/
-	r.HandleFunc("POST /api/notification", rest.PostNotificationHandler)
+	r.HandleFunc("POST /api/notification", rest.HandleCreateNotificatio)
 	r.HandleFunc("GET /api/notifications", rest.GetNotificationHandler)
-	r.HandleFunc("DELETE /api/notifications/{id}", rest.DeleteNotificationHandler)
+	r.HandleFunc("DELETE /api/notifications/{id}", rest.HandleDeleteNotification)
 	r.HandleFunc("PATCH /api/notifications/{id}", rest.UpdateNotificationHandler)
 
 	/*
@@ -55,6 +55,12 @@ func main() {
 	r.HandleFunc("/api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
 	r.HandleFunc("POST /api/sessions/{id}/close", rest.CloseSessionHandler)
 	r.HandleFunc("/api/hasActiveSession", rest.HasActiveSessionHandler)
+
+	/*
+		Labels
+	*/
+	r.HandleFunc("/api/goods/{id}/print", rest.HandlePrintLabel)
+	r.HandleFunc("/assets/goods/{id}/qrcode", rest.HandleGenerateQrCode)
 
 	database.ConnectTodataBase()
 

@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"fenetre-ouverte/api/utils"
 	"fenetre-ouverte/database"
 	"io"
 	"log"
@@ -15,7 +16,7 @@ import (
 )
 
 func HandleGetUsers(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodGet) {
+	if !utils.AssertMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -45,7 +46,7 @@ func HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPost) {
+	if !utils.AssertMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -78,7 +79,7 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodDelete) {
+	if !utils.AssertMethod(w, r, http.MethodDelete) {
 		return
 	}
 
@@ -95,7 +96,7 @@ func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPatch) {
+	if !utils.AssertMethod(w, r, http.MethodPatch) {
 		return
 	}
 

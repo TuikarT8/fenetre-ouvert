@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"fenetre-ouverte/api/utils"
 	"fenetre-ouverte/database"
 	"io"
 	"log"
@@ -15,7 +16,7 @@ import (
 )
 
 func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodGet) {
+	if !utils.AssertMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -47,16 +48,16 @@ func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsondata)
 }
 
-func PostNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPost) {
+func HandleCreateNotificatio(w http.ResponseWriter, r *http.Request) {
+	if !utils.AssertMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("postNotificationHandler () => Errors lors de la lecture du corps de la requette"))
-		log.Print("postNotificationHandler () => Errors lors de la lecture du corps de la requette", err)
+		w.Write([]byte("HandleCreateNotificatio () => Errors lors de la lecture du corps de la requette"))
+		log.Print("HandleCreateNotificatio () => Errors lors de la lecture du corps de la requette", err)
 		return
 	}
 
@@ -71,8 +72,8 @@ func PostNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = notification.saveNotificationInDb()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("postNotificationHandler () => Errors while creating notification"))
-		log.Print("postNotificationHandler () => Errors while creating notification", err)
+		w.Write([]byte("HandleCreateNotificatio () => Errors while creating notification"))
+		log.Print("HandleCreateNotificatio () => Errors while creating notification", err)
 		return
 	}
 
@@ -80,9 +81,9 @@ func PostNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(jsondata))
 }
 
-func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodDelete) {
-
+func HandleDeleteNotification(w http.ResponseWriter, r *http.Request) {
+	if !utils.AssertMethod(w, r, http.MethodDelete) {
+		return
 	}
 
 	notificationId := mux.Vars(r)["id"]
@@ -90,15 +91,15 @@ func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	err := deleteNotificationInDb(notificationId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("deleteNotificationHandler() => Errors while deleting notification"))
-		log.Print("deleteNotificationHandler() => Errors while deleting notification", err)
+		w.Write([]byte("HandleDeleteNotification() => Errors while deleting notification"))
+		log.Print("HandleDeleteNotification() => Errors while deleting notification", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
 func UpdateNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPatch) {
+	if !utils.AssertMethod(w, r, http.MethodPatch) {
 		return
 	}
 

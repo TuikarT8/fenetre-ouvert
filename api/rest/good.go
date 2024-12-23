@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 	"encoding/json"
+	"fenetre-ouverte/api/utils"
 	database "fenetre-ouverte/database"
 	"io"
 	"log"
@@ -25,7 +26,7 @@ func GoodsHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodPost {
 		CreateGoodHandler(w, r)
 	} else {
-		reportWrongHttpMethod(w, r, r.Method)
+		utils.ReportWrongHttpMethod(w, r, r.Method)
 	}
 }
 
@@ -35,12 +36,12 @@ func GoodHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodPatch {
 		UpdateGoodHandler(w, r)
 	} else {
-		reportWrongHttpMethod(w, r, r.Method)
+		utils.ReportWrongHttpMethod(w, r, r.Method)
 	}
 }
 
 func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodGet) {
+	if !utils.AssertMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -72,7 +73,7 @@ func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateGoodHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPost) {
+	if !utils.AssertMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -192,7 +193,7 @@ func handleCreateOneGood(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteGoodHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodDelete) {
+	if !utils.AssertMethod(w, r, http.MethodDelete) {
 		return
 	}
 
@@ -208,7 +209,7 @@ func DeleteGoodHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPatch) {
+	if !utils.AssertMethod(w, r, http.MethodPatch) {
 		return
 	}
 
@@ -241,7 +242,7 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPost) {
+	if !utils.AssertMethod(w, r, http.MethodPost) {
 		return
 	}
 	goodId := mux.Vars(r)["id"]
@@ -286,11 +287,11 @@ func HandleGoodChangeOperation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reportWrongHttpMethod(w, r, r.Method)
+	utils.ReportWrongHttpMethod(w, r, r.Method)
 }
 
 func UpdateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodPatch) {
+	if !utils.AssertMethod(w, r, http.MethodPatch) {
 		return
 	}
 
@@ -323,7 +324,7 @@ func UpdateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
-	if !checkMethod(w, r, http.MethodDelete) {
+	if !utils.AssertMethod(w, r, http.MethodDelete) {
 		return
 	}
 
@@ -593,4 +594,23 @@ func UpdateGoodChange(goodId string, sessionId string, change GoodChange) error 
 	}
 
 	return nil
+}
+
+func GetGoodById(goodId string) (Good, error) {
+	var good Good
+	hexId, err := primitive.ObjectIDFromHex(goodId)
+	if err != nil {
+		return Good{}, err
+	}
+	result := database.Goods.FindOne(database.Ctx,
+		bson.M{
+			"_id": hexId,
+		})
+
+	err = result.Decode(&good)
+	if err != nil {
+		return Good{}, err
+	}
+
+	return good, nil
 }
