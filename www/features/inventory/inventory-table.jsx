@@ -24,7 +24,7 @@ import {
 	Title1,
 } from '@fluentui/react-components';
 import axios from 'axios';
-import _, { cloneDeep } from 'lodash';
+import _, { cloneDeep, last } from 'lodash';
 import { useParams } from 'react-router-dom';
 import { GoodEditorDrawer } from './good-editor-drawer';
 import { ConfimationDialog } from '../../common/dialogs/confimation-dialog';
@@ -89,14 +89,14 @@ export const InventoryTable = () => {
 			});
 	}, [inventoryId]);
 
-	const contactTheServerToCreateAnAssetInTheCurrentSession = (
+	const contactTheServerToCreateAChangeInTheCurrentSession = (
 		good,
 		lastChange,
 	) => {
-		const change = cloneDeep(lastChange);
+		const change = cloneDeep(lastChange) || {};
 		change.sessionId = session.sessionId;
 
-		axios
+		return axios
 			.post(`/api/goods/${good.id}/changes`, change)
 			.then(() => {
 				moveGoodNotInSessionToGoodsInSession(good, change);
@@ -148,6 +148,17 @@ export const InventoryTable = () => {
 			});
 	};
 
+
+	const onGoodScanned = (goodCode) => {
+		const good = session.goodsNotInSession.find(({ id }) => id === goodCode)
+		if (!good) {
+			console.error('Good not found or already in session, cannot add it via scan');
+			return;
+		}
+
+		setSelectedGood(good);
+	}
+
 	return (
 		<div>
 			{!!session || <Title1>{"Aucune session n'est active"}</Title1>}
@@ -158,7 +169,7 @@ export const InventoryTable = () => {
 					onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
 				/>
 			)}
-			{!!session?.goods?.length && <InventoryToolbar sessionId={inventoryId} />}
+			{!!session?.goods?.length && <InventoryToolbar sessionId={inventoryId} onGoodScanned={onGoodScanned} />}
 			{!!session?.goods?.length && (
 				<Table
 					{...keyboardNavAttr}
@@ -293,7 +304,7 @@ export const InventoryTable = () => {
 												aria-label="Add"
 												onClick={() => {
 													if (change) {
-														contactTheServerToCreateAnAssetInTheCurrentSession(
+														contactTheServerToCreateAChangeInTheCurrentSession(
 															item,
 															change,
 														);

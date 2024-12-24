@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -94,17 +93,13 @@ func handleCreateManyGoods(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var goods []FormularyGood = make([]FormularyGood, 0)
+	var goods []FormularyGood
 
 	err = json.Unmarshal(body, &goods)
 	if err != nil {
 		log.Printf("handleCreateManyGoods() Error while unmarshalling payload for creating many goods, err=[%v]", err)
 		handleUnmarshallingError(err.Error(), w)
 		return
-	}
-
-	for _, v := range goods {
-		v.Code = uuid.New().String()
 	}
 
 	goods, err = createManyGoods(goods)
@@ -168,11 +163,7 @@ func handleCreateOneGood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var good = FormularyGood{
-		Good: Good{
-			Code: uuid.New().String(),
-		},
-	}
+	var good FormularyGood
 
 	err = json.Unmarshal(body, &good)
 	if err != nil {

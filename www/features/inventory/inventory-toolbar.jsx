@@ -12,7 +12,7 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { GoodScanner } from '../../common/qr-scanner';
 
-export const InventoryToolbar = ({ sessionId }) => {
+export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
 	const [isCreateGoodDialogOpen, setIsCreateGoodDialogOpen] = useState(false);
 	const fileInputRef = useRef(null);
 	const { onFileUpload } = useFileUploader();
@@ -39,19 +39,10 @@ export const InventoryToolbar = ({ sessionId }) => {
 		setIsCreateGoodDialogOpen(true);
 	};
 
-	const onGoodScanned = (goodCode) => {
-		// 1. Récupérer le bien depuis la base de donnée, dont le code correspond à decodedText
-
-		// 2. Ajouter un changement pour la session active et
-
-		// 3. Afficher la panneau latéral droit pour permettre à l'utilisateur de modifier les valeurs
-		// du changement
-	}
-
 	return (
 		<div>
 			<Toolbar aria-label="Vertical Button">
-				<GoodScanner onGoodSCanned={onGoodScanned}/>
+				<GoodScanner onGoodScanned={onGoodScanned}/>
 				<Tooltip content={'Créer un bien'} relationship="description">
 					<ToolbarButton
 						vertical
@@ -115,4 +106,5 @@ export const InventoryToolbar = ({ sessionId }) => {
 
 InventoryToolbar.propTypes = {
 	sessionId: PropTypes.string.isRequired,
+	onGoodScanned: PropTypes.func.isRequired,
 };

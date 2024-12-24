@@ -29,6 +29,7 @@ export const GoodDrawer = ({ isOpen, selectedGood, onClose }) => {
 
 	if (!selectedGood) return null;
 
+
 	return (
 		<Drawer
 			{...restoreFocusSourceAttributes}
@@ -58,10 +59,10 @@ export const GoodDrawer = ({ isOpen, selectedGood, onClose }) => {
 			<DrawerBody>
 				<p>{selectedGood.description}</p>
 				<GoodCard></GoodCard>
-				{selectedGood?.code ? (
+				{selectedGood?.id ? (
 					<QRCode
 						title="goodQrCode"
-						value={selectedGood.code}
+						value={selectedGood?.id}
 						bgColor={'#FFFFFF'}
 						fgColor={'#000000'}
 						size={128}

@@ -244,10 +244,10 @@ export const GoodEditorDrawer = ({
 				</form>
 
 				<div>
-					{selectedGood?.code ? (
+					{selectedGood?.id ? (
 						<QRCode
 							title="goodQrCode"
-							value={selectedGood?.code}
+							value={selectedGood?.id}
 							bgColor={'#FFFFFF'}
 							fgColor={'#000000'}
 							size={128}

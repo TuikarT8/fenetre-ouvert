@@ -27,7 +27,7 @@ func main() {
 	*/
 	r.HandleFunc("/api/goods", rest.GoodsHandler)
 	r.HandleFunc("/api/goods/{id}", rest.GoodHandler)
-	r.HandleFunc("POST /api/goods/{id}/changes", rest.CreateGoodChangeHandler)
+	r.HandleFunc("/api/goods/{id}/changes", rest.CreateGoodChangeHandler)
 	r.HandleFunc("/api/goods/{id}/changes/{sessionId}", rest.HandleGoodChangeOperation)
 
 	/*
