@@ -2,6 +2,7 @@ import {
 	makeStyles,
 	mergeClasses,
 	themeToTokensObject,
+	Toolbar,
 	ToolbarButton,
 	Tooltip,
 	webLightTheme,
@@ -9,7 +10,7 @@ import {
 import { ScanDash32Filled } from '@fluentui/react-icons';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import PropTypes from 'prop-types';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 const tokens = themeToTokensObject(webLightTheme);
 const useStyles = makeStyles({
@@ -51,7 +52,7 @@ export function GoodScanner({ onGoodScanned }) {
 	);
 
 	const onScanSuccess = (decodedText) => {
-		onGoodScanned(decodedText)
+		onGoodScanned(decodedText);
 		setIsScanRequested(false);
 		scanner?.clear();
 	};
@@ -65,8 +66,19 @@ export function GoodScanner({ onGoodScanned }) {
 		scanner?.render(onScanSuccess);
 	};
 
+	useEffect(() => {
+		if (!isScanRequested) {
+			scanner?.clear();
+		}
+	}, [isScanRequested]);
+
 	return (
 		<div>
+			<Toolbar>
+				<ToolbarButton onClick={() => setIsScanRequested(false)}>
+					Fermer
+				</ToolbarButton>
+			</Toolbar>
 			<div
 				className={mergeClasses(
 					styles.scannerBox,
@@ -88,4 +100,4 @@ export function GoodScanner({ onGoodScanned }) {
 
 GoodScanner.propTypes = {
 	onGoodScanned: PropTypes.func.isRequired,
-}
+};

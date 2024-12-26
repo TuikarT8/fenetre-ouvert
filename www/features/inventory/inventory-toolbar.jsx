@@ -42,7 +42,7 @@ export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
 	return (
 		<div>
 			<Toolbar aria-label="Vertical Button">
-				<GoodScanner onGoodScanned={onGoodScanned}/>
+				<GoodScanner onGoodScanned={onGoodScanned} />
 				<Tooltip content={'Créer un bien'} relationship="description">
 					<ToolbarButton
 						vertical

@@ -29,7 +29,6 @@ export const GoodDrawer = ({ isOpen, selectedGood, onClose }) => {
 
 	if (!selectedGood) return null;
 
-
 	return (
 		<Drawer
 			{...restoreFocusSourceAttributes}
