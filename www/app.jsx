@@ -10,6 +10,7 @@ import { InventoriesTable } from './features/inventory/inventories';
 import { Login } from './login';
 import { ProtectedRoute } from './common/protected-route';
 import { SinginUp } from './SinginUp';
+import { Error } from './common';
 
 const useStyles = makeStyles({
 	main: {
@@ -77,6 +78,7 @@ export function App() {
 							/>
 							<Route path="/login" element={<Login />}></Route>
 							<Route path="/signinup" element={<SinginUp />}></Route>
+							<Route path="/error" element={<Error />}></Route>
 						</Routes>
 					</InventoryProvider>
 				</section>

@@ -33,9 +33,8 @@ type User struct {
 	Deleted      bool           `bson:"deleted,omitempty" json:"deleted"`
 }
 
-type FormField struct {
-	Value string
-	Error string
+type ValidJwToken struct {
+	Valid bool `json:"valid"`
 }
 
 type Good struct {

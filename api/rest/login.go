@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"encoding/json"
 	"fenetre-ouverte/database"
 	"fmt"
 	"log"
@@ -147,4 +148,57 @@ func CompareHashAndPassword(tokenString string) (AuthToken, error) {
 	}
 
 	return authToken, nil
+}
+
+func HandleVerifyJwt(w http.ResponseWriter, r *http.Request) {
+	var decoded AuthToken
+
+	cookie, err := r.Cookie("jwt")
+	if err != nil {
+		log.Printf("Token not find, %v", decoded.User)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HandleVerifyJwt () => Error  find  jwt token"))
+	}
+
+	log.Print(cookie)
+
+	if cookie.Value == "" {
+		log.Printf("Cannot find token user, %v", decoded.User)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HandleVerifyJwt () => Error while finding jwt the value is empty"))
+	}
+
+	decoded, err = decodeToken(cookie.Value)
+	if err != nil {
+		log.Printf(" the jwt is not valid, %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HandleVerifyJwt () => the jwt is not valid"))
+		return
+	}
+
+	jsondata, _ := json.Marshal(ValidJwToken{
+		Valid: true,
+	})
+	w.Write([]byte(jsondata))
+
+}
+
+func decodeToken(tokenString string) (AuthToken, error) {
+	var decoded AuthToken
+	token, err := jwt.ParseWithClaims(tokenString, &decoded, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtKey), nil
+	})
+
+	if err != nil {
+		return decoded, err
+	}
+
+	if token.Valid {
+		err = mapstructure.Decode(token.Claims, &decoded)
+		if err != nil {
+			return decoded, err
+		}
+	}
+
+	return decoded, nil
 }

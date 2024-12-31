@@ -43,7 +43,7 @@ func main() {
 	*/
 	r.HandleFunc("/api/login", rest.LoginHandler)
 	r.HandleFunc("/api/register", rest.RegisterUserHandler)
-	r.HandleFunc("DELETE /api/users/{id}", rest.HandleDeleteUser)
+	r.HandleFunc("/api/auth/verify", rest.HandleVerifyJwt)
 	r.HandleFunc("PATCH /api/users/{id}", rest.HandleUpdateUser)
 
 	/*
