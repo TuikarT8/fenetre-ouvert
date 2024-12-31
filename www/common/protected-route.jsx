@@ -7,6 +7,8 @@ export function ProtectedRoute({ children }) {
 
 	useEffect(() => {
 		const cookieParts = document.cookie.split(';');
+		console.log(cookieParts);
+		console.log(document.cookie);
 		const jwtCookie = cookieParts.find((part) => part.trim().startsWith('jwt'));
 
 		if (!jwtCookie) {

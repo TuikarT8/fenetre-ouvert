@@ -41,8 +41,8 @@ func main() {
 	/*
 		Handle Users
 	*/
-	r.HandleFunc("POST /api/users", rest.HandleCreateUser)
-	r.HandleFunc("GET /api/users", rest.HandleGetUsers)
+	r.HandleFunc("/api/login", rest.LoginHandler)
+	r.HandleFunc("/api/register", rest.RegisterUserHandler)
 	r.HandleFunc("DELETE /api/users/{id}", rest.HandleDeleteUser)
 	r.HandleFunc("PATCH /api/users/{id}", rest.HandleUpdateUser)
 
@@ -62,7 +62,9 @@ func main() {
 	*/
 	r.HandleFunc("/api/goods/{id}/print", rest.HandlePrintLabel)
 
-	/* Assets */
+	/*
+		Assets
+	*/
 	r.HandleFunc("/assets/goods/{id}/qrcode", assets.HandleGenerateQrCode)
 
 	database.ConnectTodataBase()

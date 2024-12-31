@@ -7,6 +7,9 @@ import { InventoryProvider } from './provider';
 import { makeStyles } from '@fluentui/react-components';
 import { NavigationDrawer } from './nav-drawer';
 import { InventoriesTable } from './features/inventory/inventories';
+import { Login } from './login';
+import { ProtectedRoute } from './common/protected-route';
+import { SinginUp } from './SinginUp';
 
 const useStyles = makeStyles({
 	main: {
@@ -47,9 +50,33 @@ export function App() {
 					<Navbar onToggleAppNavDrawer={() => toggleAppNavDrawerOpen()} />
 					<InventoryProvider>
 						<Routes>
-							<Route index path="/" element={<Home />} />
-							<Route path="/inventories/:inventoryId" element={<Inventory />} />
-							<Route path="/inventories" element={<InventoriesTable />} />
+							<Route
+								index
+								path="/"
+								element={
+									<ProtectedRoute>
+										<Home />
+									</ProtectedRoute>
+								}
+							/>
+							<Route
+								path="/inventories/:inventoryId"
+								element={
+									<ProtectedRoute>
+										<Inventory />
+									</ProtectedRoute>
+								}
+							/>
+							<Route
+								path="/inventories"
+								element={
+									<ProtectedRoute>
+										<InventoriesTable />
+									</ProtectedRoute>
+								}
+							/>
+							<Route path="/login" element={<Login />}></Route>
+							<Route path="/signinup" element={<SinginUp />}></Route>
 						</Routes>
 					</InventoryProvider>
 				</section>

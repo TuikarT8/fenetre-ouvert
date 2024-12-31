@@ -1,7 +1,10 @@
 package rest
 
 import (
+	"regexp"
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
 const (
@@ -21,9 +24,18 @@ type User struct {
 	Id           interface{}    `bson:"_id,omitempty" json:"id"`
 	FirstName    string         `bson:"fistname,omitempty" json:"firstname"`
 	LastName     string         `bson:"lastname,omitempty" json:"lastname"`
+	EmailAddress string         `bson:"emailAddress,omitempty" json:"emailAddress"`
+	Password     string         `bson:"password,omitempty" json:"password"`
 	MiddleName   string         `bson:"middlename,omitempty" json:"middlename"`
 	Notification []Notification `bson:"notification,omitempty" json:"notification"`
 	Condition    string         `bson:"condition,omitempty" json:"condition"`
+	Address      string         `bson:"address,omitempty" json:"address"`
+	Deleted      bool           `bson:"deleted,omitempty" json:"deleted"`
+}
+
+type FormField struct {
+	Value string
+	Error string
 }
 
 type Good struct {
@@ -90,6 +102,38 @@ type Notification struct {
 	Description string      `bson:"description,omitempty" json:"description"`
 }
 
+type PermissionSchema struct {
+	Id             interface{}         `bson:"_id,omitempty" json:"id"`
+	Name           string              `bson: "name, omitempty" json:"id"`
+	AttributionMap map[string][]string `bson: "attributionMap, omitempty" json:"attributionMap"`
+}
+
+type AuthToken struct {
+	User User
+	jwt.StandardClaims
+}
+
 func (good *FormularyGood) ToGood() Good {
 	return good.Good
+}
+
+func (user *User) verify() map[string]string {
+	errs := make(map[string]string)
+	if len(user.FirstName) < 3 {
+		errs["firstName"] = "The length of the first-name should not be lesser than 2"
+	}
+
+	if len(user.LastName) < 3 {
+		errs["lastName"] = "The length of the first-name should not be lesser than 2"
+	}
+
+	if matched, _ := regexp.MatchString(`[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+`, user.EmailAddress); !matched && user.EmailAddress != "" {
+		errs["emailAddress"] = "value should be of the form  xxxxx@xxxxxx.xx"
+	}
+
+	if matched, _ := regexp.MatchString(`[a-zA-Z]{10,}`, user.Password); !matched && user.Password != "" {
+		errs["password"] = "value should be of the form  xxXXxxx123"
+	}
+
+	return errs
 }
