@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
+func HandleSignupUser(w http.ResponseWriter, r *http.Request) {
 	firstname := r.FormValue("firstname")
 	middlename := r.FormValue("middlename")
 	lastname := r.FormValue("lastname")

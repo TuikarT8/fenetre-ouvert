@@ -29,7 +29,7 @@ func InitAuth() {
 	}
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
+func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("emailaddress")
 	password := r.FormValue("password")
 
@@ -151,21 +151,30 @@ func CompareHashAndPassword(tokenString string) (AuthToken, error) {
 }
 
 func HandleVerifyJwt(w http.ResponseWriter, r *http.Request) {
-	var decoded AuthToken
+	if _, err := verifyJwt(w, r); err != nil {
+		jsondata, _ := json.Marshal(map[string]bool{
+			"valid": false,
+		})
 
-	cookie, err := r.Cookie("jwt")
-	if err != nil {
-		log.Printf("Token not find, %v", decoded.User)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleVerifyJwt () => Error  find  jwt token"))
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(jsondata)
+		return
 	}
 
-	log.Print(cookie)
+	jsondata, _ := json.Marshal(map[string]bool{
+		"valid": true,
+	})
+	w.Write([]byte(jsondata))
+}
 
-	if cookie.Value == "" {
-		log.Printf("Cannot find token user, %v", decoded.User)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleVerifyJwt () => Error while finding jwt the value is empty"))
+func verifyJwt(w http.ResponseWriter, r *http.Request) (User, error) {
+	var decoded AuthToken
+	var user User
+
+	cookie, err := r.Cookie("jwt")
+	if err != nil || cookie.Value == "" {
+		return user, fmt.Errorf("Cannot find JWT token in the request")
 	}
 
 	decoded, err = decodeToken(cookie.Value)
@@ -173,14 +182,13 @@ func HandleVerifyJwt(w http.ResponseWriter, r *http.Request) {
 		log.Printf(" the jwt is not valid, %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("HandleVerifyJwt () => the jwt is not valid"))
-		return
 	}
 
-	jsondata, _ := json.Marshal(ValidJwToken{
-		Valid: true,
-	})
-	w.Write([]byte(jsondata))
+	if err = decoded.Valid(); err == nil {
+		return decoded.User, nil
+	}
 
+	return user, err
 }
 
 func decodeToken(tokenString string) (AuthToken, error) {

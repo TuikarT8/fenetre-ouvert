@@ -33,10 +33,6 @@ type User struct {
 	Deleted      bool           `bson:"deleted,omitempty" json:"deleted"`
 }
 
-type ValidJwToken struct {
-	Valid bool `json:"valid"`
-}
-
 type Good struct {
 	ID            interface{}  `bson:"_id,omitempty" json:"id"`
 	Name          string       `bson:"name,omitempty" json:"name"`
@@ -104,6 +100,7 @@ type Notification struct {
 type PermissionSchema struct {
 	Id             interface{}         `bson:"_id,omitempty" json:"id"`
 	Name           string              `bson: "name, omitempty" json:"id"`
+	Permission     []string            `bson: "name" omitemty json:"id"`
 	AttributionMap map[string][]string `bson: "attributionMap, omitempty" json:"attributionMap"`
 }
 

@@ -50,7 +50,7 @@ export function SinginUp() {
 		}
 
 		axios
-			.post('/api/register', form)
+			.post('/api/auth/signup', form)
 			.then(() => {
 				form.current?.reset();
 				Navigate('/login');

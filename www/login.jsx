@@ -46,7 +46,7 @@ export function Login() {
 		}
 
 		axios
-			.post('/api/login', form)
+			.post('/api/auth/login', form)
 			.then(() => {
 				navigate('/');
 			})
