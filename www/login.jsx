@@ -60,7 +60,20 @@ export function Login() {
 		const jwtCookie = cookieParts.find((part) => part.trim().startsWith('jwt'));
 
 		if (jwtCookie) {
-			navigate('/');
+			axios.post('/api/auth/verify', {})
+			.then(({ data }) => {
+				if (data.valid) {
+					navigate('/');
+					return;
+				} else {
+					cookieParts.filter(part => part.trim().startsWith('jwt'));
+					document.cookie = cookieParts.map(part => part.trim()).join('; ');
+				}
+			}).catch((e) => {
+				console.error(e);
+				navigate('/error');
+				return
+			});
 		}
 	}, []);
 

@@ -2,6 +2,7 @@ package rest
 
 import (
 	"regexp"
+	"slices"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -20,6 +21,21 @@ const (
 	GoodCondition_TresMauvais = "tres-mauvais"
 )
 
+const (
+	Entities_Good    = "goods"
+	Entities_Session = "sessions"
+	Entities_Group   = "groups"
+	Entities_User    = "users"
+	Entities_Unknown = "unknown"
+)
+
+const (
+	EntityOperation_Write   = "WRITE"
+	EntityOperation_Update  = "UPDATE"
+	EntityOperation_Read    = "READ"
+	EntityOperation_Unknown = "UNKNOWN"
+)
+
 type User struct {
 	Id           interface{}    `bson:"_id,omitempty" json:"id"`
 	FirstName    string         `bson:"fistname,omitempty" json:"firstname"`
@@ -31,6 +47,7 @@ type User struct {
 	Condition    string         `bson:"condition,omitempty" json:"condition"`
 	Address      string         `bson:"address,omitempty" json:"address"`
 	Deleted      bool           `bson:"deleted,omitempty" json:"deleted"`
+	Roles        []string       `bson:"roles,omitempty" json:"roles"`
 }
 
 type Good struct {
@@ -97,16 +114,15 @@ type Notification struct {
 	Description string      `bson:"description,omitempty" json:"description"`
 }
 
-type PermissionSchema struct {
-	Id             interface{}         `bson:"_id,omitempty" json:"id"`
-	Name           string              `bson: "name, omitempty" json:"id"`
-	Permission     []string            `bson: "name" omitemty json:"id"`
-	AttributionMap map[string][]string `bson: "attributionMap, omitempty" json:"attributionMap"`
-}
-
 type AuthToken struct {
 	User User
 	jwt.StandardClaims
+}
+
+type Group struct {
+	Id    interface{} `bson:"_id,omitempty" json:"id"`
+	Name  string      `bson:"name, omitempty" json:"name"`
+	Users []User      `bson:"users, omitempty" json:"users"`
 }
 
 func (good *FormularyGood) ToGood() Good {
@@ -132,4 +148,25 @@ func (user *User) verify() map[string]string {
 	}
 
 	return errs
+}
+
+type RolesMap map[string][]string
+
+func (user *User) HasPermission(permission string) bool {
+	if len(user.Roles) == 0 {
+		return false
+	}
+
+	for _, role := range user.Roles {
+		baseRoles := permissions["roles"].(RolesMap)[role]
+		for _, baseRole := range baseRoles {
+			perms := permissions["baseRoles"].(RolesMap)[baseRole]
+
+			if slices.Contains(perms, permission) {
+				return true
+			}
+		}
+	}
+
+	return false
 }

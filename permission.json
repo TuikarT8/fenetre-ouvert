@@ -1,0 +1,15 @@
+{
+    "base_roles": {
+        "good_editor": ["READ_GOOD", "WRITE_GOOD"],
+        "good_reader": ["READ_GOOD"],
+        "session_editor": ["READ_SESSION", "WRITE_SESSION"],
+        "session_reader": ["READ_SESSION"],
+        "user_editor": ["READ_USER", "WRITE_USER", "UPDATE_USER"],
+        "user_reader": ["READ_USER"]
+    },
+    "roles": {
+        "supervisor": ["good_editor", "session_editor", "user_editor"],
+        "viewer": ["good_viewer", "session_viewer", "user_viewer"],
+        "editor": ["good_editor", "session_viewer", "user_viewer"]
+    }
+}

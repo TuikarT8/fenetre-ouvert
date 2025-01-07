@@ -2,7 +2,6 @@ package main
 
 import (
 	"fenetre-ouverte/api/rest"
-	"fenetre-ouverte/api/rest/assets"
 
 	"github.com/gorilla/mux"
 )
@@ -61,5 +60,5 @@ func createAuthRoutes(r *mux.Router) {
 }
 
 func createAssetRoutes(r *mux.Router) {
-	r.HandleFunc("/assets/goods/{id}/qrcode", assets.HandleGenerateQrCode)
+	r.HandleFunc("/assets/goods/{id}/qrcode", rest.HandleGenerateQrCode)
 }

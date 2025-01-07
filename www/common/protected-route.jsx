@@ -13,6 +13,7 @@ export function ProtectedRoute({ children }) {
 		
 		if (!jwtCookie) {
 			navigate('/login');
+			console.warn('Cookie not present, redirecting to /login');
 			return;
 		}
 
@@ -21,12 +22,15 @@ export function ProtectedRoute({ children }) {
 				if (data.valid) {
 					setCanRenderContent(true);
 				} else {
+					console.warn('Forbidden, redirecting to /login')
+					
+					const otherCookies = cookieParts.filter(part => part.trim().startsWith('jwt'));
+					document.cookie = otherCookies.map(part => part.trim()).join('; ');
 					navigate('/login');
-					cookieParts.filter(part => part.trim().startsWith('jwt'));
-					document.cookie = cookieParts.map(part => part.trim()).join('; ');
 				}
 			}).catch((e) => {
 				console.error(e);
+				console.warn('Error, redirecting to /error');
 				navigate('/error');
 				return
 			});

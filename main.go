@@ -2,7 +2,6 @@ package main
 
 import (
 	"fenetre-ouverte/api/rest"
-	"fenetre-ouverte/api/rest/assets"
 	"fenetre-ouverte/database"
 	"fmt"
 	"log"
@@ -20,55 +19,14 @@ func init() {
 }
 
 func main() {
-	r := mux.NewRouter()
-
-	/*
-		Handle Goods
-	*/
-	r.HandleFunc("/api/goods", rest.GoodsHandler)
-	r.HandleFunc("/api/goods/{id}", rest.GoodHandler)
-	r.HandleFunc("/api/goods/{id}/changes", rest.CreateGoodChangeHandler)
-	r.HandleFunc("/api/goods/{id}/changes/{sessionId}", rest.HandleGoodChangeOperation)
-
-	/*
-		Handle Notifications
-	*/
-	r.HandleFunc("POST /api/notification", rest.HandleCreateNotificatio)
-	r.HandleFunc("GET /api/notifications", rest.GetNotificationHandler)
-	r.HandleFunc("DELETE /api/notifications/{id}", rest.HandleDeleteNotification)
-	r.HandleFunc("PATCH /api/notifications/{id}", rest.UpdateNotificationHandler)
-
-	/*
-		Handle Users
-	*/
-	r.HandleFunc("/api/login", rest.LoginHandler)
-	r.HandleFunc("/api/register", rest.RegisterUserHandler)
-	r.HandleFunc("/api/auth/verify", rest.HandleVerifyJwt)
-	r.HandleFunc("PATCH /api/users/{id}", rest.HandleUpdateUser)
-
-	/*
-		Handle Sessions
-	*/
-	r.HandleFunc("/api/sessions", rest.SessionsHandler)
-	r.HandleFunc("/api/sessions/{id}", rest.DeleteSessionHandler)
-	r.HandleFunc("/api/sessions/{id}/session", rest.UpdateSessionHandler)
-	r.HandleFunc("/api/sessions/{id}/activate", rest.HandleActivateSession)
-	r.HandleFunc("/api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
-	r.HandleFunc("/api/sessions/{id}/close", rest.CloseSessionHandler)
-	r.HandleFunc("/api/hasActiveSession", rest.HasActiveSessionHandler)
-
-	/*
-		Labels
-	*/
-	r.HandleFunc("/api/goods/{id}/print", rest.HandlePrintLabel)
-
-	/*
-		Assets
-	*/
-	r.HandleFunc("/assets/goods/{id}/qrcode", assets.HandleGenerateQrCode)
-
+	rest.Init()
+	r := createRoutes()
 	database.ConnectTodataBase()
+	listenAndServe(r)
 
+}
+
+func listenAndServe(r *mux.Router) {
 	port := getListeningPort()
 	log.Printf("Server is Listening on port %s", os.Getenv("PORT"))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), r))
