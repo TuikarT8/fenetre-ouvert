@@ -9,3 +9,14 @@ func getAuthorFromRequest(r *http.Request) Author {
 		Id:   user.Id,
 	}
 }
+
+func map[I any, O any](slice []I, callbackFn func(element I, index int) O) []O {
+	output := make([]O, 0)
+
+	for idx, i := range slice {
+		o := callbackFn(i, idx)
+		output = append(output, o)
+	}
+
+	return output
+}

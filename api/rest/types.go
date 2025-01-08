@@ -71,10 +71,11 @@ type Good struct {
 }
 
 type Event struct {
-	At     time.Time `bson:"at" json"at"`
-	Entity string    `bson:"entity" json"entity"`
-	Action string    `bson:"action" json"action"`
-	Author Author    `bson:"author" json"author"`
+	EntityId interface{} `bson:"entityId" json:"entityId"`
+	At       time.Time   `bson:"at" json"at"`
+	Entity   string      `bson:"entity" json"entity"`
+	Action   string      `bson:"action" json"action"`
+	Author   Author      `bson:"author" json"author"`
 }
 
 type GoodUpdateRequest struct {

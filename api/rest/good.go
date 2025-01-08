@@ -110,11 +110,17 @@ func handleCreateManyGoods(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	goodsIds := mapSlice[FormularyGood, interface{}](
+		goods,
+		func(o FormularyGood, index int) interface{} { return o.ID },
+	)
+
 	var event Event = Event{
-		At:     time.Now(),
-		Entity: Entities_Good,
-		Action: EventOperation_Created_Many,
-		Author: getAuthorFromRequest(r),
+		EntityId: goodsIds,
+		At:       time.Now(),
+		Entity:   Entities_Good,
+		Action:   EventOperation_Created_Many,
+		Author:   getAuthorFromRequest(r),
 	}
 	_ = event.save()
 
@@ -188,10 +194,11 @@ func handleCreateOneGood(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var event Event = Event{
-		At:     time.Now(),
-		Entity: Entities_Good,
-		Action: EventOperation_Created,
-		Author: getAuthorFromRequest(r),
+		EntityId: good.ID,
+		At:       time.Now(),
+		Entity:   Entities_Good,
+		Action:   EventOperation_Created,
+		Author:   getAuthorFromRequest(r),
 	}
 	_ = event.save()
 
@@ -213,6 +220,15 @@ func DeleteGoodHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+
+	var event Event = Event{
+		EntityId: goodId,
+		At:       time.Now(),
+		Entity:   Entities_Good,
+		Action:   EventOperation_Deleted,
+		Author:   getAuthorFromRequest(r),
+	}
+	_ = event.save()
 }
 
 func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
@@ -246,6 +262,15 @@ func UpdateGoodHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+
+	var event Event = Event{
+		EntityId: goodId,
+		At:       time.Now(),
+		Entity:   Entities_Good,
+		Action:   EventOperation_Updated,
+		Author:   getAuthorFromRequest(r),
+	}
+	_ = event.save()
 }
 
 func CreateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
@@ -283,6 +308,15 @@ func CreateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+
+	var event Event = Event{
+		EntityId: goodId,
+		At:       time.Now(),
+		Entity:   Entities_Good,
+		Action:   EventOperation_Updated,
+		Author:   getAuthorFromRequest(r),
+	}
+	_ = event.save()
 }
 
 func HandleGoodChangeOperation(w http.ResponseWriter, r *http.Request) {
@@ -328,6 +362,14 @@ func UpdateGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	var event Event = Event{
+		EntityId: goodId,
+		At:       time.Now(),
+		Entity:   Entities_Good,
+		Action:   EventOperation_Updated,
+		Author:   getAuthorFromRequest(r),
+	}
+	_ = event.save()
 }
 
 func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
@@ -347,6 +389,15 @@ func DeleteGoodChangeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+
+	var event Event = Event{
+		EntityId: goodId,
+		At:       time.Now(),
+		Entity:   Entities_Good,
+		Action:   EventOperation_Updated,
+		Author:   getAuthorFromRequest(r),
+	}
+	_ = event.save()
 }
 
 func handleUnmarshallingError(err string, w http.ResponseWriter) {
@@ -542,7 +593,7 @@ func (good *Good) save(condition string) error {
 	return nil
 }
 
-func findGoodTOChange(id string) (Good, error) {
+func findGoodToChange(id string) (Good, error) {
 	hexId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return Good{}, err

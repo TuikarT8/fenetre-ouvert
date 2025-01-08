@@ -87,10 +87,11 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var event Event = Event{
-		At:     time.Now(),
-		Entity: Entities_Session,
-		Action: EventOperation_Created,
-		Author: getAuthorFromRequest(r),
+		EntityId: session.Id,
+		At:       time.Now(),
+		Entity:   Entities_Session,
+		Action:   EventOperation_Created,
+		Author:   getAuthorFromRequest(r),
 	}
 	_ = event.save()
 
@@ -103,8 +104,8 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	SessionId := mux.Vars(r)["id"]
-	if count, _ := countSessionGood(SessionId); count > 0 {
+	sessionId := mux.Vars(r)["id"]
+	if count, _ := countSessionGood(sessionId); count > 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		payload, _ := json.Marshal(errors.WebError{
 			Code:        errors.ErrorSessionHasGoodChanges,
@@ -114,7 +115,7 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := deleteSessionInDb(SessionId)
+	err := deleteSessionInDb(sessionId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("deleteSessionHandler() => Error while deleting good"))
@@ -123,10 +124,11 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var event Event = Event{
-		At:     time.Now(),
-		Entity: Entities_Session,
-		Action: EventOperation_Deleted,
-		Author: getAuthorFromRequest(r),
+		EntityId: sessionId,
+		At:       time.Now(),
+		Entity:   Entities_Session,
+		Action:   EventOperation_Deleted,
+		Author:   getAuthorFromRequest(r),
 	}
 	_ = event.save()
 
@@ -139,7 +141,6 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionId := mux.Vars(r)["id"]
-
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -164,10 +165,11 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var event Event = Event{
-		At:     time.Now(),
-		Entity: Entities_Session,
-		Action: EventOperation_Updated,
-		Author: getAuthorFromRequest(r),
+		EntityId: session.Id,
+		At:       time.Now(),
+		Entity:   Entities_Session,
+		Action:   EventOperation_Updated,
+		Author:   getAuthorFromRequest(r),
 	}
 	_ = event.save()
 
