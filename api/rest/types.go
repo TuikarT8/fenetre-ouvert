@@ -32,9 +32,10 @@ const (
 )
 
 const (
-	EventOperation_Created = "created"
-	EventOperation_Deleted = "deleted"
-	EventOperation_Updated = "updated"
+	EventOperation_Created_Many = "createdMany"
+	EventOperation_Created      = "created"
+	EventOperation_Deleted      = "deleted"
+	EventOperation_Updated      = "updated"
 )
 
 const (
@@ -177,7 +178,6 @@ func (user *User) verify() map[string]string {
 
 func (user *User) HasPermission(permission string) bool {
 	err := user.loadRoles()
-
 	if err != nil {
 		return false
 	}

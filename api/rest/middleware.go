@@ -88,7 +88,6 @@ func authenticateRequest(w http.ResponseWriter, r *http.Request) (User, error) {
 func authorizeRequest(user User, w http.ResponseWriter, r *http.Request) bool {
 	entity := getEntityFromRequest(r)
 	operation := getOperationFromRequest(r)
-
 	if entity == Entities_Unknown || entity == Entities_NoneEntity {
 		return true
 	}
@@ -129,6 +128,7 @@ func getOperationFromRequest(r *http.Request) string {
 	case http.MethodPatch:
 		return EntityOperation_Update
 	case http.MethodPost:
+		return EntityOperation_Write
 	case http.MethodDelete:
 		return EntityOperation_Write
 	case http.MethodGet:

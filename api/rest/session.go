@@ -86,15 +86,11 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := r.Context().Value("user").(User)
 	var event Event = Event{
 		At:     time.Now(),
 		Entity: Entities_Session,
 		Action: EventOperation_Created,
-		Author: Author{
-			Id:   user.Id,
-			Name: user.GetUserFullName(),
-		},
+		Author: getAuthorFromRequest(r),
 	}
 	_ = event.save()
 
@@ -125,16 +121,12 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print("deleteSessionHandler() => Error while deleting good", err)
 		return
 	}
-	user := r.Context().Value("user").(User)
 
 	var event Event = Event{
 		At:     time.Now(),
 		Entity: Entities_Session,
 		Action: EventOperation_Deleted,
-		Author: Author{
-			Id:   user.Id,
-			Name: user.GetUserFullName(),
-		},
+		Author: getAuthorFromRequest(r),
 	}
 	_ = event.save()
 
@@ -171,16 +163,11 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := r.Context().Value("user").(User)
-
 	var event Event = Event{
 		At:     time.Now(),
 		Entity: Entities_Session,
 		Action: EventOperation_Updated,
-		Author: Author{
-			Id:   user.Id,
-			Name: user.GetUserFullName(),
-		},
+		Author: getAuthorFromRequest(r),
 	}
 	_ = event.save()
 
@@ -602,7 +589,7 @@ func countSessionGood(stringSessionId string) (int64, error) {
 }
 
 func (event *Event) save() error {
-	_, err := database.Sessions.InsertOne(database.Ctx, event)
+	_, err := database.Events.InsertOne(database.Ctx, event)
 	if err != nil {
 		log.Printf("error inserting event, %v\n", err)
 		return err

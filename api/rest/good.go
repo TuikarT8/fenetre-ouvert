@@ -110,6 +110,14 @@ func handleCreateManyGoods(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var event Event = Event{
+		At:     time.Now(),
+		Entity: Entities_Good,
+		Action: EventOperation_Created_Many,
+		Author: getAuthorFromRequest(r),
+	}
+	_ = event.save()
+
 	jsondata, _ := json.Marshal(goods)
 	w.Write([]byte(jsondata))
 }
@@ -178,6 +186,14 @@ func handleCreateOneGood(w http.ResponseWriter, r *http.Request) {
 		log.Print("handleCreateOneGood () => Error while creating good", err)
 		return
 	}
+
+	var event Event = Event{
+		At:     time.Now(),
+		Entity: Entities_Good,
+		Action: EventOperation_Created,
+		Author: getAuthorFromRequest(r),
+	}
+	_ = event.save()
 
 	jsondata, _ := json.Marshal(good)
 	w.Write([]byte(jsondata))
