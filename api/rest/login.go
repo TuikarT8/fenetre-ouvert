@@ -155,7 +155,6 @@ func HandleVerifyJwt(w http.ResponseWriter, r *http.Request) {
 		jsondata, _ := json.Marshal(map[string]bool{
 			"valid": false,
 		})
-
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(jsondata)

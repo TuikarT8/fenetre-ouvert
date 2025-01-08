@@ -4,17 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"fenetre-ouverte/api/tplt"
+	"fenetre-ouverte/database"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type ContextKey string
 
-var permissions map[string]interface{}
+var permissions PermissionsDescriptor
 
 func Init() {
 	bytesRead := make([]byte, 0)
@@ -31,13 +34,17 @@ func Init() {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		if !strings.Contains(request.URL.Path, "/login") && !strings.Contains(request.URL.Path, "/signup") {
+		if !strings.Contains(request.URL.Path, "/login") &&
+			!strings.Contains(request.URL.Path, "/signup") &&
+			!strings.Contains(request.URL.Path, "/verify") {
 			user, err := authenticateRequest(writer, request)
 			if err != nil {
+				log.Printf("Error while authentcating request, err=[%v]", err)
 				return
 			}
 
 			if !authorizeRequest(user, writer, request) {
+				log.Println("Error while authorizing the request")
 				return
 			}
 
@@ -54,12 +61,12 @@ func AuthMiddleware(next http.Handler) http.Handler {
 func authenticateRequest(w http.ResponseWriter, r *http.Request) (User, error) {
 	user, err := verifyJwt(w, r)
 	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
 		if strings.Contains(r.URL.Path, "/api") {
 			jsondata, _ := json.Marshal(map[string]interface{}{
 				"error": "You are not authorized to access this resource",
 				"code":  "E_ACCESS_DENIED",
 			})
-			w.WriteHeader(http.StatusUnauthorized)
 			_, _ = w.Write(jsondata)
 			return user, fmt.Errorf("Autentication failed")
 		}
@@ -81,21 +88,36 @@ func authenticateRequest(w http.ResponseWriter, r *http.Request) (User, error) {
 func authorizeRequest(user User, w http.ResponseWriter, r *http.Request) bool {
 	entity := getEntityFromRequest(r)
 	operation := getOperationFromRequest(r)
-	if entity == Entities_Unknown {
+
+	if entity == Entities_Unknown || entity == Entities_NoneEntity {
+		return true
+	}
+
+	entity = strings.ToUpper(entity)
+	entity = strings.TrimRight(entity, "S")
+	if !user.HasPermission(fmt.Sprintf("%s_%s", operation, strings.ToUpper(entity))) {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("403 Forbidden"))
 		return false
 	}
 
-	return user.HasPermission(fmt.Sprintf("%s_%s", strings.ToUpper(entity), operation))
+	return true
 }
 
 func getEntityFromRequest(r *http.Request) string {
+	if !strings.Contains(r.URL.Path, "/api") {
+		return Entities_NoneEntity
+	}
 	if strings.Contains(r.URL.Path, "/users") {
 		return Entities_User
-	} else if strings.Contains(r.URL.Path, "/groups") {
+	}
+	if strings.Contains(r.URL.Path, "/groups") {
 		return Entities_Group
-	} else if strings.Contains(r.URL.Path, "/goods") {
+	}
+	if strings.Contains(r.URL.Path, "/goods") {
 		return Entities_Good
-	} else if strings.Contains(r.URL.Path, "/sessions") {
+	}
+	if strings.Contains(r.URL.Path, "/sessions") {
 		return Entities_Session
 	}
 
@@ -116,4 +138,20 @@ func getOperationFromRequest(r *http.Request) string {
 	}
 
 	return EntityOperation_Unknown
+}
+
+func (user *User) loadRoles() error {
+	var doc User
+	result := database.Users.FindOne(ctx, bson.M{
+		"emailAddress": user.EmailAddress,
+	})
+
+	err := result.Decode(&doc)
+	if err != nil {
+		log.Println("Error while to laoding user roles", err)
+		return err
+	}
+
+	user.Roles = doc.Roles
+	return nil
 }

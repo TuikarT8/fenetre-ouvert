@@ -30,7 +30,7 @@ export function ProtectedRoute({ children }) {
 				}
 			}).catch((e) => {
 				console.error(e);
-				console.warn('Error, redirecting to /error');
+				console.warn('Error, redirecting to /error ');
 				navigate('/error');
 				return
 			});

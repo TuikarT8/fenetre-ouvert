@@ -131,8 +131,6 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("This is the", sessionId)
-
 	var session Session
 
 	err = json.Unmarshal(body, &session)
@@ -140,7 +138,6 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 		handleUnmarshallingError(err.Error(), w)
 		return
 	}
-	log.Println(session)
 
 	if _, err := session.UpdateSessionInDb(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -220,6 +217,12 @@ func GetSessionGoodsHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if response, err = getGoodsMatchingSession(sessionId); err != nil {
+		if err == mongo.ErrNoDocuments {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("404 Not found"))
+			return
+		}
+
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("GetSessionGoodsHandler() => Error while retrieving session goods"))
 		log.Printf("GetSessionGoodsHandler() => Error while retrieving session goods err=[%v]", err)
@@ -460,7 +463,7 @@ func (session *Session) UpdateSessionInDb(id string) (string, error) {
 	)
 
 	if err != nil {
-		log.Printf("Error while updating Session, error=%v", err)
+		log.Printf("Error while updating session, error=%v", err)
 		return "", err
 	}
 

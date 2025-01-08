@@ -22,11 +22,12 @@ const (
 )
 
 const (
-	Entities_Good    = "goods"
-	Entities_Session = "sessions"
-	Entities_Group   = "groups"
-	Entities_User    = "users"
-	Entities_Unknown = "unknown"
+	Entities_Good       = "goods"
+	Entities_Session    = "sessions"
+	Entities_Group      = "groups"
+	Entities_User       = "users"
+	Entities_Unknown    = "unknown"
+	Entities_NoneEntity = "noneentity"
 )
 
 const (
@@ -119,6 +120,11 @@ type AuthToken struct {
 	jwt.StandardClaims
 }
 
+type PermissionsDescriptor struct {
+	BaseRoles map[string][]string `json:"base_roles"`
+	Roles     map[string][]string `json:"roles"`
+}
+
 type Group struct {
 	Id    interface{} `bson:"_id,omitempty" json:"id"`
 	Name  string      `bson:"name, omitempty" json:"name"`
@@ -150,17 +156,21 @@ func (user *User) verify() map[string]string {
 	return errs
 }
 
-type RolesMap map[string][]string
-
 func (user *User) HasPermission(permission string) bool {
+	err := user.loadRoles()
+
+	if err != nil {
+		return false
+	}
+
 	if len(user.Roles) == 0 {
 		return false
 	}
 
 	for _, role := range user.Roles {
-		baseRoles := permissions["roles"].(RolesMap)[role]
+		baseRoles := permissions.Roles[role]
 		for _, baseRole := range baseRoles {
-			perms := permissions["baseRoles"].(RolesMap)[baseRole]
+			perms := permissions.BaseRoles[baseRole]
 
 			if slices.Contains(perms, permission) {
 				return true

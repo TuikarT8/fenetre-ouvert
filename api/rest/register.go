@@ -15,12 +15,10 @@ func HandleSignupUser(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	address := r.FormValue("address")
 
-	log.Printf(
-		" firstName: %s, MiddleName: %s, lastName:%s, Email:%s, passWord:%s, address: %s", firstname, middlename, lastname, email, password, address)
-
 	passwordEncrypted, err := EncryptUserPassword([]byte(password))
 	if err != nil {
 		log.Printf("Error while encrypting password [err %v]", err)
+		// TODO send back an http error
 	}
 
 	var user = User{
@@ -35,6 +33,7 @@ func HandleSignupUser(w http.ResponseWriter, r *http.Request) {
 	err = user.Store()
 	if err != nil {
 		log.Printf("error while inserting user, %v", err)
+		// TODO send back an http error
 		return
 	}
 
@@ -44,8 +43,9 @@ func HandleSignupUser(w http.ResponseWriter, r *http.Request) {
 func EncryptUserPassword(pwd []byte) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Error while encrypting password, %v", err)
+		return "", err
 	}
 
-	return string(hash), err
+	return string(hash), nil
 }

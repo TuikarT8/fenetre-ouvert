@@ -41,6 +41,7 @@ export function Login() {
 
 		const username = form.emailaddress?.value;
 		const password = form.password?.value;
+		
 		if (!username || !password) {
 			return;
 		}
@@ -60,14 +61,14 @@ export function Login() {
 		const jwtCookie = cookieParts.find((part) => part.trim().startsWith('jwt'));
 
 		if (jwtCookie) {
-			axios.post('/api/auth/verify', {})
+			axios.post('/api/auth/verify', {})	
 			.then(({ data }) => {
 				if (data.valid) {
 					navigate('/');
 					return;
 				} else {
-					cookieParts.filter(part => part.trim().startsWith('jwt'));
-					document.cookie = cookieParts.map(part => part.trim()).join('; ');
+					const otherCookies = cookieParts.filter(part => part.trim().startsWith('jwt'));
+					document.cookie = otherCookies.map(part => part.trim()).join('; ');
 				}
 			}).catch((e) => {
 				console.error(e);
