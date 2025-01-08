@@ -11,6 +11,7 @@ import { Login } from './login';
 import { ProtectedRoute } from './common/protected-route';
 import { SinginUp } from './SinginUp';
 import { Error } from './common';
+import { Historique } from './features/home/historique';
 
 const useStyles = makeStyles({
 	main: {
@@ -73,6 +74,14 @@ export function App() {
 								element={
 									<ProtectedRoute>
 										<InventoriesTable />
+									</ProtectedRoute>
+								}
+							/>
+							<Route
+								path="/historique"
+								element={
+									<ProtectedRoute>
+										<Historique />	
 									</ProtectedRoute>
 								}
 							/>

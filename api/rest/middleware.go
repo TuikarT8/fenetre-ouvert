@@ -95,7 +95,7 @@ func authorizeRequest(user User, w http.ResponseWriter, r *http.Request) bool {
 
 	entity = strings.ToUpper(entity)
 	entity = strings.TrimRight(entity, "S")
-	if !user.HasPermission(fmt.Sprintf("%s_%s", operation, strings.ToUpper(entity))) {
+	if !user.HasPermission(fmt.Sprintf("%s_%s", operation, entity)) {
 		w.WriteHeader(http.StatusForbidden)
 		w.Write([]byte("403 Forbidden"))
 		return false

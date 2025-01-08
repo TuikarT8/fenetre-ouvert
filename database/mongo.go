@@ -14,6 +14,8 @@ var Users mongo.Collection
 var Goods mongo.Collection
 var Notifications mongo.Collection
 var Sessions mongo.Collection
+var Events mongo.Collection
+
 var Ctx = context.TODO()
 
 func getMongoUrlFromArgs() string {
@@ -64,4 +66,6 @@ func ConnectTodataBase() {
 	Goods = *client.Database(DatabaseName).Collection("goods")
 	Notifications = *client.Database(DatabaseName).Collection("notifications")
 	Sessions = *client.Database(DatabaseName).Collection("sessions")
+	Events = *client.Database(DatabaseName).Collection("events")
+
 }

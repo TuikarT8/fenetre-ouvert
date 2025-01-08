@@ -71,15 +71,14 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var Session Session
-
-	err = json.Unmarshal(body, &Session)
+	var session Session
+	err = json.Unmarshal(body, &session)
 	if err != nil {
 		handleUnmarshallingError(err.Error(), w)
 		return
 	}
 
-	_, err = Session.saveSessionInDb()
+	err = session.save()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("postSessionHandler () => Error while creating good"))
@@ -87,7 +86,19 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsondata, _ := json.Marshal(Session)
+	user := r.Context().Value("user").(User)
+	var event Event = Event{
+		At:     time.Now(),
+		Entity: Entities_Session,
+		Action: EventOperation_Created,
+		Author: Author{
+			Id:   user.Id,
+			Name: user.GetUserFullName(),
+		},
+	}
+	_ = event.save()
+
+	jsondata, _ := json.Marshal(session)
 	w.Write([]byte(jsondata))
 }
 
@@ -106,6 +117,7 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write(payload)
 		return
 	}
+
 	err := deleteSessionInDb(SessionId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -113,6 +125,19 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print("deleteSessionHandler() => Error while deleting good", err)
 		return
 	}
+	user := r.Context().Value("user").(User)
+
+	var event Event = Event{
+		At:     time.Now(),
+		Entity: Entities_Session,
+		Action: EventOperation_Deleted,
+		Author: Author{
+			Id:   user.Id,
+			Name: user.GetUserFullName(),
+		},
+	}
+	_ = event.save()
+
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -145,6 +170,19 @@ func UpdateSessionHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print("UpdateSessionHandler() => Error while Updating session", err)
 		return
 	}
+
+	user := r.Context().Value("user").(User)
+
+	var event Event = Event{
+		At:     time.Now(),
+		Entity: Entities_Session,
+		Action: EventOperation_Updated,
+		Author: Author{
+			Id:   user.Id,
+			Name: user.GetUserFullName(),
+		},
+	}
+	_ = event.save()
 
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -234,13 +272,15 @@ func GetSessionGoodsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonData)
 }
 
-func (session *Session) saveSessionInDb() (string, error) {
-	_, err := database.Sessions.InsertOne(database.Ctx, session)
+func (session *Session) save() error {
+	result, err := database.Sessions.InsertOne(database.Ctx, session)
 	if err != nil {
-		log.Printf("error inserting appointment, %v\n", err)
-		return "", err
+		log.Printf("error inserting session, %v\n", err)
+		return err
 	}
-	return "", nil
+
+	session.Id = result.InsertedID
+	return nil
 }
 
 func DisableCurrentActiveSession(sessionId string) error {
@@ -559,4 +599,14 @@ func countSessionGood(stringSessionId string) (int64, error) {
 	}
 
 	return count, nil
+}
+
+func (event *Event) save() error {
+	_, err := database.Sessions.InsertOne(database.Ctx, event)
+	if err != nil {
+		log.Printf("error inserting event, %v\n", err)
+		return err
+	}
+
+	return nil
 }

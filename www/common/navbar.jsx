@@ -6,6 +6,7 @@ import { GoodCreationDialog } from './dialogs/good-creation.dialog';
 import { SessionCreationDialog } from './dialogs/session-creation-dialog';
 import { Hamburger } from '@fluentui/react-nav-preview';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 const Logo = () => {
 	return (
@@ -34,6 +35,7 @@ export const Navbar = (props) => {
 			setIsCreateGoodDialogOpen(true);
 		}
 	};
+	const navigate = useNavigate();
 
 	const onCreateMenuSessionSelected = (option) => {
 		if (option === 'session') {
@@ -52,7 +54,12 @@ export const Navbar = (props) => {
 					onMenuSelected={onCreateMenuOptionSelected}
 					onSessionMenuSelected={onCreateMenuSessionSelected}
 				/>
-				<ToolbarButton vertical icon={<HistoryFilled />}>
+				<ToolbarButton
+					vertical icon={<HistoryFilled />}
+					onClick = {()=> {
+						navigate('historique');
+					}}
+				>
 					Historique
 				</ToolbarButton>
 				<ToolbarButton vertical icon={<LauncherSettingsRegular />}>

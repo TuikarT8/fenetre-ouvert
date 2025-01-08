@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"regexp"
 	"slices"
 	"time"
@@ -28,6 +29,12 @@ const (
 	Entities_User       = "users"
 	Entities_Unknown    = "unknown"
 	Entities_NoneEntity = "noneentity"
+)
+
+const (
+	EventOperation_Created = "created"
+	EventOperation_Deleted = "deleted"
+	EventOperation_Updated = "updated"
 )
 
 const (
@@ -60,6 +67,13 @@ type Good struct {
 	Changes       []GoodChange `bson:"changes,omitempty" json:"changes"`
 	Deleted       bool         `bson:"deleted,omitempty" json:"deleted"`
 	StringId      string       `bson:"stringId,omitempty" json:"StringId"`
+}
+
+type Event struct {
+	At     time.Time `bson:"at" json"at"`
+	Entity string    `bson:"entity" json"entity"`
+	Action string    `bson:"action" json"action"`
+	Author Author    `bson:"author" json"author"`
 }
 
 type GoodUpdateRequest struct {
@@ -131,6 +145,11 @@ type Group struct {
 	Users []User      `bson:"users, omitempty" json:"users"`
 }
 
+type Author struct {
+	Name string      `bson:"name" json:"name"`
+	Id   interface{} `bson:"id" json:"id"`
+}
+
 func (good *FormularyGood) ToGood() Good {
 	return good.Good
 }
@@ -179,4 +198,8 @@ func (user *User) HasPermission(permission string) bool {
 	}
 
 	return false
+}
+
+func (user *User) GetUserFullName() string {
+	return fmt.Sprintf("%s %s", user.FirstName, user.LastName)
 }
