@@ -63,7 +63,7 @@ func authenticateRequest(w http.ResponseWriter, r *http.Request) (User, error) {
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		if strings.Contains(r.URL.Path, "/api") {
-			jsondata, _ := json.Marshal(map[string]interface{}{
+			jsondata, _ := json.Marshal(map[string]string{
 				"error": "You are not authorized to access this resource",
 				"code":  "E_ACCESS_DENIED",
 			})
@@ -91,6 +91,7 @@ func authorizeRequest(user User, w http.ResponseWriter, r *http.Request) bool {
 	if entity == Entities_Unknown || entity == Entities_NoneEntity {
 		return true
 	}
+	log.Printf("This is the operation= [%v] | entity= [%v]", operation, entity)
 
 	entity = strings.ToUpper(entity)
 	entity = strings.TrimRight(entity, "S")
@@ -118,6 +119,9 @@ func getEntityFromRequest(r *http.Request) string {
 	}
 	if strings.Contains(r.URL.Path, "/sessions") {
 		return Entities_Session
+	}
+	if strings.Contains(r.URL.Path, "/events") {
+		return Entities_Events
 	}
 
 	return Entities_Unknown

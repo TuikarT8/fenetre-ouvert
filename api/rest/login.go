@@ -38,11 +38,10 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		Password:     password,
 	}
 
-	log.Println("This is the users", user.EmailAddress, user.Password)
-
 	token, err := user.Authenticate()
 	if err != nil {
 		fmt.Printf("Error while authenticated user, err=[%v]", err)
+		return
 	} else {
 		setAuthenticationCookie(token, w)
 		return

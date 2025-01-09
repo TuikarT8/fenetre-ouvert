@@ -11,7 +11,8 @@ import { Login } from './login';
 import { ProtectedRoute } from './common/protected-route';
 import { SinginUp } from './SinginUp';
 import { Error } from './common';
-import { Historique } from './features/home/historique';
+import { History } from './features/history';
+import { User } from './features/home/user';
 
 const useStyles = makeStyles({
 	main: {
@@ -78,13 +79,22 @@ export function App() {
 								}
 							/>
 							<Route
-								path="/historique"
+								path="/history"
 								element={
 									<ProtectedRoute>
-										<Historique />	
+										<History />
 									</ProtectedRoute>
 								}
 							/>
+							<Route
+								path="/user/:id"
+								element={
+									<ProtectedRoute>
+										<User />
+									</ProtectedRoute>
+								}
+							/>
+
 							<Route path="/login" element={<Login />}></Route>
 							<Route path="/signinup" element={<SinginUp />}></Route>
 							<Route path="/error" element={<Error />}></Route>

@@ -35,17 +35,24 @@ export function SinginUp() {
 	const form = useRef(null);
 
 	const handleSubmit = (event) => {
-        event.preventDefault();
+		event.preventDefault();
 		const form = event.target;
 
 		const username = form.emailAddress?.value;
 		const password = form.password?.value;
-        const firstname = form.firstname?.value;
-        const middlename = form.middlename?.value;
-        const lastname = form.lastname?.value;
+		const firstname = form.firstname?.value;
+		const middlename = form.middlename?.value;
+		const lastname = form.lastname?.value;
 		const address = form.address?.value;
 
-		if (!username || !password || !firstname || !middlename || !lastname || !address) {
+		if (
+			!username ||
+			!password ||
+			!firstname ||
+			!middlename ||
+			!lastname ||
+			!address
+		) {
 			return;
 		}
 
@@ -57,8 +64,8 @@ export function SinginUp() {
 			})
 			.catch(() => {
 				console.error("L'inscription n'a pas reussi");
-		});
-    };
+			});
+	};
 
 	return (
 		<div className={styles.container}>

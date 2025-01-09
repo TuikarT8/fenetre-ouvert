@@ -43,7 +43,7 @@ export function NavigationDrawer({ open, onToggleDrawerOpenState }) {
 				<Link to="/inventories" replace={true} className={styles.link}>
 					<NavItem value="3">Inventaires</NavItem>
 				</Link>
-				<Link to="historique" replace={true} className={styles.link}>
+				<Link to="history" replace={true} className={styles.link}>
 					<NavItem value="4">Historique</NavItem>
 				</Link>
 			</NavDrawerBody>

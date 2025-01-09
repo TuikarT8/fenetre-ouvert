@@ -29,6 +29,7 @@ const (
 	Entities_User       = "users"
 	Entities_Unknown    = "unknown"
 	Entities_NoneEntity = "noneentity"
+	Entities_Events     = "events"
 )
 
 const (
@@ -36,6 +37,8 @@ const (
 	EventOperation_Created      = "created"
 	EventOperation_Deleted      = "deleted"
 	EventOperation_Updated      = "updated"
+	EventOperation_Login        = "login"
+	EventOperation_Register     = "register"
 )
 
 const (
@@ -71,11 +74,12 @@ type Good struct {
 }
 
 type Event struct {
+	ID       interface{} `bson:"_id,omitempty" json:"id"`
 	EntityId interface{} `bson:"entityId" json:"entityId"`
-	At       time.Time   `bson:"at" json"at"`
-	Entity   string      `bson:"entity" json"entity"`
-	Action   string      `bson:"action" json"action"`
-	Author   Author      `bson:"author" json"author"`
+	At       time.Time   `bson:"at" json:"at"`
+	Entity   string      `bson:"entity" json:"entity"`
+	Action   string      `bson:"action" json:"action"`
+	Author   Author      `bson:"author" json:"author"`
 }
 
 type GoodUpdateRequest struct {

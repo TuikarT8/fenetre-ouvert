@@ -55,11 +55,11 @@ export const Navbar = (props) => {
 					onSessionMenuSelected={onCreateMenuSessionSelected}
 				/>
 				<ToolbarButton
-					vertical icon={<HistoryFilled />}
-					onClick = {()=> {
-						navigate('historique');
-					}}
-				>
+					vertical
+					icon={<HistoryFilled />}
+					onClick={() => {
+						navigate('history');
+					}}>
 					Historique
 				</ToolbarButton>
 				<ToolbarButton vertical icon={<LauncherSettingsRegular />}>

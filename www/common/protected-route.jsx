@@ -10,31 +10,34 @@ export function ProtectedRoute({ children }) {
 	useEffect(() => {
 		const cookieParts = document.cookie.split(';');
 		const jwtCookie = cookieParts.find((part) => part.trim().startsWith('jwt'));
-		
+
 		if (!jwtCookie) {
 			navigate('/login');
 			console.warn('Cookie not present, redirecting to /login');
 			return;
 		}
 
-		axios.post('/api/auth/verify', {})
+		axios
+			.post('/api/auth/verify', {})
 			.then(({ data }) => {
 				if (data.valid) {
 					setCanRenderContent(true);
 				} else {
-					console.warn('Forbidden, redirecting to /login')
-					
-					const otherCookies = cookieParts.filter(part => part.trim().startsWith('jwt'));
-					document.cookie = otherCookies.map(part => part.trim()).join('; ');
+					console.warn('Forbidden, redirecting to /login');
+
+					const otherCookies = cookieParts.filter((part) =>
+						part.trim().startsWith('jwt'),
+					);
+					document.cookie = otherCookies.map((part) => part.trim()).join('; ');
 					navigate('/login');
 				}
-			}).catch((e) => {
+			})
+			.catch((e) => {
 				console.error(e);
 				console.warn('Error, redirecting to /error ');
 				navigate('/error');
-				return
+				return;
 			});
-
 	}, []);
 
 	return canRenderContent ? <>{children}</> : null; // TODO instead of null, render a spinner

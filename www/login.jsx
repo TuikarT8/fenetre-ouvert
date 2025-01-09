@@ -41,7 +41,7 @@ export function Login() {
 
 		const username = form.emailaddress?.value;
 		const password = form.password?.value;
-		
+
 		if (!username || !password) {
 			return;
 		}
@@ -53,7 +53,7 @@ export function Login() {
 			})
 			.catch(() => {
 				console.error("L'authentification n'a pas reussi");
-		});
+			});
 	};
 
 	useEffect(() => {
@@ -61,20 +61,26 @@ export function Login() {
 		const jwtCookie = cookieParts.find((part) => part.trim().startsWith('jwt'));
 
 		if (jwtCookie) {
-			axios.post('/api/auth/verify', {})	
-			.then(({ data }) => {
-				if (data.valid) {
-					navigate('/');
+			axios
+				.post('/api/auth/verify', {})
+				.then(({ data }) => {
+					if (data.valid) {
+						navigate('/');
+						return;
+					} else {
+						const otherCookies = cookieParts.filter((part) =>
+							part.trim().startsWith('jwt'),
+						);
+						document.cookie = otherCookies
+							.map((part) => part.trim())
+							.join('; ');
+					}
+				})
+				.catch((e) => {
+					console.error(e);
+					navigate('/error');
 					return;
-				} else {
-					const otherCookies = cookieParts.filter(part => part.trim().startsWith('jwt'));
-					document.cookie = otherCookies.map(part => part.trim()).join('; ');
-				}
-			}).catch((e) => {
-				console.error(e);
-				navigate('/error');
-				return
-			});
+				});
 		}
 	}, []);
 
