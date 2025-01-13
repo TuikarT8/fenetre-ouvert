@@ -91,7 +91,6 @@ func authorizeRequest(user User, w http.ResponseWriter, r *http.Request) bool {
 	if entity == Entities_Unknown || entity == Entities_NoneEntity {
 		return true
 	}
-	log.Printf("This is the operation= [%v] | entity= [%v]", operation, entity)
 
 	entity = strings.ToUpper(entity)
 	entity = strings.TrimRight(entity, "S")

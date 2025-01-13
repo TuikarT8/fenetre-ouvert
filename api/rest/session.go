@@ -58,6 +58,50 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsondata)
 }
 
+func GetOneSessionHandler(w http.ResponseWriter, r *http.Request) {
+	if !utils.AssertMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	goodId := mux.Vars(r)["id"]
+
+	good, err := getOneSession(goodId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("GetOneSessionHandler () => Error while gettig session"))
+		log.Print("GetOneSessionHandler () => Error while getting session", err)
+		return
+	}
+
+	jsondata, err := json.Marshal(good)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("GetOneSessionHandler () => Error while marsalling session"))
+		log.Print("GetOneSessionHandler () => Error while marshalling session", err)
+		return
+	}
+	w.Write(jsondata)
+}
+
+func getOneSession(id string) (Good, error) {
+	hexId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return Good{}, err
+	}
+	var good Good
+
+	result := database.Sessions.FindOne(ctx, bson.M{
+		"_id": hexId,
+	})
+
+	err = result.Decode(&good)
+	if err != nil {
+		return good, err
+	}
+
+	return good, nil
+}
+
 func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 	if !utils.AssertMethod(w, r, http.MethodPost) {
 		return
@@ -97,6 +141,16 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	jsondata, _ := json.Marshal(session)
 	w.Write([]byte(jsondata))
+}
+
+func SessionHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodDelete {
+		DeleteSessionHandler(w, r)
+	} else if r.Method == http.MethodGet {
+		GetOneSessionHandler(w, r)
+	} else {
+		utils.ReportWrongHttpMethod(w, r, r.Method)
+	}
 }
 
 func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {

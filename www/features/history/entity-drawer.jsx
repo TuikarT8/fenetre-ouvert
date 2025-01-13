@@ -1,48 +1,59 @@
-import React, { useState } from 'react';
-import {
-	DrawerBody,
-	DrawerHeader,
-	DrawerHeaderTitle,
-	Drawer,
-	Button,
-	useRestoreFocusSource,
-	makeStyles,
-} from '@fluentui/react-components';
+import React, { useEffect, useState } from 'react';
+
 import PropTypes from 'prop-types';
 import axios from 'axios';
-
-const useStyles = makeStyles({
-	iconPositon: {
-		display: 'flex',
-		flexDirection: 'rows',
-	},
-});
+import { SessionDrawer } from './session-drawer';
+import { UserDrawer } from './user-drawer';
+import { GoodDrawer } from './good-drawer';
+import { NotEntityDrawer } from './notentity-drawer';
 
 export const EntityDrawer = ({ isOpen, entityGroup, entityId, onClose }) => {
-	const [entity, setEntity] = useState();
-	const styles = useStyles();
-	const restoreFocusSourceAttributes = useRestoreFocusSource();
+	const [entity, setEntity] = useState(null);
+	console.log("Voici le donnees de l'url", entityGroup, entityId);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (!entityId) return;
+		console.log("Voici le donnees de l'url", entityGroup, entityId);
 
 		axios
 			.get(`/api/${entityGroup}/${entityId}`)
 			.then(({ data }) => {
-				setEntity(data);
+				if (data) {
+					setEntity(data);
+				}
 			})
 			.catch(console.error);
-	});
-	
+	}, [entityId]);
+
+	console.log(isOpen);
+
 	switch (entityGroup) {
 		case 'goods':
-			return <GoodDrawer></GoodDrawer>
-		case 'session':
-			return <SessionDrawer></SessionDrawer>
+			return (
+				<GoodDrawer
+					good={entity}
+					isOpen={isOpen}
+					onClose={() => onClose(false)}
+				/>
+			);
+		case 'sessions':
+			return (<SessionDrawer
+						session={entity}
+						isOpen={isOpen}
+						onClose={() => onClose(false)}
+			/>);
 		case 'users':
-			return <UserDrawer></UserDrawer>
+			return (<UserDrawer
+						user={entity}
+						isOpen={isOpen}
+						onClose={() => onClose(false)}
+			/>);
 		default:
-			return <NotEntityDrawer></NotEntityDrawer> 
+			return <NotEntityDrawer
+					notEntity={entity}
+					isOpen={isOpen}
+					onClose={() => onClose(false)}
+				/>
 	}
 };
 

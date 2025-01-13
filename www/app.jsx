@@ -87,7 +87,7 @@ export function App() {
 								}
 							/>
 							<Route
-								path="/user/:id"
+								path="/users/:id"
 								element={
 									<ProtectedRoute>
 										<User />

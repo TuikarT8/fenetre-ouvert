@@ -39,6 +39,7 @@ export function History() {
 			.get(`/api/events`)
 			.then(({ data }) => {
 				setEvents(data);
+				console.log('sessions', data);
 			})
 			.catch((e) => {
 				console.error(e);

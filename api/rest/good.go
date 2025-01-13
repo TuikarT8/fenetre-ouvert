@@ -34,9 +34,36 @@ func GoodHandler(w http.ResponseWriter, r *http.Request) {
 		DeleteGoodHandler(w, r)
 	} else if r.Method == http.MethodPatch {
 		UpdateGoodHandler(w, r)
+	} else if r.Method == http.MethodGet {
+		GetOneGoodHandler(w, r)
 	} else {
 		utils.ReportWrongHttpMethod(w, r, r.Method)
 	}
+}
+
+func GetOneGoodHandler(w http.ResponseWriter, r *http.Request) {
+	if !utils.AssertMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	goodId := mux.Vars(r)["id"]
+
+	good, err := getOneGood(goodId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("GetOneGoodHandler () => Error while gettig good"))
+		log.Print("GetOneGoodHandler () => Error while getting good", err)
+		return
+	}
+
+	jsondata, err := json.Marshal(good)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("GetOneGoodHandler () => Error while marsalling good"))
+		log.Print("GetOneGoodHandler () => Error while marshalling good", err)
+		return
+	}
+	w.Write(jsondata)
 }
 
 func GetGoodHandler(w http.ResponseWriter, r *http.Request) {
@@ -492,6 +519,25 @@ func deleteGood(id string) error {
 	}
 
 	return nil
+}
+
+func getOneGood(id string) (Good, error) {
+	hexId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return Good{}, err
+	}
+	var good Good
+
+	result := database.Goods.FindOne(ctx, bson.M{
+		"_id": hexId,
+	})
+
+	err = result.Decode(&good)
+	if err != nil {
+		return good, err
+	}
+
+	return good, nil
 }
 
 func getGoods(pagination PageQueryParams) (GetGoodResponse, error) {

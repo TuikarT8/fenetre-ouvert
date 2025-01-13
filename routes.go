@@ -16,6 +16,7 @@ func createRoutes() *mux.Router {
 	createInvetorySessionsRoutes(r)
 	createAssetRoutes(r)
 	createAuthRoutes(r)
+	createHistRoutes(r)
 
 	return r
 }
@@ -40,12 +41,13 @@ func createNotificationsRoutes(r *mux.Router) {
 }
 
 func createUsersRoutes(r *mux.Router) {
+	r.HandleFunc("/api/users/{id}", rest.HandleGetUser)
 	r.HandleFunc("PATCH /api/users/{id}", rest.HandleUpdateUser)
 }
 
 func createInvetorySessionsRoutes(r *mux.Router) {
 	r.HandleFunc("/api/sessions", rest.SessionsHandler)
-	r.HandleFunc("/api/sessions/{id}", rest.DeleteSessionHandler)
+	r.HandleFunc("/api/sessions/{id}", rest.SessionHandler)
 	r.HandleFunc("/api/sessions/{id}/session", rest.UpdateSessionHandler)
 	r.HandleFunc("/api/sessions/{id}/activate", rest.HandleActivateSession)
 	r.HandleFunc("/api/sessions/{id}/goods", rest.GetSessionGoodsHandler)
@@ -61,4 +63,8 @@ func createAuthRoutes(r *mux.Router) {
 
 func createAssetRoutes(r *mux.Router) {
 	r.HandleFunc("/assets/goods/{id}/qrcode", rest.HandleGenerateQrCode)
+}
+
+func createHistRoutes(r *mux.Router) {
+	r.HandleFunc("/api/events", rest.HandleGetHistorique)
 }

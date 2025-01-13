@@ -128,6 +128,50 @@ func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func HandleGetUser(w http.ResponseWriter, r *http.Request) {
+	if !utils.AssertMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	userId := mux.Vars(r)["id"]
+
+	usr, err := getOneUser(userId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HandleGetUser ()=> Error while gettig user"))
+		log.Print("HandleGetUser ()=> Error while getting user", err)
+		return
+	}
+
+	jsondata, err := json.Marshal(usr)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("GetOneSessionHandler () => Error while marsalling good"))
+		log.Print("GetOneSessionHandler () => Error while marshalling good", err)
+		return
+	}
+	w.Write(jsondata)
+}
+
+func getOneUser(id string) (User, error) {
+	hexId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return User{}, err
+	}
+	var user User
+
+	result := database.Users.FindOne(ctx, bson.M{
+		"_id": hexId,
+	})
+
+	err = result.Decode(&user)
+	if err != nil {
+		return User{}, err
+	}
+
+	return user, nil
+}
+
 func (User *User) saveUserInDb() (string, error) {
 	_, err := database.Users.InsertOne(database.Ctx, User)
 	if err != nil {
