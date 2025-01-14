@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"fenetre-ouverte/api/utils"
 	"fenetre-ouverte/database"
 	"fmt"
 	"log"
@@ -10,8 +11,10 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/gorilla/mux"
 	"github.com/mitchellh/mapstructure"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -207,4 +210,66 @@ func decodeToken(tokenString string) (AuthToken, error) {
 	}
 
 	return decoded, nil
+}
+
+func HandleUpdatePassword(w http.ResponseWriter, r *http.Request) {
+	if !utils.AssertMethod(w, r, http.MethodPost) {
+		return
+	}
+
+	userId := mux.Vars(r)["id"]
+	password := r.FormValue("password")
+	newPassWord := r.FormValue("newpassword")
+
+	if !CheckPassWord(password, w, r) {
+		log.Println("HandleUpdatePassword() => The password is not the same")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HandleUpdatePassword () => The password is not the same"))
+		return
+	}
+
+	newPasswordEncrypted, err := EncryptUserPassword([]byte(newPassWord))
+	if err != nil {
+		log.Printf(" HandleUpdatePassword () => Error while encrypting password [err %v]", err)
+	}
+
+	var user = User{
+		Password: newPasswordEncrypted,
+	}
+
+	user.UpdatePasswordIndb(userId)
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func CheckPassWord(password string, w http.ResponseWriter, r *http.Request) bool {
+	user, _ := verifyJwt(w, r)
+	hashPassword := []byte(user.Password)
+	if err := bcrypt.CompareHashAndPassword(hashPassword, []byte(password)); err != nil {
+		log.Println("Error while compare HashPassword", err)
+		return false
+	}
+	return true
+}
+
+func (user *User) UpdatePasswordIndb(id string) (string, error) {
+	bsonId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return "", err
+	}
+	_, err = database.Users.UpdateOne(
+		ctx,
+		primitive.M{"_id": bsonId},
+		primitive.M{
+			"$set": primitive.M{
+				"password": user.Password,
+			},
+		},
+	)
+	if err != nil {
+		log.Printf("Error while updating User password, error=%v", err)
+		return "", err
+	}
+
+	return "", err
 }

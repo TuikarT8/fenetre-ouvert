@@ -49,17 +49,18 @@ const (
 )
 
 type User struct {
-	Id           interface{}    `bson:"_id,omitempty" json:"id"`
-	FirstName    string         `bson:"fistname,omitempty" json:"firstname"`
-	LastName     string         `bson:"lastname,omitempty" json:"lastname"`
-	EmailAddress string         `bson:"emailAddress,omitempty" json:"emailAddress"`
-	Password     string         `bson:"password,omitempty" json:"password"`
-	MiddleName   string         `bson:"middlename,omitempty" json:"middlename"`
-	Notification []Notification `bson:"notification,omitempty" json:"notification"`
-	Condition    string         `bson:"condition,omitempty" json:"condition"`
-	Address      string         `bson:"address,omitempty" json:"address"`
-	Deleted      bool           `bson:"deleted,omitempty" json:"deleted"`
-	Roles        []string       `bson:"roles,omitempty" json:"roles"`
+	Id             interface{}    `bson:"_id,omitempty" json:"id"`
+	FirstName      string         `bson:"fistname,omitempty" json:"firstname"`
+	LastName       string         `bson:"lastname,omitempty" json:"lastname"`
+	EmailAddress   string         `bson:"emailAddress,omitempty" json:"emailAddress"`
+	Password       string         `bson:"password,omitempty" json:"password"`
+	UpdatePassword string         `bson:"updatePassword,omitempty" json:"updatePassword"`
+	MiddleName     string         `bson:"middlename,omitempty" json:"middlename"`
+	Notification   []Notification `bson:"notification,omitempty" json:"notification"`
+	Condition      string         `bson:"condition,omitempty" json:"condition"`
+	Address        string         `bson:"address,omitempty" json:"address"`
+	Deleted        bool           `bson:"deleted,omitempty" json:"deleted"`
+	Roles          []string       `bson:"roles,omitempty" json:"roles"`
 }
 
 type Good struct {

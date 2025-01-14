@@ -8,7 +8,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 export function UserDrawer({ user, isOpen, onClose }) {
-
 	return (
 		<Drawer
 			open={isOpen}
@@ -21,7 +20,8 @@ export function UserDrawer({ user, isOpen, onClose }) {
 				<DrawerHeaderTitle>{user?.name || 'Aucun nom'}</DrawerHeaderTitle>
 			</DrawerHeader>
 			<DrawerBody>
-				<p>{user?.name || 'Aucun nom'}</p></DrawerBody>
+				<p>{user?.name || 'Aucun nom'}</p>
+			</DrawerBody>
 		</Drawer>
 	);
 }

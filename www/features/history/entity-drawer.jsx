@@ -37,23 +37,29 @@ export const EntityDrawer = ({ isOpen, entityGroup, entityId, onClose }) => {
 				/>
 			);
 		case 'sessions':
-			return (<SessionDrawer
-						session={entity}
-						isOpen={isOpen}
-						onClose={() => onClose(false)}
-			/>);
+			return (
+				<SessionDrawer
+					session={entity}
+					isOpen={isOpen}
+					onClose={() => onClose(false)}
+				/>
+			);
 		case 'users':
-			return (<UserDrawer
-						user={entity}
-						isOpen={isOpen}
-						onClose={() => onClose(false)}
-			/>);
+			return (
+				<UserDrawer
+					user={entity}
+					isOpen={isOpen}
+					onClose={() => onClose(false)}
+				/>
+			);
 		default:
-			return <NotEntityDrawer
+			return (
+				<NotEntityDrawer
 					notEntity={entity}
 					isOpen={isOpen}
 					onClose={() => onClose(false)}
 				/>
+			);
 	}
 };
 

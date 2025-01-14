@@ -8,8 +8,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 export function SessionDrawer({ session, isOpen, onClose }) {
-	console.log('SessionDrawer and isOpen', session, isOpen);
-
 	return (
 		<Drawer
 			open={isOpen}
