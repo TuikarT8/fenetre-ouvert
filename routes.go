@@ -56,6 +56,7 @@ func createInvetorySessionsRoutes(r *mux.Router) {
 }
 
 func createAuthRoutes(r *mux.Router) {
+	r.HandleFunc("/api/auth/email/{id}", rest.HandleUpdateEmail)
 	r.HandleFunc("/api/auth/password/{id}", rest.HandleUpdatePassword)
 	r.HandleFunc("/api/auth/verify", rest.HandleVerifyJwt)
 	r.HandleFunc("/api/auth/login", rest.HandleLogin)

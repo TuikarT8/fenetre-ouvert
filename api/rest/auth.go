@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -242,6 +243,30 @@ func HandleUpdatePassword(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func HandleUpdateEmail(w http.ResponseWriter, r *http.Request) {
+	if !utils.AssertMethod(w, r, http.MethodPost) {
+		return
+	}
+
+	userId := mux.Vars(r)["id"]
+	email := r.FormValue("email")
+	log.Printf("userId [%s] est email [%s] ", userId, email)
+	if !CheckEmail(email) {
+		log.Println("HandleUpdateEmail ()=> The password is not the same")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HandleUpdateEmail ()=> The password is not the same"))
+		return
+	}
+
+	var user = User{
+		EmailAddress: email,
+	}
+
+	user.UpdateEmailAddressIndb(userId)
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func CheckPassWord(password string, w http.ResponseWriter, r *http.Request) bool {
 	user, _ := verifyJwt(w, r)
 	hashPassword := []byte(user.Password)
@@ -249,6 +274,14 @@ func CheckPassWord(password string, w http.ResponseWriter, r *http.Request) bool
 		log.Println("Error while compare HashPassword", err)
 		return false
 	}
+	return true
+}
+
+func CheckEmail(email string) bool {
+	if matched, _ := regexp.MatchString(`[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+`, email); !matched {
+		return false
+	}
+
 	return true
 }
 
@@ -268,6 +301,28 @@ func (user *User) UpdatePasswordIndb(id string) (string, error) {
 	)
 	if err != nil {
 		log.Printf("Error while updating User password, error=%v", err)
+		return "", err
+	}
+
+	return "", err
+}
+
+func (user *User) UpdateEmailAddressIndb(id string) (string, error) {
+	bsonId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return "", err
+	}
+	_, err = database.Users.UpdateOne(
+		ctx,
+		primitive.M{"_id": bsonId},
+		primitive.M{
+			"$set": primitive.M{
+				"emailAddress": user.EmailAddress,
+			},
+		},
+	)
+	if err != nil {
+		log.Printf("Error while updating EmailAddress, error=%v", err)
 		return "", err
 	}
 

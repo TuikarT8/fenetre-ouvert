@@ -12,7 +12,7 @@ import { ProtectedRoute } from './common/protected-route';
 import { SinginUp } from './SinginUp';
 import { Error } from './common';
 import { History } from './features/history';
-import { User } from './features/home/user';
+import { User } from './features/user';
 
 const useStyles = makeStyles({
 	main: {

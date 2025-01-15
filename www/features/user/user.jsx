@@ -1,8 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { Button, Field, Input, Label, makeStyles } from '@fluentui/react-components';
+import {
+	Button,
+	Field,
+	Input,
+	Label,
+	makeStyles,
+	Spinner,
+} from '@fluentui/react-components';
 import { useParams } from 'react-router-dom';
-import { set } from 'lodash';
+import { EmailRenderer } from './email-renderer';
 
 const useStyles = makeStyles({
 	container: {
@@ -11,17 +18,35 @@ const useStyles = makeStyles({
 	form: {
 		display: 'flex',
 		flexDirection: 'column',
-		width: '200px',
-		height: '500px',
+	},
+	emailForm: {
+		display: 'flex',
+		flexDirection: 'row',
+	},
+	inputForm: {
+		display: 'flex',
 	},
 	input: {
 		marginBottom: '16px',
+	},
+	button: {
+		width: '10px',
+		height: '20px',
+	},
+	spinner: {
+		position: 'absolute',
+		top: 0,
+		bottom: 0,
+		left: 0,
+		right: 0,
+		margin: 'auto',
+		height: 'fit-content',
+		width: 'fit-conten',
 	},
 });
 
 export function User() {
 	const styles = useStyles();
-	//const navigate = useNavigate();
 	const [password, setPassWord] = useState('');
 	const [confirmPassword, setconfirmPassword] = useState('');
 	const [isPasswordNotMatching, setIsPasswordNotMatching] = useState(false);
@@ -46,11 +71,11 @@ export function User() {
 
 	useEffect(() => {
 		if (password !== confirmPassword) {
-			if(confirmPassword !== "" ) {
-				setIsPasswordNotMatching(true)
+			if (confirmPassword !== '') {
+				setIsPasswordNotMatching(true);
 			}
 		} else {
-			setIsPasswordNotMatching(false)
+			setIsPasswordNotMatching(false);
 		}
 	}, [password, confirmPassword]);
 
@@ -70,21 +95,29 @@ export function User() {
 			.post(`/api/auth/password/${id}`, form)
 			.then(() => {})
 			.catch(() => {
-				console.error("La mise a jour du mot de passe n'a pas reussi");
+				console.error(`La mise a jour du mot de passe n'a pas reussie`);
 			});
 	};
+
+	if (!user) {
+		return (
+			<div className={styles.spinner}>
+				<Spinner />
+			</div>
+		);
+	}
 
 	return (
 		<div>
 			<p>{user?.firstname}</p>
 			<p>{user?.lastname}</p>
-			<p>{user?.emailAddress}</p>
 
+			<EmailRenderer userId={id} defaultEmail={user?.emailAddress} />
 			<form className={styles.form} onSubmit={handleSubmit} ref={form}>
 				<Label required htmlFor={'password-input'}>
-					Password
+					Mot de passe
 				</Label>
-					
+
 				<Input
 					required
 					type="password"
@@ -93,37 +126,36 @@ export function User() {
 					className={styles.input}
 				/>
 				<Label required htmlFor={'password-input'}>
-					Nouveau Mot de passe
+					Nouveau mot de passe
 				</Label>
 				<Input
 					required
 					type="password"
-					id={'password-input'}
+					id={'new-password-input'}
 					name="newpassword"
 					className={styles.input}
 					onChange={(e) => {
 						setPassWord(e.target.value);
 					}}
 				/>
-				<Label required htmlFor={'password-input'}>
-					Confirmer le mot de passe
-				</Label>
-					
+				<Field
+					label="Confirmer le mot de passe"
+					validationState={isPasswordNotMatching ? 'error' : undefined}
+					validationMessage={
+						isPasswordNotMatching
+							? 'Les mots de passes ne correspondent pas'
+							: ''
+					}>
 					<Input
 						required
 						type="password"
-						id={'password-input'}
+						id={'password-confirmation-input'}
 						name="confirmationpassword"
 						onChange={(e) => {
 							setconfirmPassword(e.target.value);
 						}}
 					/>
-					{isPasswordNotMatching && <Field
-						validationState="warning"
-						validationMessage="Le mot de passe n'est pas identique"
-						size="medium"
-    				>
-				</Field>}
+				</Field>
 
 				<div ref={ref}></div>
 				<Button type="submit" appearance="primary">
