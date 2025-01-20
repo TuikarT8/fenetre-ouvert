@@ -25,18 +25,18 @@ const useStyles = makeStyles({
 
 export function EmailRenderer({ userId, defaultEmail }) {
 	const styles = useStyles();
-	const [isInputPristine, setIsInputPristine] = useState(false);
+	const [isInputPristine, setIsInputPristine] = useState(true);
 	const updateSubmitEmailAddress = (event) => {
 		event.preventDefault();
 		const form = event.target;
-		const email = event.target?.value;
-
-		if (!email && !userId) {
+		const emailAddress = form.email?.value;
+		
+		if (!emailAddress || !userId) {
 			return;
 		}
 
 		axios
-			.post(`/api/auth/email/${userId}`, form)
+			.patch(`/api/users/${userId}`, {emailAddress})
 			.then(() => {
 				console.log('Ok');
 			})
@@ -56,15 +56,11 @@ export function EmailRenderer({ userId, defaultEmail }) {
 					name="email"
 					className={styles.input}
 					onChange={(event) => {
-						if (event.target.value !== defaultEmail) {
-							setIsInputPristine(true);
-						} else {
-							setIsInputPristine(false);
-						}
+						setIsInputPristine(event.target.value === defaultEmail);
 					}}
 				/>
 			</Field>
-			{isInputPristine && (
+			{!isInputPristine && (
 				<Button
 					type="submit"
 					className={styles.emailFormButton}

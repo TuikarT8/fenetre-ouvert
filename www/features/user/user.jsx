@@ -10,6 +10,7 @@ import {
 } from '@fluentui/react-components';
 import { useParams } from 'react-router-dom';
 import { EmailRenderer } from './email-renderer';
+import { NameRenderer } from './name-renderer';
 
 const useStyles = makeStyles({
 	container: {
@@ -50,7 +51,6 @@ export function User() {
 	const [password, setPassWord] = useState('');
 	const [confirmPassword, setconfirmPassword] = useState('');
 	const [isPasswordNotMatching, setIsPasswordNotMatching] = useState(false);
-	const ref = useRef();
 	const { id } = useParams();
 	const form = useRef(null);
 	const [user, setUser] = useState(null);
@@ -92,7 +92,7 @@ export function User() {
 		}
 
 		axios
-			.post(`/api/auth/password/${id}`, form)
+			.patch(`/api/users/${id}`, {password})
 			.then(() => {})
 			.catch(() => {
 				console.error(`La mise a jour du mot de passe n'a pas reussie`);
@@ -109,10 +109,9 @@ export function User() {
 
 	return (
 		<div>
-			<p>{user?.firstname}</p>
-			<p>{user?.lastname}</p>
-
+			<NameRenderer userId={id} defaultFirstName={user?.firstname || ''} defaultLastName={user?.lastname || ''} />
 			<EmailRenderer userId={id} defaultEmail={user?.emailAddress} />
+			
 			<form className={styles.form} onSubmit={handleSubmit} ref={form}>
 				<Label required htmlFor={'password-input'}>
 					Mot de passe
@@ -156,8 +155,6 @@ export function User() {
 						}}
 					/>
 				</Field>
-
-				<div ref={ref}></div>
 				<Button type="submit" appearance="primary">
 					enregistrer
 				</Button>

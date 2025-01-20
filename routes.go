@@ -41,8 +41,7 @@ func createNotificationsRoutes(r *mux.Router) {
 }
 
 func createUsersRoutes(r *mux.Router) {
-	r.HandleFunc("/api/users/{id}", rest.HandleGetUser)
-	r.HandleFunc("PATCH /api/users/{id}", rest.HandleUpdateUser)
+	r.HandleFunc("/api/users/{id}", rest.UserHandler)
 }
 
 func createInvetorySessionsRoutes(r *mux.Router) {
@@ -56,8 +55,6 @@ func createInvetorySessionsRoutes(r *mux.Router) {
 }
 
 func createAuthRoutes(r *mux.Router) {
-	r.HandleFunc("/api/auth/email/{id}", rest.HandleUpdateEmail)
-	r.HandleFunc("/api/auth/password/{id}", rest.HandleUpdatePassword)
 	r.HandleFunc("/api/auth/verify", rest.HandleVerifyJwt)
 	r.HandleFunc("/api/auth/login", rest.HandleLogin)
 	r.HandleFunc("/api/auth/signup", rest.HandleSignupUser)

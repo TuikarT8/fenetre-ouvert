@@ -251,12 +251,6 @@ func HandleUpdateEmail(w http.ResponseWriter, r *http.Request) {
 	userId := mux.Vars(r)["id"]
 	email := r.FormValue("email")
 	log.Printf("userId [%s] est email [%s] ", userId, email)
-	if !CheckEmail(email) {
-		log.Println("HandleUpdateEmail ()=> The password is not the same")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("HandleUpdateEmail ()=> The password is not the same"))
-		return
-	}
 
 	var user = User{
 		EmailAddress: email,

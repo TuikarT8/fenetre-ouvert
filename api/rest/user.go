@@ -111,21 +111,38 @@ func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var User User
+	var user User
 
-	err = json.Unmarshal(body, &User)
+	err = json.Unmarshal(body, &user)
 	if err != nil {
 		handleUnmarshallingError(err.Error(), w)
 		return
 	}
 
-	if _, err := User.UpdateUserInDb(UserId); err != nil {
+	if !CheckEmail(user.EmailAddress) {
+		log.Println("HandleUpdateUser ()=> The password is not the same")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("UpdateGoodHandler() => Error while Updating good"))
-		log.Print("UpdateGoodHandler() => Error while Updating good", err)
+		w.Write([]byte("HandleUpdateUser ()=> The password is not the same"))
+		return
+	}
+
+	if err := user.Update(UserId); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HandleUpdateUser() => Error while Updating good"))
+		log.Print("HandleUpdateUser() => Error while Updating good", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func UserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		HandleGetUser(w, r)
+	} else if r.Method == http.MethodPatch {
+		HandleUpdateUser(w, r)
+	} else {
+		utils.ReportWrongHttpMethod(w, r, r.Method)
+	}
 }
 
 func HandleGetUser(w http.ResponseWriter, r *http.Request) {
@@ -206,10 +223,10 @@ func getUserInDb(pagination PageQueryParams) ([]User, error) {
 	return usrs, nil
 }
 
-func (user *User) UpdateUserInDb(id string) (string, error) {
+func (user *User) Update(id string) error {
 	bsonId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return "", err
+		return err
 	}
 	_, err = database.Users.UpdateOne(
 		ctx,
@@ -220,11 +237,10 @@ func (user *User) UpdateUserInDb(id string) (string, error) {
 	)
 	if err != nil {
 		log.Printf("Error while updating User, error=%v", err)
-		return "", err
+		return err
 	}
 
-	return "", err
-
+	return err
 }
 
 func deleteUserInDb(id string) error {
