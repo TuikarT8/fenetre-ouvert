@@ -54,7 +54,7 @@ export function NameRenderer({ userId, defaultFirstName, defaultLastName }) {
 
 	return (
 		<form className={styles.emailForm} onSubmit={updateSubmitEmailAddress}>
-			<Field label="FirstName" className={styles.emailFormField}>
+			<Field label="Prénom" className={styles.emailFormField}>
 				<Input
 					defaultValue={defaultFirstName || ''}
 					type="text"
@@ -67,7 +67,7 @@ export function NameRenderer({ userId, defaultFirstName, defaultLastName }) {
 				/>
 			</Field>
 
-            <Field label="LastName" className={styles.emailFormField}>
+            <Field label="Postnom" className={styles.emailFormField}>
 				<Input
 					defaultValue={defaultLastName || ''}
 					type="text"

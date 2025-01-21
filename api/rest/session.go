@@ -169,7 +169,7 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := deleteSessionInDb(sessionId)
+	err := deleteSession(sessionId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("deleteSessionHandler() => Error while deleting good"))
@@ -236,7 +236,7 @@ func HandleActivateSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionId := mux.Vars(r)["id"]
-	if _, err := updateActiveSessionFromDB(sessionId); err != nil {
+	if _, err := updateActiveSession(sessionId); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("HandleActivateSession() => Error while Active session"))
 		log.Print("HandleActivateSession() => Error while active session", err)
@@ -372,8 +372,13 @@ func getGoodsMatchingSession(sessionId string) (SessionGoodsLookupResponse, erro
 	return getGoodsMatchingAnySession(sessionId)
 }
 
-func getGoodsMatchingAnySession(sessionId string) (SessionGoodsLookupResponse, error) {
+func getGoodsMatchingAnySession(stringSessionId string) (SessionGoodsLookupResponse, error) {
 	goods := make([]Good, 0)
+	sessionId, err := database.ConvertStringToPrimitiveOBjectId(stringSessionId)
+	if err != nil {
+		log.Printf("Error while retrieiving session goods, err=[%v]", err)
+		return SessionGoodsLookupResponse{}, err
+	}
 
 	cusor, err := database.Goods.Find(database.Ctx, bson.M{"changes.sessionId": sessionId})
 	if err != nil {
@@ -553,7 +558,7 @@ func (session *Session) UpdateSessionInDb(id string) (string, error) {
 	return "", nil
 }
 
-func deleteSessionInDb(id string) error {
+func deleteSession(id string) error {
 	bsonId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
@@ -568,7 +573,7 @@ func deleteSessionInDb(id string) error {
 	return nil
 }
 
-func updateActiveSessionFromDB(id string) (string, error) {
+func updateActiveSession(id string) (string, error) {
 	bsonId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return "", err

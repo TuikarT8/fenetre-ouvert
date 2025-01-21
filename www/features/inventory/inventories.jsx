@@ -24,6 +24,7 @@ import {
 } from '../../common';
 import { useInventory } from '../../provider';
 import { SessionDrawer } from './session-editor-drawer';
+import { Link, useNavigate } from 'react-router-dom';
 
 const columns = [
 	{ columnKey: 'author', label: 'Author' },
@@ -37,6 +38,7 @@ export const InventoriesTable = () => {
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
 	});
+	const navigate = useNavigate()
 	const [isCreateSessionDialogOpen, setCreateSessionDialogOpen] =
 		useState(false);
 	const [hasActiveSession, setHasActiveSession] = useState(false);
@@ -107,13 +109,12 @@ export const InventoriesTable = () => {
 				<TableBody>
 					{(sessions || []).map((item) => {
 						return (
-							<TableRow key={item.id}>
+							<TableRow key={item.id} onClick={() => navigate(`/inventories/${item?.id}`)}>
 								<TableCell>
 									<TableCellLayout key={item.id}>
 										{capitalizeFirstLetter(item.author || 'inconnu')}
 									</TableCellLayout>
 								</TableCell>
-
 								<TableCell>
 									<TableCellLayout>
 										{convertStringToDate(item.startDate)?.toDateString()}
