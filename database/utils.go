@@ -11,7 +11,3 @@ func ConvertStringToPrimitiveOBjectId(id string) (primitive.ObjectID, error) {
 
 	return hexId, nil
 }
-
-func BsonToString(id string) string {
-	return string(id)
-}

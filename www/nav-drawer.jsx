@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles, tokens } from '@fluentui/react-components';
+import { Divider, makeStyles, tokens } from '@fluentui/react-components';
 import {
 	Hamburger,
 	NavDrawer,
@@ -9,6 +9,7 @@ import {
 	NavItem,
 } from '@fluentui/react-nav-preview';
 import { Link } from 'react-router-dom';
+import { getCookie } from './common';
 
 const useStyles = makeStyles({
 	drawer: {
@@ -22,6 +23,7 @@ const useStyles = makeStyles({
 
 export function NavigationDrawer({ open, onToggleDrawerOpenState }) {
 	const styles = useStyles();
+	const userId = getCookie('user');
 
 	return (
 		<NavDrawer
@@ -45,6 +47,10 @@ export function NavigationDrawer({ open, onToggleDrawerOpenState }) {
 				</Link>
 				<Link to="history" replace={true} className={styles.link}>
 					<NavItem value="4">Historique</NavItem>
+				</Link>
+				<Divider />
+				<Link to={`/users/${userId}`} replace={true} className={styles.link}>
+					<NavItem value="5">Profil</NavItem>
 				</Link>
 			</NavDrawerBody>
 		</NavDrawer>

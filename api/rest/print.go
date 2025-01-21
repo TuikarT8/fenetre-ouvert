@@ -3,7 +3,6 @@ package rest
 import (
 	"fenetre-ouverte/api/tplt"
 	"fenetre-ouverte/api/utils"
-	"fenetre-ouverte/database"
 	"log"
 	"net/http"
 
@@ -23,7 +22,7 @@ func HandlePrintLabel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	good.StringId = database.BsonToString(goodId)
+	good.StringId = goodId
 	err = tplt.RenderTemplate(w, "label", good)
 	if err != nil {
 		log.Printf("HandleGenerateQrCode() => Error while while rendering template err=[%v]", err)

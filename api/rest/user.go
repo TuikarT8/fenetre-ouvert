@@ -112,14 +112,13 @@ func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user User
-
 	err = json.Unmarshal(body, &user)
 	if err != nil {
 		handleUnmarshallingError(err.Error(), w)
 		return
 	}
 
-	if !CheckEmail(user.EmailAddress) {
+	if user.EmailAddress != "" && !CheckEmail(user.EmailAddress) {
 		log.Println("HandleUpdateUser ()=> The password is not the same")
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("HandleUpdateUser ()=> The password is not the same"))

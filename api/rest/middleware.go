@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -20,14 +21,13 @@ type ContextKey string
 var permissions PermissionsDescriptor
 
 func Init() {
-	bytesRead := make([]byte, 0)
 	jsonfile, err := os.Open("permission.json")
 	if err != nil {
 		log.Println("Erreur survenu lors de la lecture du fichier json", err)
 	}
 	defer jsonfile.Close()
 
-	bytesRead, _ = ioutil.ReadAll(jsonfile)
+	bytesRead, _ := ioutil.ReadAll(jsonfile)
 
 	json.Unmarshal(bytesRead, &permissions)
 }
@@ -48,7 +48,19 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				return
 			}
 
-			newContext := context.WithValue(request.Context(), "user", user)
+			cookie := http.Cookie{
+				Name:     "user",
+				Value:    user.Id.(string),
+				Path:     "/",
+				MaxAge:   time.Now().Add(720 * time.Hour).Nanosecond(),
+				HttpOnly: false, // TODO remove this in production
+				Secure:   false, // TODO remove this in production
+				SameSite: http.SameSiteLaxMode,
+			}
+
+			http.SetCookie(writer, &cookie)
+
+			newContext := context.WithValue(request.Context(), ContextKey("user"), user)
 			enhancedRequest := request.WithContext(newContext)
 			next.ServeHTTP(writer, enhancedRequest)
 			return

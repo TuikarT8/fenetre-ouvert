@@ -60,3 +60,4 @@ export function isZeroDate(date) {
 }
 
 export * from './use-depencency-observer';
+export * from './get-cookie';

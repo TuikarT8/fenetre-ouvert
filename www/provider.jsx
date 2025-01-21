@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Context } from './context';
+import { Context } from './features/user/context';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { uniq, uniqBy } from 'lodash';
