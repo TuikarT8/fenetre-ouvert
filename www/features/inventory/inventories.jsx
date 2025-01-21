@@ -112,7 +112,7 @@ export const InventoriesTable = () => {
 							<TableRow key={item.id} onClick={() => navigate(`/inventories/${item?.id}`)}>
 								<TableCell>
 									<TableCellLayout key={item.id}>
-										{capitalizeFirstLetter(item.author || 'inconnu')}
+										{capitalizeFirstLetter(item?.author?.name || 'inconnu')}
 									</TableCellLayout>
 								</TableCell>
 								<TableCell>

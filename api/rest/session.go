@@ -126,11 +126,12 @@ func PostSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	session.Author = getAuthorFromRequest(r)
 	err = session.save()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("postSessionHandler () => Error while creating good"))
-		log.Print("postSessionHandler () => Error while creating good", err)
+		w.Write([]byte("postSessionHandler () => Error while creating session"))
+		log.Print("postSessionHandler () => Error while creating session", err)
 		return
 	}
 

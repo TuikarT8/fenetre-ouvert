@@ -120,7 +120,7 @@ type Session struct {
 	Id        interface{} `bson:"_id,omitempty" json:"id"`
 	StartDate time.Time   `bson:"startDate,omitempty" json:"startDate,omitempty"`
 	EndDate   time.Time   `bson:"endDate,omitempty" json:"endDate,omitempty"`
-	Author    interface{} `bson:"author,omitempty" json:"author"`
+	Author    Author      `bson:"author,omitempty" json:"author"`
 	Active    bool        `bson:"active" json:"active"`
 	CloseDate time.Time   `bson:"closeDate,omitempty" json:"closeDate,omitempty"`
 }
