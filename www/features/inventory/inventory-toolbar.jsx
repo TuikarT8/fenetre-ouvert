@@ -12,7 +12,7 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { GoodScanner } from '../../common/qr-scanner';
 
-export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
+export const InventoryToolbar = ({ disabledButton, sessionId, onGoodScanned }) => {
 	const [isCreateGoodDialogOpen, setIsCreateGoodDialogOpen] = useState(false);
 	const fileInputRef = useRef(null);
 	const { onFileUpload } = useFileUploader();
@@ -41,12 +41,13 @@ export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
 
 	return (
 		<div>
-			<Toolbar aria-label="Vertical Button">
-				<GoodScanner onGoodScanned={onGoodScanned} />
+			<Toolbar  aria-label="Vertical Button">
+				<GoodScanner disabled={disabledButton} onGoodScanned={onGoodScanned} />
 				<Tooltip content={'Créer un bien'} relationship="description">
 					<ToolbarButton
 						vertical
 						onClick={onCreateMenuOptionSelected}
+						disabled={disabledButton}
 						icon={<AddFilled />}>
 						Ajouter
 					</ToolbarButton>
@@ -57,6 +58,7 @@ export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
 					relationship="description">
 					<ToolbarButton
 						vertical
+						disabled={disabledButton}
 						onClick={handleFileUploadClick}
 						icon={<ArrowUploadFilled />}>
 						Importer
@@ -66,6 +68,7 @@ export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
 				<Tooltip content={'Clôturer cette session'} relationship="description">
 					<ToolbarButton
 						vertical
+						disabled={disabledButton}
 						onClick={onDesabledCurrentSession}
 						icon={<LockClosedFilled />}>
 						Clôturer
@@ -107,4 +110,5 @@ export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
 InventoryToolbar.propTypes = {
 	sessionId: PropTypes.string.isRequired,
 	onGoodScanned: PropTypes.func.isRequired,
+	disabledButton:PropTypes.bool.isRequired,
 };

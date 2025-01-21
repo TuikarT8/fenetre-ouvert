@@ -36,7 +36,7 @@ const useStyles = makeStyles({
 	},
 });
 
-export function GoodScanner({ onGoodScanned }) {
+export function GoodScanner({ disabled, onGoodScanned }) {
 	const styles = useStyles();
 	const scannerRef = useRef(null);
 	const [isScanRequested, setIsScanRequested] = useState(false);
@@ -75,7 +75,10 @@ export function GoodScanner({ onGoodScanned }) {
 	return (
 		<div>
 			<Toolbar>
-				<ToolbarButton onClick={() => setIsScanRequested(false)}>
+				<ToolbarButton
+					disabled = {disabled}
+					onClick={() => setIsScanRequested(false)}
+				>
 					Fermer
 				</ToolbarButton>
 			</Toolbar>
@@ -88,6 +91,7 @@ export function GoodScanner({ onGoodScanned }) {
 				id="reader"></div>
 			<Tooltip content={'Scanner un bien'} relationship="description">
 				<ToolbarButton
+					disabled = {disabled}
 					vertical
 					onClick={() => scanQRCode()}
 					icon={<ScanDash32Filled />}>
@@ -100,4 +104,5 @@ export function GoodScanner({ onGoodScanned }) {
 
 GoodScanner.propTypes = {
 	onGoodScanned: PropTypes.func.isRequired,
+	disabled: PropTypes.bool.isRequired
 };

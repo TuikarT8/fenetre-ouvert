@@ -63,9 +63,9 @@ func GetOneSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	goodId := mux.Vars(r)["id"]
+	sessionId := mux.Vars(r)["id"]
 
-	good, err := getOneSession(goodId)
+	session, err := getOneSession(sessionId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("GetOneSessionHandler () => Error while gettig session"))
@@ -73,7 +73,7 @@ func GetOneSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsondata, err := json.Marshal(good)
+	jsondata, err := json.Marshal(session)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("GetOneSessionHandler () => Error while marsalling session"))
@@ -83,23 +83,27 @@ func GetOneSessionHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsondata)
 }
 
-func getOneSession(id string) (Good, error) {
-	hexId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return Good{}, err
+func getOneSession(id string) (Session, error) {
+	if id == "" {
+		return Session{}, nil
 	}
-	var good Good
+
+	hexId, err := database.ConvertStringToPrimitiveOBjectId(id)
+	if err != nil {
+		return Session{}, err
+	}
+	var session Session
 
 	result := database.Sessions.FindOne(ctx, bson.M{
 		"_id": hexId,
 	})
 
-	err = result.Decode(&good)
+	err = result.Decode(&session)
 	if err != nil {
-		return good, err
+		return session, err
 	}
 
-	return good, nil
+	return session, nil
 }
 
 func PostSessionHandler(w http.ResponseWriter, r *http.Request) {

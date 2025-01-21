@@ -69,6 +69,7 @@ export const InventoryTable = () => {
 	const [isDisabled, setIsDisabled] = useState(false);
 	const [selectedGood, setSelectedGood] = useState(null);
 	const [goodToDelete, setGoodToDelete] = useState(null);
+	const [sess ,setSession] = useState(null)
 	const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
@@ -77,7 +78,21 @@ export const InventoryTable = () => {
 
 	useEffect(() => {
 		if (!inventoryId) return;
+		
+		axios
+			.get(`/api/sessions/${inventoryId}`)
+			.then(({ data }) => {
+				setSession(data);
+				console.log('session', data);
+			})
+			.catch((e) => {
+				console.error(e);
+			});
+	}, [inventoryId]);
 
+	useEffect(() => {
+		if (!inventoryId) return;
+		
 		axios
 			.get(`/api/sessions/${inventoryId}/goods`)
 			.then(({ data }) => {
@@ -130,6 +145,7 @@ export const InventoryTable = () => {
 		});
 	};
 
+	console.log("This is the acive" ,sess?.active)
 	const handleDeleteGood = () => {
 		axios
 			.delete(`/api/goods/${goodToDelete.id}/changes/${session?.sessionId}`)
@@ -164,18 +180,18 @@ export const InventoryTable = () => {
 		<div>
 			{!!session || <Title1>{"Aucune session n'est active"}</Title1>}
 
-			{!!session?.goods?.length && (
+			{!!session?.goodsNotInSession?.length && (
 				<InventoryMessageBox
 					count={session?.goodsNotInSession?.length || 0}
 					onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
 				/>
 			)}
-			{!!session?.goods?.length && (
+				
 				<InventoryToolbar
-					sessionId={inventoryId}
+				    disabledButton={!sess?.active}
 					onGoodScanned={onGoodScanned}
 				/>
-			)}
+
 			{!!session?.goods?.length && (
 				<Table
 					{...keyboardNavAttr}
