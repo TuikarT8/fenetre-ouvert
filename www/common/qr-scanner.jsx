@@ -89,7 +89,7 @@ export function GoodScanner({ disabled, onGoodScanned }) {
 				)}
 				ref={scannerRef}
 				id="reader"></div>
-			<Tooltip content={'Scanner un bien'} relationship="description">
+			<Tooltip content={!disabled?'Scanner un bien':"Vous ne pouvez pas scanner un bien tant que la session est inactive"}  relationship="description">
 				<ToolbarButton
 					disabled = {disabled}
 					vertical

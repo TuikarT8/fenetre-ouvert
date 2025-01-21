@@ -145,7 +145,6 @@ export const InventoryTable = () => {
 		});
 	};
 
-	console.log("This is the acive" ,sess?.active)
 	const handleDeleteGood = () => {
 		axios
 			.delete(`/api/goods/${goodToDelete.id}/changes/${session?.sessionId}`)
@@ -186,11 +185,13 @@ export const InventoryTable = () => {
 					onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
 				/>
 			)}
-				
+			{!!session?.goods?.length &&
 				<InventoryToolbar
-				    disabledButton={!sess?.active}
-					onGoodScanned={onGoodScanned}
+				disabledButton={!sess?.active}
+				onGoodScanned={onGoodScanned}
 				/>
+			}	
+				
 
 			{!!session?.goods?.length && (
 				<Table

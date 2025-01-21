@@ -24,7 +24,7 @@ import {
 } from '../../common';
 import { useInventory } from '../../provider';
 import { SessionDrawer } from './session-editor-drawer';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const columns = [
 	{ columnKey: 'author', label: 'Author' },

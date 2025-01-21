@@ -43,7 +43,10 @@ export const InventoryToolbar = ({ disabledButton, sessionId, onGoodScanned }) =
 		<div>
 			<Toolbar  aria-label="Vertical Button">
 				<GoodScanner disabled={disabledButton} onGoodScanned={onGoodScanned} />
-				<Tooltip content={'Créer un bien'} relationship="description">
+				<Tooltip 
+					content={!disabledButton?'Créer un bien':"Vous ne pouvez pas créer une session tant que la session est inactive"} 
+					relationship="description"
+				>
 					<ToolbarButton
 						vertical
 						onClick={onCreateMenuOptionSelected}
@@ -54,7 +57,7 @@ export const InventoryToolbar = ({ disabledButton, sessionId, onGoodScanned }) =
 				</Tooltip>
 
 				<Tooltip
-					content={"Importer des biens à partir d'un fichier JSON, CSV ou XML"}
+					content={!disabledButton?"Importer des biens à partir d'un fichier JSON, CSV ou XML":"Vous ne pouvez pas importer une session tant que la session est inactive"}
 					relationship="description">
 					<ToolbarButton
 						vertical
@@ -65,7 +68,7 @@ export const InventoryToolbar = ({ disabledButton, sessionId, onGoodScanned }) =
 					</ToolbarButton>
 				</Tooltip>
 
-				<Tooltip content={'Clôturer cette session'} relationship="description">
+				<Tooltip content={!disabledButton?'Clôturer cette session':"Vous ne pouvez pas cloturer une session tant que la session est inactive"} relationship="description">
 					<ToolbarButton
 						vertical
 						disabled={disabledButton}
