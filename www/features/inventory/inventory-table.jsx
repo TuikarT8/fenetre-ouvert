@@ -43,6 +43,7 @@ const columns = [
 	{ columnKey: 'Actions', label: 'Actions' },
 ];
 
+
 const tokens = themeToTokensObject(webLightTheme);
 const useStyles = makeStyles({
 	foreignRow: {
@@ -59,6 +60,11 @@ const useStyles = makeStyles({
 		height: 'fit-content',
 		width: 'fit-content',
 	},
+	
+	main: {
+		margin:"4px"
+	},
+	
 });
 
 export const InventoryTable = () => {

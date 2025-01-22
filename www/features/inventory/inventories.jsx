@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { EditRegular, DeleteRegular, AddFilled } from '@fluentui/react-icons';
+import { AddFilled, Edit12Regular, Delete12Regular } from '@fluentui/react-icons';
 import {
 	TableBody,
 	TableCell,
@@ -14,6 +14,7 @@ import {
 	Tooltip,
 	ToolbarButton,
 	Toolbar,
+	makeStyles,
 } from '@fluentui/react-components';
 import axios from 'axios';
 import {
@@ -27,10 +28,16 @@ import { SessionDrawer } from './session-editor-drawer';
 import { useNavigate } from 'react-router-dom';
 
 const columns = [
-	{ columnKey: 'author', label: 'Author' },
-	{ columnKey: 'startDate', label: 'Start Date' },
-	{ columnKey: 'closeDate', label: 'Close Date' },
+	{ columnKey: 'author', label: 'Auteur' },
+	{ columnKey: 'startDate', label: 'Date début' },
+	{ columnKey: 'closeDate', label: 'Date clôture' },
 ];
+
+const useStyles = makeStyles({
+	main: {
+		margin:"4px"
+	}
+});
 
 export const InventoriesTable = () => {
 	const { setSessions, sessions } = useInventory();
@@ -44,6 +51,8 @@ export const InventoriesTable = () => {
 	const [hasActiveSession, setHasActiveSession] = useState(false);
 	const [selectedSession, setSelectedSession] = useState();
 	const [action, setAction] = useState('');
+	const styles = useStyles();
+
 
 	useEffect(() => {
 		axios
@@ -131,12 +140,15 @@ export const InventoriesTable = () => {
 									<TableCellLayout>
 										<Tooltip content="Modifier la session" relationship="label">
 											<Button
-												icon={<EditRegular />}
+												icon={<Edit12Regular />}
 												aria-label="Edit"
-												onClick={() => {
+												onClick={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
 													setSelectedSession(item);
 													setAction('edit');
 												}}
+												className= {styles.main}
 											/>
 										</Tooltip>
 
@@ -148,10 +160,12 @@ export const InventoriesTable = () => {
 											}
 											relationship="label">
 											<Button
-												icon={<DeleteRegular />}
+												icon={<Delete12Regular />}
 												aria-label="Delete"
 												disabled={item.active}
-												onClick={() => {
+												onClick={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
 													setSelectedSession(item);
 													setAction('delete');
 												}}

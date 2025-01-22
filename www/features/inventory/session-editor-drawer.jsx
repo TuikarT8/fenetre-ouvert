@@ -5,9 +5,10 @@ import {
 	DrawerHeaderTitle,
 	Drawer,
 	Button,
-	Input,
 	Field,
 	DrawerFooter,
+	Avatar,
+	makeStyles,
 } from '@fluentui/react-components';
 import { Dismiss24Regular } from '@fluentui/react-icons';
 import PropTypes from 'prop-types';
@@ -15,8 +16,20 @@ import axios from 'axios';
 import { convertStringToDate, isZeroDate } from '../../common';
 import { DatePicker } from '@fluentui/react-datepicker-compat';
 
+const useStyles = makeStyles({
+	main: {
+		display:"flex",
+		flexDirection: "row",
+	},
+	avatarName: {
+		margin:"4px"
+	}
+});
+
+
 export const SessionDrawer = ({ isOpen, onClose, sessionId, session }) => {
 	const form = useRef(null);
+	const styles = useStyles()
 	const handleSubmitForm = (_form) => {
 		var session = {
 			startDate: isZeroDate(_form.startDate?.value)
@@ -53,20 +66,15 @@ export const SessionDrawer = ({ isOpen, onClose, sessionId, session }) => {
 							onClick={() => onClose()}
 						/>
 					}>
-					Modifier la session
+					{" Session du " + convertStringToDate(session.startDate)}
 				</DrawerHeaderTitle>
+				<div className={styles.main}>
+					<Avatar name={session?.name?.author || 'Auteur Inconnu'} />
+					<div className={styles.avatarName}>{session?.author?.name || 'Auteur inconnu'}</div>
+				</div>
 			</DrawerHeader>
 			<DrawerBody>
 				<form onSubmit={handleSubmitForm} ref={form}>
-					<Field label={'Author'} required>
-						<Input
-							required
-							type="string"
-							name="author"
-							defaultValue={session.author || 'Non defini'}
-						/>
-					</Field>
-
 					<Field label={'Start Date'}>
 						<DatePicker
 							name="startDate"
