@@ -12,7 +12,11 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { GoodScanner } from '../../common/qr-scanner';
 
-export const InventoryToolbar = ({ disabledButton, sessionId, onGoodScanned }) => {
+export const InventoryToolbar = ({
+	disabledButton,
+	sessionId,
+	onGoodScanned,
+}) => {
 	const [isCreateGoodDialogOpen, setIsCreateGoodDialogOpen] = useState(false);
 	const fileInputRef = useRef(null);
 	const { onFileUpload } = useFileUploader();
@@ -41,12 +45,15 @@ export const InventoryToolbar = ({ disabledButton, sessionId, onGoodScanned }) =
 
 	return (
 		<div>
-			<Toolbar  aria-label="Vertical Button">
+			<Toolbar aria-label="Vertical Button">
 				<GoodScanner disabled={disabledButton} onGoodScanned={onGoodScanned} />
-				<Tooltip 
-					content={!disabledButton?'Créer un bien':"Vous ne pouvez pas créer une session tant que la session est inactive"} 
-					relationship="description"
-				>
+				<Tooltip
+					content={
+						!disabledButton
+							? 'Créer un bien'
+							: 'Vous ne pouvez pas créer une session tant que la session est inactive'
+					}
+					relationship="description">
 					<ToolbarButton
 						vertical
 						onClick={onCreateMenuOptionSelected}
@@ -57,7 +64,11 @@ export const InventoryToolbar = ({ disabledButton, sessionId, onGoodScanned }) =
 				</Tooltip>
 
 				<Tooltip
-					content={!disabledButton?"Importer des biens à partir d'un fichier JSON, CSV ou XML":"Vous ne pouvez pas importer une session tant que la session est inactive"}
+					content={
+						!disabledButton
+							? "Importer des biens à partir d'un fichier JSON, CSV ou XML"
+							: 'Vous ne pouvez pas importer une session tant que la session est inactive'
+					}
 					relationship="description">
 					<ToolbarButton
 						vertical
@@ -68,7 +79,13 @@ export const InventoryToolbar = ({ disabledButton, sessionId, onGoodScanned }) =
 					</ToolbarButton>
 				</Tooltip>
 
-				<Tooltip content={!disabledButton?'Clôturer cette session':"Vous ne pouvez pas cloturer une session tant que la session est inactive"} relationship="description">
+				<Tooltip
+					content={
+						!disabledButton
+							? 'Clôturer cette session'
+							: 'Vous ne pouvez pas cloturer une session tant que la session est inactive'
+					}
+					relationship="description">
 					<ToolbarButton
 						vertical
 						disabled={disabledButton}
@@ -113,5 +130,5 @@ export const InventoryToolbar = ({ disabledButton, sessionId, onGoodScanned }) =
 InventoryToolbar.propTypes = {
 	sessionId: PropTypes.string.isRequired,
 	onGoodScanned: PropTypes.func.isRequired,
-	disabledButton:PropTypes.bool.isRequired,
+	disabledButton: PropTypes.bool.isRequired,
 };

@@ -76,9 +76,8 @@ export function GoodScanner({ disabled, onGoodScanned }) {
 		<div>
 			<Toolbar>
 				<ToolbarButton
-					disabled = {disabled}
-					onClick={() => setIsScanRequested(false)}
-				>
+					disabled={disabled}
+					onClick={() => setIsScanRequested(false)}>
 					Fermer
 				</ToolbarButton>
 			</Toolbar>
@@ -89,9 +88,15 @@ export function GoodScanner({ disabled, onGoodScanned }) {
 				)}
 				ref={scannerRef}
 				id="reader"></div>
-			<Tooltip content={!disabled?'Scanner un bien':"Vous ne pouvez pas scanner un bien tant que la session est inactive"}  relationship="description">
+			<Tooltip
+				content={
+					!disabled
+						? 'Scanner un bien'
+						: 'Vous ne pouvez pas scanner un bien tant que la session est inactive'
+				}
+				relationship="description">
 				<ToolbarButton
-					disabled = {disabled}
+					disabled={disabled}
 					vertical
 					onClick={() => scanQRCode()}
 					icon={<ScanDash32Filled />}>
@@ -104,5 +109,5 @@ export function GoodScanner({ disabled, onGoodScanned }) {
 
 GoodScanner.propTypes = {
 	onGoodScanned: PropTypes.func.isRequired,
-	disabled: PropTypes.bool.isRequired
+	disabled: PropTypes.bool.isRequired,
 };

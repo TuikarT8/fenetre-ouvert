@@ -30,13 +30,13 @@ export function EmailRenderer({ userId, defaultEmail }) {
 		event.preventDefault();
 		const form = event.target;
 		const emailAddress = form.email?.value;
-		
+
 		if (!emailAddress || !userId) {
 			return;
 		}
 
 		axios
-			.patch(`/api/users/${userId}`, {emailAddress})
+			.patch(`/api/users/${userId}`, { emailAddress })
 			.then(() => {
 				console.log('Ok');
 			})

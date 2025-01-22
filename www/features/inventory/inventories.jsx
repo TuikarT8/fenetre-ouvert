@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { AddFilled, Edit12Regular, Delete12Regular } from '@fluentui/react-icons';
+import {
+	AddFilled,
+	Edit12Regular,
+	Delete12Regular,
+} from '@fluentui/react-icons';
 import {
 	TableBody,
 	TableCell,
@@ -15,6 +19,9 @@ import {
 	ToolbarButton,
 	Toolbar,
 	makeStyles,
+	tokens,
+	Avatar,
+	Text,
 } from '@fluentui/react-components';
 import axios from 'axios';
 import {
@@ -22,10 +29,12 @@ import {
 	ConfimationDialog,
 	convertStringToDate,
 	SessionCreationDialog,
+	useAppContext,
 } from '../../common';
 import { useInventory } from '../../provider';
 import { SessionDrawer } from './session-editor-drawer';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { usePermissions } from '../../auth/permissions';
 
 const columns = [
 	{ columnKey: 'author', label: 'Auteur' },
@@ -34,8 +43,14 @@ const columns = [
 ];
 
 const useStyles = makeStyles({
-	main: {
-		margin:"4px"
+	actionButtonUpdate: {
+		margin: '4px',
+	},
+	actionButtonDelete: {
+		color: tokens.colorStatusDangerForeground1,
+	},
+	marginSpace: {
+		margin: '4px',
 	}
 });
 
@@ -45,14 +60,14 @@ export const InventoriesTable = () => {
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
 	});
-	const navigate = useNavigate()
+	const navigate = useNavigate();
 	const [isCreateSessionDialogOpen, setCreateSessionDialogOpen] =
 		useState(false);
-	const [hasActiveSession, setHasActiveSession] = useState(false);
 	const [selectedSession, setSelectedSession] = useState();
 	const [action, setAction] = useState('');
 	const styles = useStyles();
-
+	const { canCreateSessions, canDeleteSessions, canUpdateSessions } =
+		usePermissions();
 
 	useEffect(() => {
 		axios
@@ -85,13 +100,13 @@ export const InventoriesTable = () => {
 			<Toolbar aria-label="Vertical Button">
 				<Tooltip
 					content={
-						hasActiveSession
-							? "Vous ne pouvez pas créer une session tant qu'il y'a une session active"
+						!canCreateSessions()
+							? "Vous ne pouvez pas créer de session car vous n'avez pas les autoririsation requises"
 							: 'Créer une session'
 					}
 					relationship="description">
 					<ToolbarButton
-						disabled={hasActiveSession}
+						disabled={!canCreateSessions()}
 						vertical
 						onClick={() => {
 							setCreateSessionDialogOpen(true);
@@ -118,10 +133,16 @@ export const InventoriesTable = () => {
 				<TableBody>
 					{(sessions || []).map((item) => {
 						return (
-							<TableRow key={item.id} onClick={() => navigate(`/inventories/${item?.id}`)}>
+							<TableRow
+								key={item.id}
+								onClick={() => navigate(`/inventories/${item?.id}`)}>
 								<TableCell>
-									<TableCellLayout key={item.id}>
-										{capitalizeFirstLetter(item?.author?.name || 'inconnu')}
+									<TableCellLayout
+										key={item.id}
+										>
+										<Avatar  name={item?.author?.name || 'Inconnu'} />
+										{item.author?.name && <Link className={styles.marginSpace} to= {`/users/${item.id}`}>{capitalizeFirstLetter(item?.author?.name || 'inconnu')}</Link>}
+										{!item.author?.name && <Text className={styles.marginSpace}>{"Auteur Inconnu"}</Text>}
 									</TableCellLayout>
 								</TableCell>
 								<TableCell>
@@ -140,6 +161,7 @@ export const InventoriesTable = () => {
 									<TableCellLayout>
 										<Tooltip content="Modifier la session" relationship="label">
 											<Button
+												disabled={!canUpdateSessions()}
 												icon={<Edit12Regular />}
 												aria-label="Edit"
 												onClick={(e) => {
@@ -148,7 +170,7 @@ export const InventoriesTable = () => {
 													setSelectedSession(item);
 													setAction('edit');
 												}}
-												className= {styles.main}
+												className={styles.actionButtonUpdate}
 											/>
 										</Tooltip>
 
@@ -160,9 +182,10 @@ export const InventoriesTable = () => {
 											}
 											relationship="label">
 											<Button
+												className={styles.actionButtonDelete}
 												icon={<Delete12Regular />}
 												aria-label="Delete"
-												disabled={item.active}
+												disabled={!canDeleteSessions()}
 												onClick={(e) => {
 													e.preventDefault();
 													e.stopPropagation();

@@ -19,31 +19,30 @@ const useStyles = makeStyles({
 		width: '100%',
 		display: 'flex',
 		flexDirection: 'column',
-        marginBottom: '16px',
+		marginBottom: '16px',
 	},
 });
 
 export function NameRenderer({ userId, defaultFirstName, defaultLastName }) {
 	const styles = useStyles();
-    const [firstName, setFirstName] = useState(defaultFirstName);
-    const [lastName, setLastName] = useState(defaultLastName);
-    const areInputsPristine = useMemo(() => {
-        return firstName === defaultFirstName && lastName === defaultLastName;
-    }, [firstName, lastName]);
-
+	const [firstName, setFirstName] = useState(defaultFirstName);
+	const [lastName, setLastName] = useState(defaultLastName);
+	const areInputsPristine = useMemo(() => {
+		return firstName === defaultFirstName && lastName === defaultLastName;
+	}, [firstName, lastName]);
 
 	const updateSubmitEmailAddress = (event) => {
 		event.preventDefault();
-        const form = event.target;
+		const form = event.target;
 		const firstName = form.firstname?.value;
-        const lastName = form.lastname?.value;
+		const lastName = form.lastname?.value;
 
 		if (!firstName || !userId || !lastName) {
 			return;
 		}
 
 		axios
-			.patch(`/api/users/${userId}`, {firstName, lastName})
+			.patch(`/api/users/${userId}`, { firstName, lastName })
 			.then(() => {
 				console.log('Ok');
 			})
@@ -62,12 +61,12 @@ export function NameRenderer({ userId, defaultFirstName, defaultLastName }) {
 					name="firstname"
 					className={styles.input}
 					onChange={(event) => {
-                        setFirstName(event.target.value);
+						setFirstName(event.target.value);
 					}}
 				/>
 			</Field>
 
-            <Field label="Postnom" className={styles.emailFormField}>
+			<Field label="Postnom" className={styles.emailFormField}>
 				<Input
 					defaultValue={defaultLastName || ''}
 					type="text"
@@ -75,17 +74,16 @@ export function NameRenderer({ userId, defaultFirstName, defaultLastName }) {
 					name="lastname"
 					className={styles.input}
 					onChange={(event) => {
-                        setLastName(event.target.value)
+						setLastName(event.target.value);
 					}}
 				/>
 			</Field>
-				<Button
-					type="submit"
-					className={styles.emailFormButton}
-                    disabled={areInputsPristine}
-				>
-                    Enregistrer
-                </Button>                
+			<Button
+				type="submit"
+				className={styles.emailFormButton}
+				disabled={areInputsPristine}>
+				Enregistrer
+			</Button>
 		</form>
 	);
 }

@@ -154,7 +154,10 @@ func CompareHashAndPassword(tokenString string) (AuthToken, error) {
 }
 
 func HandleVerifyJwt(w http.ResponseWriter, r *http.Request) {
-	if _, err := verifyJwt(w, r); err != nil {
+	var user User
+	var err error
+
+	if user, err = verifyJwt(w, r); err != nil {
 		jsondata, _ := json.Marshal(map[string]bool{
 			"valid": false,
 		})
@@ -164,8 +167,21 @@ func HandleVerifyJwt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsondata, _ := json.Marshal(map[string]bool{
+	user, err = getOneUser(user.Id.(string))
+	if err != nil {
+		log.Printf("Error while autheticateing user, %v", err)
+		jsondata, _ := json.Marshal(map[string]bool{
+			"valid": false,
+		})
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(jsondata)
+		return
+	}
+
+	jsondata, _ := json.Marshal(map[string]any{
 		"valid": true,
+		"roles": user.Roles,
 	})
 	w.Write([]byte(jsondata))
 }

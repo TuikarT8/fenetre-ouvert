@@ -43,7 +43,6 @@ const columns = [
 	{ columnKey: 'Actions', label: 'Actions' },
 ];
 
-
 const tokens = themeToTokensObject(webLightTheme);
 const useStyles = makeStyles({
 	foreignRow: {
@@ -60,11 +59,10 @@ const useStyles = makeStyles({
 		height: 'fit-content',
 		width: 'fit-content',
 	},
-	
+
 	main: {
-		margin:"4px"
+		margin: '4px',
 	},
-	
 });
 
 export const InventoryTable = () => {
@@ -75,7 +73,7 @@ export const InventoryTable = () => {
 	const [isDisabled, setIsDisabled] = useState(false);
 	const [selectedGood, setSelectedGood] = useState(null);
 	const [goodToDelete, setGoodToDelete] = useState(null);
-	const [sess ,setSession] = useState(null)
+	const [sess, setSession] = useState(null);
 	const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
@@ -84,7 +82,7 @@ export const InventoryTable = () => {
 
 	useEffect(() => {
 		if (!inventoryId) return;
-		
+
 		axios
 			.get(`/api/sessions/${inventoryId}`)
 			.then(({ data }) => {
@@ -98,7 +96,7 @@ export const InventoryTable = () => {
 
 	useEffect(() => {
 		if (!inventoryId) return;
-		
+
 		axios
 			.get(`/api/sessions/${inventoryId}/goods`)
 			.then(({ data }) => {
@@ -191,13 +189,12 @@ export const InventoryTable = () => {
 					onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
 				/>
 			)}
-			{!!session?.goods?.length &&
+			{!!session?.goods?.length && (
 				<InventoryToolbar
-				disabledButton={!sess?.active}
-				onGoodScanned={onGoodScanned}
+					disabledButton={!sess?.active}
+					onGoodScanned={onGoodScanned}
 				/>
-			}	
-				
+			)}
 
 			{!!session?.goods?.length && (
 				<Table

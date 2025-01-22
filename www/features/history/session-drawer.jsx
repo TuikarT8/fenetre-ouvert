@@ -7,7 +7,7 @@ import {
 import PropTypes from 'prop-types';
 import React from 'react';
 
-export function SessionDrawer({ session, isOpen, onClose }) {	
+export function SessionDrawer({ session, isOpen, onClose }) {
 	return (
 		<Drawer
 			open={isOpen}

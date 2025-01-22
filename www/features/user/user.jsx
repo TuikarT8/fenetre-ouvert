@@ -92,7 +92,7 @@ export function User() {
 		}
 
 		axios
-			.patch(`/api/users/${id}`, {password})
+			.patch(`/api/users/${id}`, { password })
 			.then(() => {})
 			.catch(() => {
 				console.error(`La mise a jour du mot de passe n'a pas reussie`);
@@ -109,9 +109,13 @@ export function User() {
 
 	return (
 		<div>
-			<NameRenderer userId={id} defaultFirstName={user?.firstname || ''} defaultLastName={user?.lastname || ''} />
+			<NameRenderer
+				userId={id}
+				defaultFirstName={user?.firstname || ''}
+				defaultLastName={user?.lastname || ''}
+			/>
 			<EmailRenderer userId={id} defaultEmail={user?.emailAddress} />
-			
+
 			<form className={styles.form} onSubmit={handleSubmit} ref={form}>
 				<Label required htmlFor={'password-input'}>
 					Mot de passe

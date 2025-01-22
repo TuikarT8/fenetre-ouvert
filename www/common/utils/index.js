@@ -16,8 +16,6 @@ export function capitalizeFirstLetter(elem) {
 	}
 }
 
-
-
 export function hashGood(good) {
 	return good.id || uniqueId('good');
 }

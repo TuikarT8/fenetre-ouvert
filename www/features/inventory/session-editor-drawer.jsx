@@ -18,18 +18,17 @@ import { DatePicker } from '@fluentui/react-datepicker-compat';
 
 const useStyles = makeStyles({
 	main: {
-		display:"flex",
-		flexDirection: "row",
+		display: 'flex',
+		flexDirection: 'row',
 	},
 	avatarName: {
-		margin:"4px"
-	}
+		margin: '4px',
+	},
 });
-
 
 export const SessionDrawer = ({ isOpen, onClose, sessionId, session }) => {
 	const form = useRef(null);
-	const styles = useStyles()
+	const styles = useStyles();
 	const handleSubmitForm = (_form) => {
 		var session = {
 			startDate: isZeroDate(_form.startDate?.value)
@@ -66,11 +65,13 @@ export const SessionDrawer = ({ isOpen, onClose, sessionId, session }) => {
 							onClick={() => onClose()}
 						/>
 					}>
-					{" Session du " + convertStringToDate(session.startDate)}
+					{' Session du ' + convertStringToDate(session.startDate)}
 				</DrawerHeaderTitle>
 				<div className={styles.main}>
 					<Avatar name={session?.name?.author || 'Auteur Inconnu'} />
-					<div className={styles.avatarName}>{session?.author?.name || 'Auteur inconnu'}</div>
+					<div className={styles.avatarName}>
+						{session?.author?.name || 'Auteur inconnu'}
+					</div>
 				</div>
 			</DrawerHeader>
 			<DrawerBody>
