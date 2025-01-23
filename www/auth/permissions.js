@@ -32,7 +32,9 @@ function makePermissionName(entity, operation) {
 }
 
 export function usePermissions() {
-	const { roles, permissions } = useAppContext();
+	const {
+		auth: { roles, permissions },
+	} = useAppContext();
 
 	function hasRoles(requestedRoles) {
 		return requestedRoles.some((role) => roles.includes(role));

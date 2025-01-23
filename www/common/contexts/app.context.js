@@ -4,11 +4,21 @@ import { createContext, useContext, useEffect, useState } from 'react';
 export const AppContext = createContext({
 	roles: [],
 	permissions: [],
+	currentSession: null,
+	activeSession: null,
+	sessions: [],
+	goods: [],
+
+	setActiveSession: () => {},
+	setCurrentSession: () => {},
+	setGoods: () => {},
+	setSessions: () => {},
+	setCurrentGoods: () => {},
+	setStagingGoods: () => {},
 });
 
 /**
  * Hook to use the app context
- * @returns {{roles: string[], valid: boolean}}
  */
 export function useAppContext() {
 	return useContext(AppContext);
@@ -19,14 +29,20 @@ export function useAppContext() {
  * @returns {{roles: string[], permissions: [], valid: boolean}}
  */
 export function useAppContextData() {
-	const [data, setData] = useState({});
+	const [authData, setAuthData] = useState({});
+	const [sessions, setSessions] = useState([]);
+	const [goods, setGoods] = useState([]);
+	const [activeSession, setActiveSession] = useState(null);
+	const [currentSession, setCurrentSession] = useState(activeSession);
+	const [currentGoods, setCurrentGoods] = useState([]);
+	const [stagingGoods, setStagingGoods] = useState([]);
 
 	useEffect(() => {
 		const effector = () => {
 			axios
 				.get('/api/auth/verify')
 				.then(({ data }) => {
-					setData(data);
+					setAuthData(data);
 				})
 				.catch((e) => console.error(e));
 		};
@@ -38,5 +54,39 @@ export function useAppContextData() {
 		return () => clearInterval(interval);
 	}, []);
 
-	return data;
+	useEffect(() => {
+		const sessions$ = axios.get('/api/sessions');
+		const activeSession$ = axios.get('/api/sessions/active');
+		const goods$ = axios.get('/api/goods');
+
+		Promise.all([sessions$, activeSession$, goods$])
+			.then(([sessionsResult, activeSessionResult, goodsResult]) => {
+				const sessions = sessionsResult.data;
+				const activeSession = activeSessionResult.data;
+				const goods = goodsResult.data;
+
+				setSessions(sessions.sessions);
+				setActiveSession(activeSession);
+				setGoods(goods);
+				setCurrentSession(activeSession);
+			})
+			.catch(console.error);
+	}, []);
+
+	return {
+		auth: authData,
+		goods,
+		sessions,
+		activeSession,
+		currentSession,
+		currentGoods,
+		stagingGoods,
+
+		setCurrentSession,
+		setActiveSession,
+		setStagingGoods,
+		setCurrentGoods,
+		setSessions,
+		setGoods,
+	};
 }

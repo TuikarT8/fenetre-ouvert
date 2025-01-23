@@ -19,8 +19,8 @@ import (
 )
 
 type GetSessionsResponse struct {
-	Total    int64     `json:"json"`
-	Sessions []Session `json:"session"`
+	Total    int64     `json:"total"`
+	Sessions []Session `json:"sessions"`
 }
 
 func SessionsHandler(w http.ResponseWriter, r *http.Request) {

@@ -32,7 +32,9 @@ export const InventoryToolbar = ({
 	const disableCurrentSession = () => {
 		axios
 			.post(`/api/sessions/${sessionId}/close`)
-			.then(function () {})
+			.then(function () {
+				onSessionDisabled(true);
+			})
 			.catch((e) => {
 				console.error(e);
 			});
@@ -46,7 +48,7 @@ export const InventoryToolbar = ({
 		axios
 			.patch(`/api/sessions/${sessionId}/activate`)
 			.then(function () {
-				onSessionDisabled();
+				onSessionDisabled(false);
 			})
 			.catch((e) => {
 				console.error(e);

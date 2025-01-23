@@ -33,8 +33,11 @@ import { ConfimationDialog } from '../../common/dialogs/confimation-dialog';
 import { InventoryMessageBox } from './message-box';
 import { InventoryToolbar } from './inventory-toolbar';
 import { GoodsNotInSessionDrawer } from './missing-good-product';
-import { capitalizeFirstLetter, convertStringToDate } from '../../common';
-import { useInventory } from '../../provider';
+import {
+	capitalizeFirstLetter,
+	convertStringToDate,
+	useAppContext,
+} from '../../common';
 import { usePermissions } from '../../auth/permissions';
 
 const columns = [
@@ -97,55 +100,65 @@ const useStyles = makeStyles({
 
 export const InventoryTable = () => {
 	const styles = useStyles();
-	const { setActiveSession, session } = useInventory();
 	const [isGoodsNotInSessionDrawerOpen, setIsGoodsNotInSessionDrawerOpen] =
 		useState(false);
 	const [isDisabled, setIsDisabled] = useState(false);
 	const [selectedGood, setSelectedGood] = useState(null);
 	const [goodToDelete, setGoodToDelete] = useState(null);
-	const [sess, setSession] = useState(null);
 	const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
 	});
 	const { canDeleteGoods, canUpdateGoods } = usePermissions();
+	const {
+		sessions,
+		activeSession,
+		currentSession,
+		currentGoods,
+		stagingGoods,
+		setCurrentSession,
+		setCurrentGoods,
+		setStagingGoods,
+	} = useAppContext();
 
-	const { inventoryId } = useParams();
-
-	useEffect(() => {
-		if (!inventoryId) return;
-
-		axios
-			.get(`/api/sessions/${inventoryId}`)
-			.then(({ data }) => {
-				setSession(data);
-				console.log('session', data);
-			})
-			.catch((e) => {
-				console.error(e);
-			});
-	}, [inventoryId]);
+	const { inventoryId: sessionId } = useParams();
 
 	useEffect(() => {
-		if (!inventoryId) return;
+		if (!sessionId) return;
 
-		axios
-			.get(`/api/sessions/${inventoryId}/goods`)
-			.then(({ data }) => {
-				setActiveSession(data);
-				console.log('sessions actives', data);
-			})
-			.catch((e) => {
-				console.error(e);
-			});
-	}, [inventoryId]);
+		let shouldQuerySession = false;
+		let _currentSession = activeSession;
+
+		if (sessionId === 'active') {
+			setCurrentSession(activeSession);
+		} else {
+			const session = sessions.find((session) => session.id === sessionId);
+			if (currentSession) {
+				setCurrentSession(session);
+				_currentSession = session;
+			} else {
+				shouldQuerySession = true;
+			}
+		}
+
+		const session$ = shouldQuerySession
+			? axios.get(`/api/sessions/${sessionId}`)
+			: Promise.resolve(_currentSession);
+		const goods$ = axios.get(`/api/sessions/${sessionId}/goods`);
+
+		Promise.all([session$, goods$]).then(([sessionResponse, goodsResponse]) => {
+			setCurrentSession(sessionResponse.data);
+			setCurrentGoods(goodsResponse.sessionGoods);
+			setStagingGoods(goodsResponse.goodsNotInSession);
+		});
+	}, [sessionId]);
 
 	const contactTheServerToCreateAChangeInTheCurrentSession = (
 		good,
 		lastChange,
 	) => {
 		const change = cloneDeep(lastChange) || {};
-		change.sessionId = session.sessionId;
+		change.sessionId = currentSession.sessionId;
 
 		return axios
 			.post(`/api/goods/${good.id}/changes`, change)
@@ -159,40 +172,26 @@ export const InventoryTable = () => {
 
 	const moveGoodNotInSessionToGoodsInSession = (good, change) => {
 		const changesToAdd = change ? [change] : [];
-		setActiveSession({
-			...session,
-			goods: [
-				...session.goods,
-				{ ...good, changes: [...(good.changes || []), ...changesToAdd] },
-			],
-			goodsNotInSession: (session.goodsNotInSession || []).filter(
-				(g) => g.id !== good.id,
-			),
-		});
-		console.log({
-			...session,
-			goods: [
-				...session.goods,
-				{ ...good, changes: [...(good.changes || []), ...changesToAdd] },
-			],
-			goodsNotInSession: (session.goodsNotInSession || []).filter(
-				(g) => g.id !== good.id,
-			),
-		});
+		setCurrentGoods([
+			...currentGoods,
+			{ ...good, changes: [...(good.changes || []), ...changesToAdd] },
+		]);
+		setStagingGoods((stagingGoods || []).filter((g) => g.id !== good.id));
 	};
 
 	const handleDeleteGood = () => {
 		axios
-			.delete(`/api/goods/${goodToDelete.id}/changes/${session?.sessionId}`)
+			.delete(
+				`/api/goods/${goodToDelete.id}/changes/${currentSession.sessionId}`,
+			)
 			.then(function () {
 				setGoodToDelete(undefined);
-				setActiveSession({
-					...session,
-					goods: (session.goods || []).filter((g) => g.id !== goodToDelete.id),
-					goodsNotInSession: (session.goodsNotInSession || []).filter(
-						(g) => g.id !== goodToDelete.id,
-					),
-				});
+				setCurrentGoods(
+					(currentGoods || []).filter((g) => g.id !== goodToDelete.id),
+				);
+				setStagingGoods(
+					(stagingGoods || []).filter((g) => g.id !== goodToDelete.id),
+				);
 			})
 			.catch((e) => {
 				console.error(e);
@@ -200,7 +199,7 @@ export const InventoryTable = () => {
 	};
 
 	const onGoodScanned = (goodCode) => {
-		const good = session.goodsNotInSession.find(({ id }) => id === goodCode);
+		const good = stagingGoods.find(({ id }) => id === goodCode);
 		if (!good) {
 			console.error(
 				'Good not found or already in session, cannot add it via scan',
@@ -211,14 +210,14 @@ export const InventoryTable = () => {
 		setSelectedGood(good);
 	};
 
-	const onSessionDisabled = () => {
-		setSession({ ...session, active: false });
+	const onSessionDisabled = (disabled) => {
+		setCurrentSession({ ...currentSession, active: !disabled });
 	};
 
 	return (
 		<div>
 			<div className={styles.imgContainer}>
-				{!session && (
+				{!currentSession && (
 					<>
 						<Title3 className={styles.text}>{'Aucune session active'}</Title3>
 						<img
@@ -229,22 +228,22 @@ export const InventoryTable = () => {
 					</>
 				)}
 			</div>
-			{!!session?.goodsNotInSession?.length && (
+			{stagingGoods?.length && (
 				<InventoryMessageBox
-					count={session?.goodsNotInSession?.length || 0}
+					count={currentSession?.goodsNotInSession?.length || 0}
 					onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
 				/>
 			)}
-			{!!session?.goods?.length && (
+			{currentSession && (
 				<InventoryToolbar
-					disableButtons={!sess?.active}
+					disableButtons={currentSession.active}
 					onGoodScanned={onGoodScanned}
-					sessionId={session?.id}
+					sessionId={currentSession.id || currentSession.id}
 					onSessionDisabled={onSessionDisabled}
 				/>
 			)}
 
-			{!!session?.goods?.length && (
+			{currentGoods.length && (
 				<Table
 					{...keyboardNavAttr}
 					role="grid"
@@ -260,7 +259,7 @@ export const InventoryTable = () => {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{(session?.goods || []).map((item) => {
+						{currentGoods.goods.map((item) => {
 							const change = _.last(item.changes);
 							return (
 								<TableRow key={item.id}>
@@ -320,7 +319,7 @@ export const InventoryTable = () => {
 							);
 						})}
 
-						{(session?.goodsNotInSession || []).map((item) => {
+						{stagingGoods.map((item) => {
 							const change = _.last(item.changes);
 
 							return (
@@ -399,10 +398,10 @@ export const InventoryTable = () => {
 					</TableBody>
 				</Table>
 			)}
-			{!!session?.goods?.length && (
+			{currentGoods.length && (
 				<Caption2 className={styles.captionText}>
-					{session?.goods?.length || 0} biens dans la session /{' '}
-					{session?.goodsNotInSession?.length || 0} biens peuvent être ajoutés.
+					{currentGoods.length || 0} biens dans la session /{' '}
+					{stagingGoods.length || 0} biens peuvent être ajoutés.
 				</Caption2>
 			)}
 
@@ -435,7 +434,6 @@ export const InventoryTable = () => {
 
 						setSelectedGood();
 					}}
-					sessionId={session?.id}
 				/>
 			)}
 			{!!isGoodsNotInSessionDrawerOpen && (

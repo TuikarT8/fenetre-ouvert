@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
 	AddFilled,
 	Edit12Regular,
 	Delete12Regular,
-	FolderOpenRegular,
 } from '@fluentui/react-icons';
 import {
 	TableBody,
@@ -30,8 +29,8 @@ import {
 	ConfimationDialog,
 	convertStringToDate,
 	SessionCreationDialog,
+	useAppContext,
 } from '../../common';
-import { useInventory } from '../../provider';
 import { SessionDrawer } from './session-editor-drawer';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePermissions } from '../../auth/permissions';
@@ -59,7 +58,7 @@ const useStyles = makeStyles({
 });
 
 export const InventoriesTable = () => {
-	const { setSessions, sessions } = useInventory();
+	const { sessions } = useAppContext();
 	const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
@@ -72,18 +71,6 @@ export const InventoriesTable = () => {
 	const styles = useStyles();
 	const { canCreateSessions, canDeleteSessions, canUpdateSessions } =
 		usePermissions();
-
-	useEffect(() => {
-		axios
-			.get(`/api/sessions`)
-			.then(({ data }) => {
-				setSessions(data);
-				setHasActiveSession(!!data?.find((elem) => elem.active));
-			})
-			.catch((e) => {
-				console.error(e);
-			});
-	}, []);
 
 	const handleDeleteSession = () => {
 		if (!selectedSession) return;
