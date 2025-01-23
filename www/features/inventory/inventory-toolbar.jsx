@@ -4,6 +4,7 @@ import { GoodCreationDialog } from '../../common/dialogs/good-creation.dialog';
 import {
 	AddFilled,
 	ArrowUploadFilled,
+	FolderOpenRegular,
 	LockClosedFilled,
 } from '@fluentui/react-icons';
 import { useFileUploader } from './use-file-uploader';
@@ -11,22 +12,24 @@ import { ConfimationDialog } from '../../common';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { GoodScanner } from '../../common/qr-scanner';
+import { usePermissions } from '../../auth/permissions';
 
 export const InventoryToolbar = ({
-	disabledButton,
+	disableButtons,
 	sessionId,
 	onGoodScanned,
+	onSessionDisabled,
 }) => {
 	const [isCreateGoodDialogOpen, setIsCreateGoodDialogOpen] = useState(false);
 	const fileInputRef = useRef(null);
 	const { onFileUpload } = useFileUploader();
-	const [desabledSession, setDesabledSession] = useState(false);
-
+	const [isSessionDisabled, setIsSessionDisabled] = useState(false);
+	const { canUpdateSessions } = usePermissions();
 	function handleFileUploadClick() {
 		fileInputRef.current?.click();
 	}
 
-	const desableCurrentSession = () => {
+	const disableCurrentSession = () => {
 		axios
 			.post(`/api/sessions/${sessionId}/close`)
 			.then(function () {})
@@ -35,8 +38,23 @@ export const InventoryToolbar = ({
 			});
 	};
 
-	const onDesabledCurrentSession = () => {
-		setDesabledSession(true);
+	const activateCurrentSession = () => {
+		if (!sessionId) {
+			return;
+		}
+
+		axios
+			.patch(`/api/sessions/${sessionId}/activate`)
+			.then(function () {
+				onSessionDisabled();
+			})
+			.catch((e) => {
+				console.error(e);
+			});
+	};
+
+	const onDisabledCurrentSession = () => {
+		setIsSessionDisabled(true);
 	};
 
 	const onCreateMenuOptionSelected = () => {
@@ -46,10 +64,10 @@ export const InventoryToolbar = ({
 	return (
 		<div>
 			<Toolbar aria-label="Vertical Button">
-				<GoodScanner disabled={disabledButton} onGoodScanned={onGoodScanned} />
+				<GoodScanner disabled={disableButtons} onGoodScanned={onGoodScanned} />
 				<Tooltip
 					content={
-						!disabledButton
+						!disableButtons
 							? 'Créer un bien'
 							: 'Vous ne pouvez pas créer une session tant que la session est inactive'
 					}
@@ -57,7 +75,7 @@ export const InventoryToolbar = ({
 					<ToolbarButton
 						vertical
 						onClick={onCreateMenuOptionSelected}
-						disabled={disabledButton}
+						disabled={disableButtons}
 						icon={<AddFilled />}>
 						Ajouter
 					</ToolbarButton>
@@ -65,14 +83,14 @@ export const InventoryToolbar = ({
 
 				<Tooltip
 					content={
-						!disabledButton
+						!disableButtons
 							? "Importer des biens à partir d'un fichier JSON, CSV ou XML"
 							: 'Vous ne pouvez pas importer une session tant que la session est inactive'
 					}
 					relationship="description">
 					<ToolbarButton
 						vertical
-						disabled={disabledButton}
+						disabled={disableButtons}
 						onClick={handleFileUploadClick}
 						icon={<ArrowUploadFilled />}>
 						Importer
@@ -81,30 +99,46 @@ export const InventoryToolbar = ({
 
 				<Tooltip
 					content={
-						!disabledButton
+						!disableButtons
 							? 'Clôturer cette session'
 							: 'Vous ne pouvez pas cloturer une session tant que la session est inactive'
 					}
 					relationship="description">
 					<ToolbarButton
 						vertical
-						disabled={disabledButton}
-						onClick={onDesabledCurrentSession}
+						disabled={disableButtons}
+						onClick={onDisabledCurrentSession}
 						icon={<LockClosedFilled />}>
 						Clôturer
 					</ToolbarButton>
 				</Tooltip>
+				<Tooltip
+					content={
+						!canUpdateSessions()
+							? "Vous n'êtes pas autorisé à modifier un bien dans cette session "
+							: 'Vous êtes autorisé à modifier un bien dans cette session '
+					}>
+					<ToolbarButton
+						vertical
+						disabled={!canUpdateSessions()}
+						onClick={() => {
+							activateCurrentSession();
+						}}
+						icon={<FolderOpenRegular />}>
+						Activer
+					</ToolbarButton>
+				</Tooltip>
 			</Toolbar>
 
-			{!!desabledSession && (
+			{!!isSessionDisabled && (
 				<ConfimationDialog
-					open={!!desabledSession}
+					open={!!isSessionDisabled}
 					title={'Desactive la session'}
 					content={'voulez vous clôturer cette session.'}
 					risky
 					onClose={() => {
-						desableCurrentSession();
-						setDesabledSession(false);
+						disableCurrentSession();
+						setIsSessionDisabled(false);
 					}}
 				/>
 			)}
@@ -130,5 +164,6 @@ export const InventoryToolbar = ({
 InventoryToolbar.propTypes = {
 	sessionId: PropTypes.string.isRequired,
 	onGoodScanned: PropTypes.func.isRequired,
-	disabledButton: PropTypes.bool.isRequired,
+	disableButtons: PropTypes.bool.isRequired,
+	onSessionDisabled: PropTypes.func.isRequired,
 };

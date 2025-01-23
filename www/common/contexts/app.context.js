@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 export const AppContext = createContext({
 	roles: [],
+	permissions: [],
 });
 
 /**
@@ -15,7 +16,7 @@ export function useAppContext() {
 
 /**
  * Hook to use the app context
- * @returns {{roles: string[], valid: boolean}}
+ * @returns {{roles: string[], permissions: [], valid: boolean}}
  */
 export function useAppContextData() {
 	const [data, setData] = useState({});

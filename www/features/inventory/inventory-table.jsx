@@ -4,6 +4,8 @@ import {
 	DeleteRegular,
 	AddFilled,
 	WarningFilled,
+	Edit12Regular,
+	Delete12Regular,
 } from '@fluentui/react-icons';
 import {
 	TableBody,
@@ -21,7 +23,7 @@ import {
 	webLightTheme,
 	Tooltip,
 	Caption2,
-	Title1,
+	Title3,
 } from '@fluentui/react-components';
 import axios from 'axios';
 import _, { cloneDeep } from 'lodash';
@@ -33,6 +35,7 @@ import { InventoryToolbar } from './inventory-toolbar';
 import { GoodsNotInSessionDrawer } from './missing-good-product';
 import { capitalizeFirstLetter, convertStringToDate } from '../../common';
 import { useInventory } from '../../provider';
+import { usePermissions } from '../../auth/permissions';
 
 const columns = [
 	{ columnKey: 'good', label: 'Bien' },
@@ -63,6 +66,33 @@ const useStyles = makeStyles({
 	main: {
 		margin: '4px',
 	},
+	centerTitle: {
+		textAlign: 'center',
+	},
+	text: {
+		color: tokens.colorNeutralForeground4,
+	},
+	imgContainer: {
+		color: tokens.colorNeutralForeground4,
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	img: {
+		width: '200px',
+	},
+
+	marginSpace: {
+		margin: '4px',
+	},
+	actionButtonDelete: {
+		backgroundColor: tokens.colorStatusDangerBackground2,
+		color: '#000',
+		':hover': {
+			backgroundColor: tokens.colorStatusDangerBackground1,
+		},
+	},
 });
 
 export const InventoryTable = () => {
@@ -78,6 +108,8 @@ export const InventoryTable = () => {
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
 	});
+	const { canDeleteGoods, canUpdateGoods } = usePermissions();
+
 	const { inventoryId } = useParams();
 
 	useEffect(() => {
@@ -179,10 +211,24 @@ export const InventoryTable = () => {
 		setSelectedGood(good);
 	};
 
+	const onSessionDisabled = () => {
+		setSession({ ...session, active: false });
+	};
+
 	return (
 		<div>
-			{!!session || <Title1>{"Aucune session n'est active"}</Title1>}
-
+			<div className={styles.imgContainer}>
+				{!session && (
+					<>
+						<Title3 className={styles.text}>{'Aucune session active'}</Title3>
+						<img
+							className={styles.img}
+							src="/animation.png"
+							alt="Empty State"
+						/>
+					</>
+				)}
+			</div>
 			{!!session?.goodsNotInSession?.length && (
 				<InventoryMessageBox
 					count={session?.goodsNotInSession?.length || 0}
@@ -191,8 +237,10 @@ export const InventoryTable = () => {
 			)}
 			{!!session?.goods?.length && (
 				<InventoryToolbar
-					disabledButton={!sess?.active}
+					disableButtons={!sess?.active}
 					onGoodScanned={onGoodScanned}
+					sessionId={session?.id}
+					onSessionDisabled={onSessionDisabled}
 				/>
 			)}
 
@@ -248,7 +296,9 @@ export const InventoryTable = () => {
 										{...focusableGroupAttr}>
 										<TableCellLayout>
 											<Button
-												icon={<EditRegular />}
+												desabled={!canUpdateGoods()}
+												className={styles.marginSpace}
+												icon={<Edit12Regular />}
 												aria-label="Edit"
 												onClick={() => {
 													setSelectedGood(item);
@@ -256,7 +306,9 @@ export const InventoryTable = () => {
 												}}
 											/>
 											<Button
-												icon={<DeleteRegular />}
+												desabled={!canDeleteGoods()}
+												className={styles.actionButtonDelete}
+												icon={<Delete12Regular />}
 												aria-label="Delete"
 												onClick={() => {
 													setGoodToDelete(item);

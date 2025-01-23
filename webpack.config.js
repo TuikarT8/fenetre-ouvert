@@ -22,6 +22,10 @@ const config = {
         compress: true,
         hot: true,
         port: 'auto',
+        static: {
+            directory: path.resolve(__dirname, 'assets'),
+            publicPath: '/',
+        },
         proxy:[
             {
                 context: ['/api', '/assets'],
@@ -65,7 +69,7 @@ const config = {
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
-                type: 'asset',
+                type: 'asset/resource',
             },
 
             // Add your rules for custom modules here

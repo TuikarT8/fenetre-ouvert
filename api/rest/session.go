@@ -18,6 +18,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type GetSessionsResponse struct {
+	Total    int64     `json:"json"`
+	Sessions []Session `json:"session"`
+}
+
 func SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		GetSessionHandler(w, r)
@@ -40,15 +45,27 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Sessions, err := getSessionsFromDB(params)
+	sessions, err := getSessions(params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GetSessionHandler () => Error while gettig good"))
-		log.Print("GetSessionHandler () => Error while getting good", err)
+		w.Write([]byte("GetSessionHandler () => Error while gettig session"))
+		log.Print("GetSessionHandler () => Error while getting session", err)
 		return
 	}
 
-	jsondata, err := json.Marshal(Sessions)
+	sessionsCount, err := countSessions()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("GetSessionHandler () => Error while gettig session"))
+		log.Printf("GetSessionHandler () => Error while getting session", err)
+		return
+	}
+
+	response := GetSessionsResponse{
+		Total:    sessionsCount,
+		Sessions: sessions,
+	}
+	jsondata, err := json.Marshal(response)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("GetSessionHandler () => Error while marsalling good"))
@@ -513,7 +530,7 @@ func findGoodsNotInActiveSession(activeSession Session) ([]Good, error) {
 	return goods, nil
 }
 
-func getSessionsFromDB(pagination PageQueryParams) ([]Session, error) {
+func getSessions(pagination PageQueryParams) ([]Session, error) {
 	sessions := make([]Session, 0)
 	opts := options.Find().SetSort(bson.D{{"date", -1}})
 	opts.Skip = &pagination.skip
@@ -662,4 +679,13 @@ func (event *Event) save() error {
 	}
 
 	return nil
+}
+
+func countSessions() (int64, error) {
+	count, err := database.Sessions.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

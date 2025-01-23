@@ -15,8 +15,32 @@ const middleRoles = {
 	UserReader: 'user_reader',
 };
 
+const entities = {
+	Good: 'good',
+	Session: 'session',
+	User: 'user',
+};
+
+const operations = {
+	Read: 'read',
+	Write: 'write',
+	Update: 'update',
+};
+
+function makePermissionName(entity, operation) {
+	return `${entity}_${operation}`.toUpperCase();
+}
+
 export function usePermissions() {
-	const { roles } = useAppContext();
+	const { roles, permissions } = useAppContext();
+
+	function hasRoles(requestedRoles) {
+		return requestedRoles.some((role) => roles.includes(role));
+	}
+
+	function hasPermission(permission) {
+		return (permissions || []).includes(permission);
+	}
 
 	return {
 		/**
@@ -24,29 +48,55 @@ export function usePermissions() {
 		 * @returns {boolean}
 		 */
 		canCreateSessions: () => {
-			return (roles || []).some(
-				(role) =>
-					role === superRoles.Supervisor ||
-					role === superRoles.Editor ||
-					role === middleRoles.SessionEditor,
+			return (
+				hasRoles([
+					superRoles.Supervisor,
+					superRoles.Editor,
+					middleRoles.SessionEditor,
+				]) ||
+				hasPermission(makePermissionName(entities.Session, operations.Write))
 			);
 		},
 
 		canDeleteSessions: () => {
-			return (roles || []).some(
-				(role) =>
-					role === superRoles.Supervisor ||
-					role === superRoles.Editor ||
-					role === middleRoles.SessionEditor,
+			return (
+				hasRoles([
+					superRoles.Supervisor,
+					superRoles.Editor,
+					middleRoles.SessionEditor,
+				]) ||
+				hasPermission(makePermissionName(entities.Session, operations.Write))
 			);
 		},
 
 		canUpdateSessions: () => {
-			return (roles || []).some(
-				(role) =>
-					role === superRoles.Supervisor ||
-					role === superRoles.Editor ||
-					role === middleRoles.SessionEditor,
+			return (
+				hasRoles([
+					superRoles.Supervisor,
+					superRoles.Editor,
+					middleRoles.SessionEditor,
+				]) ||
+				hasPermission(makePermissionName(entities.Session, operations.Write))
+			);
+		},
+
+		canUpdateGoods: () => {
+			return (
+				hasRoles([
+					superRoles.Supervisor,
+					superRoles.Editor,
+					middleRoles.GoodEditor,
+				]) || hasPermission(makePermissionName(entities.Good, operations.Write))
+			);
+		},
+
+		canDeleteGoods: () => {
+			return (
+				hasRoles([
+					superRoles.Supervisor,
+					superRoles.Editor,
+					middleRoles.GoodEditor,
+				]) || hasPermission(makePermissionName(entities.Good, operations.Write))
 			);
 		},
 	};

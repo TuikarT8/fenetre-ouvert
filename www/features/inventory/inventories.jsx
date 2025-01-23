@@ -3,6 +3,7 @@ import {
 	AddFilled,
 	Edit12Regular,
 	Delete12Regular,
+	FolderOpenRegular,
 } from '@fluentui/react-icons';
 import {
 	TableBody,
@@ -29,7 +30,6 @@ import {
 	ConfimationDialog,
 	convertStringToDate,
 	SessionCreationDialog,
-	useAppContext,
 } from '../../common';
 import { useInventory } from '../../provider';
 import { SessionDrawer } from './session-editor-drawer';
@@ -47,11 +47,15 @@ const useStyles = makeStyles({
 		margin: '4px',
 	},
 	actionButtonDelete: {
-		color: tokens.colorStatusDangerForeground1,
+		backgroundColor: tokens.colorStatusDangerBackground2,
+		color: '#000',
+		':hover': {
+			backgroundColor: tokens.colorStatusDangerBackground1,
+		},
 	},
 	marginSpace: {
 		margin: '4px',
-	}
+	},
 });
 
 export const InventoriesTable = () => {
@@ -131,18 +135,26 @@ export const InventoriesTable = () => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{(sessions || []).map((item) => {
+					{(sessions.session || []).map((item) => {
 						return (
 							<TableRow
 								key={item.id}
 								onClick={() => navigate(`/inventories/${item?.id}`)}>
 								<TableCell>
-									<TableCellLayout
-										key={item.id}
-										>
-										<Avatar  name={item?.author?.name || 'Inconnu'} />
-										{item.author?.name && <Link className={styles.marginSpace} to= {`/users/${item.id}`}>{capitalizeFirstLetter(item?.author?.name || 'inconnu')}</Link>}
-										{!item.author?.name && <Text className={styles.marginSpace}>{"Auteur Inconnu"}</Text>}
+									<TableCellLayout key={item.id}>
+										<Avatar name={item?.author?.name || 'Inconnu'} />
+										{item.author?.name && (
+											<Link
+												className={styles.marginSpace}
+												to={`/users/${item.id}`}>
+												{capitalizeFirstLetter(item?.author?.name || 'inconnu')}
+											</Link>
+										)}
+										{!item.author?.name && (
+											<Text className={styles.marginSpace}>
+												{'Auteur Inconnu'}
+											</Text>
+										)}
 									</TableCellLayout>
 								</TableCell>
 								<TableCell>
