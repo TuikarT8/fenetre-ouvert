@@ -105,11 +105,24 @@ func getOneSession(id string) (Session, error) {
 		return Session{}, nil
 	}
 
+	var session Session
+	if id == "active" {
+		result := database.Sessions.FindOne(ctx, bson.M{
+			"active": true,
+		})
+
+		err := result.Decode(&session)
+		if err != nil {
+			return session, err
+		}
+
+		return session, nil
+	}
+
 	hexId, err := database.ConvertStringToPrimitiveOBjectId(id)
 	if err != nil {
 		return Session{}, err
 	}
-	var session Session
 
 	result := database.Sessions.FindOne(ctx, bson.M{
 		"_id": hexId,
@@ -181,7 +194,7 @@ func DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionId := mux.Vars(r)["id"]
-	if count, _ := countSessionGood(sessionId); count > 0 {
+	if count, _ := countSessionGoods(sessionId); count > 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		payload, _ := json.Marshal(errors.WebError{
 			Code:        errors.ErrorSessionHasGoodChanges,
@@ -654,7 +667,7 @@ func getOneSessionFromDB(id string) (Session, error) {
 	})
 }
 
-func countSessionGood(stringSessionId string) (int64, error) {
+func countSessionGoods(stringSessionId string) (int64, error) {
 	sessonId, err := primitive.ObjectIDFromHex(stringSessionId)
 
 	if err != nil {

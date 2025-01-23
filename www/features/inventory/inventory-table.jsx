@@ -127,7 +127,7 @@ export const InventoryTable = () => {
 		if (!sessionId) return;
 
 		let shouldQuerySession = false;
-		let _currentSession = activeSession;
+		let _currentSession = activeSession || currentSession;
 
 		if (sessionId === 'active') {
 			setCurrentSession(activeSession);
@@ -147,9 +147,11 @@ export const InventoryTable = () => {
 		const goods$ = axios.get(`/api/sessions/${sessionId}/goods`);
 
 		Promise.all([session$, goods$]).then(([sessionResponse, goodsResponse]) => {
-			setCurrentSession(sessionResponse.data);
-			setCurrentGoods(goodsResponse.sessionGoods);
-			setStagingGoods(goodsResponse.goodsNotInSession);
+			setCurrentSession(
+				shouldQuerySession ? sessionResponse.data : sessionResponse,
+			);
+			setCurrentGoods(goodsResponse.data.goods || []);
+			setStagingGoods(goodsResponse.data.goodsNotInSession || []);
 		});
 	}, [sessionId]);
 
@@ -210,10 +212,6 @@ export const InventoryTable = () => {
 		setSelectedGood(good);
 	};
 
-	const onSessionDisabled = (disabled) => {
-		setCurrentSession({ ...currentSession, active: !disabled });
-	};
-
 	return (
 		<div>
 			<div className={styles.imgContainer}>
@@ -228,7 +226,7 @@ export const InventoryTable = () => {
 					</>
 				)}
 			</div>
-			{stagingGoods?.length && (
+			{stagingGoods.length > 0 && (
 				<InventoryMessageBox
 					count={currentSession?.goodsNotInSession?.length || 0}
 					onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
@@ -239,11 +237,10 @@ export const InventoryTable = () => {
 					disableButtons={currentSession.active}
 					onGoodScanned={onGoodScanned}
 					sessionId={currentSession.id || currentSession.id}
-					onSessionDisabled={onSessionDisabled}
 				/>
 			)}
 
-			{currentGoods.length && (
+			{!!currentGoods.length > 0 && (
 				<Table
 					{...keyboardNavAttr}
 					role="grid"
@@ -259,7 +256,7 @@ export const InventoryTable = () => {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{currentGoods.goods.map((item) => {
+						{currentGoods.map((item) => {
 							const change = _.last(item.changes);
 							return (
 								<TableRow key={item.id}>
@@ -398,7 +395,7 @@ export const InventoryTable = () => {
 					</TableBody>
 				</Table>
 			)}
-			{currentGoods.length && (
+			{currentGoods.length > 0 && (
 				<Caption2 className={styles.captionText}>
 					{currentGoods.length || 0} biens dans la session /{' '}
 					{stagingGoods.length || 0} biens peuvent être ajoutés.

@@ -122,7 +122,7 @@ export const InventoriesTable = () => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{(sessions.session || []).map((item) => {
+					{sessions.map((item) => {
 						return (
 							<TableRow
 								key={item.id}

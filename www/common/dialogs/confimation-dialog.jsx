@@ -58,6 +58,5 @@ ConfimationDialog.propTypes = {
 	onClose: PropTypes.func.isRequired,
 	title: PropTypes.string.isRequired,
 	content: PropTypes.string.isRequired,
-	onDelete: PropTypes.func.isRequired,
 	risky: PropTypes.bool,
 };

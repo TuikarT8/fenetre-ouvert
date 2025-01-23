@@ -106,7 +106,7 @@ type GoodChange struct {
 }
 
 type SessionGoodsLookupResponse struct {
-	SessionId         interface{} `bson:"_id" json:"ùId"`
+	SessionId         interface{} `bson:"_id" json:"id"`
 	Goods             []Good      `bson:"goods" json:"goods"`
 	GoodsNotInSession []Good      `json:"goodsNotInSession"`
 }
