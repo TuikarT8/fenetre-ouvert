@@ -73,13 +73,6 @@ export function useAppContextData() {
 			.catch(console.error);
 	}, []);
 
-	if(!currentSession) {
-		console.log("Il n'a pas de biens qui ne sont pas  dans la session courante", currentSession?.goodsNotInSession)
-	}
-
-	console.log("Voici les biens qui ne sont pas dans la session courante", currentSession)
-
-
 	return {
 		auth: authData,
 		goods,

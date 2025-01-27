@@ -23,9 +23,22 @@ const useStyles = makeStyles({
 			backgroundColor: tokens.colorStatusDangerBackground3Hover,
 		},
 	},
+	riskyDisabled: {
+		backgroundColor: tokens.colorNeutralBackgroundDisabled,
+		':hover': {
+			backgroundColor: tokens.colorNeutralBackgroundDisabled,
+		},
+	},
 });
 
-export const ConfimationDialog = ({ open, content, title, risky, onClose }) => {
+export const ConfimationDialog = ({
+	open,
+	content,
+	title,
+	risky,
+	onClose,
+	disabled,
+}) => {
 	const styles = useStyles();
 
 	return (
@@ -41,8 +54,12 @@ export const ConfimationDialog = ({ open, content, title, risky, onClose }) => {
 							</Button>
 						</DialogTrigger>
 						<Button
+							disabled={disabled}
 							appearance="primary"
-							className={mergeClasses(risky ? styles.riskyPrimary : undefined)}
+							className={mergeClasses(
+								risky ? styles.riskyPrimary : undefined,
+								disabled ? styles.riskyDisabled : undefined,
+							)}
 							onClick={() => onClose?.(true)}>
 							Confirmer
 						</Button>
@@ -59,4 +76,5 @@ ConfimationDialog.propTypes = {
 	title: PropTypes.string.isRequired,
 	content: PropTypes.string.isRequired,
 	risky: PropTypes.bool,
+	disabled: PropTypes.bool,
 };

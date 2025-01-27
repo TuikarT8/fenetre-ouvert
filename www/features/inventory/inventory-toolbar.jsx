@@ -21,7 +21,9 @@ export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
 	const { canUpdateSessions } = usePermissions();
 	const [isDisablingSession, setIsDisablingSession] = useState(false);
 	const { currentSession, setCurrentSession } = useAppContext();
-	const [isSessionDisabled, setIsSessionDisabled] = useState(!currentSession?.active);
+	const [isSessionDisabled, setIsSessionDisabled] = useState(
+		!currentSession?.active,
+	);
 	function handleFileUploadClick() {
 		fileInputRef.current?.click();
 	}
@@ -68,7 +70,6 @@ export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
 
 	return (
 		<div>
-
 			<Toolbar aria-label="Vertical Button">
 				<GoodScanner
 					disabled={isSessionDisabled}
@@ -148,7 +149,7 @@ export const InventoryToolbar = ({ sessionId, onGoodScanned }) => {
 					onClose={(confirmed) => {
 						if (confirmed) {
 							disableCurrentSession();
-							return
+							return;
 						}
 
 						setIsDisablingSession(false);

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-	EditRegular,
-	DeleteRegular,
-	AddFilled,
 	WarningFilled,
 	Edit12Regular,
 	Delete12Regular,
+	Add12Filled,
 } from '@fluentui/react-icons';
 import {
 	TableBody,
@@ -52,7 +50,8 @@ const columns = [
 const tokens = themeToTokensObject(webLightTheme);
 const useStyles = makeStyles({
 	foreignRow: {
-		color: tokens.colorStatusWarningForeground3,
+		textDecoration: 'line-through',
+		color: tokens.colorNeutralForeground4,
 	},
 
 	captionText: {
@@ -85,16 +84,25 @@ const useStyles = makeStyles({
 	img: {
 		width: '200px',
 	},
-
-	marginSpace: {
-		margin: '4px',
-	},
 	actionButtonDelete: {
 		backgroundColor: tokens.colorStatusDangerBackground2,
 		color: '#000',
 		':hover': {
 			backgroundColor: tokens.colorStatusDangerBackground1,
 		},
+		marginLeft: '4px',
+	},
+	actionButtonAdd: {
+		marginLeft: '4px',
+	},
+	centerIcon: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		textDecoration: 'line-through',
+		alignContent: 'center',
+		padding: 'auto',
+		color: tokens.colorNeutralForeground4,
 	},
 });
 
@@ -105,11 +113,14 @@ export const InventoryTable = () => {
 	const [isDisabled, setIsDisabled] = useState(false);
 	const [selectedGood, setSelectedGood] = useState(null);
 	const [goodToDelete, setGoodToDelete] = useState(null);
+	const [goodNotInSessionToAdd, setgoodNotInSessionToAdd] = useState(null);
+
 	const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
 	});
-	const { canDeleteGoods, canUpdateGoods } = usePermissions();
+	const { canDeleteGoods, canUpdateGoods, canUpdateSessions } =
+		usePermissions();
 	const {
 		sessions,
 		activeSession,
@@ -166,6 +177,7 @@ export const InventoryTable = () => {
 			.post(`/api/goods/${good.id}/changes`, change)
 			.then(() => {
 				moveGoodNotInSessionToGoodsInSession(good, change);
+				setgoodNotInSessionToAdd(undefined);
 			})
 			.catch((e) => {
 				console.error(e);
@@ -293,7 +305,6 @@ export const InventoryTable = () => {
 										<TableCellLayout>
 											<Button
 												desabled={!canUpdateGoods()}
-												className={styles.marginSpace}
 												icon={<Edit12Regular />}
 												aria-label="Edit"
 												onClick={() => {
@@ -326,11 +337,12 @@ export const InventoryTable = () => {
 											onClick={() => {
 												setSelectedGood(item);
 												setIsDisabled(true);
-											}}>
+											}}
+											className={styles.centerIcon}>
 											<Tooltip
 												content="Ce bien n'est pas encore inclut dans la session active"
 												relationship="label">
-												<WarningFilled color="" style={{ margin: '5px' }} />
+												<WarningFilled style={{ marginTop: '16px' }} />
 											</Tooltip>
 											{capitalizeFirstLetter(item.name)}
 										</TableCellLayout>
@@ -359,7 +371,7 @@ export const InventoryTable = () => {
 										{...focusableGroupAttr}>
 										<TableCellLayout>
 											<Button
-												icon={<EditRegular />}
+												icon={<Edit12Regular />}
 												aria-label="Edit"
 												onClick={() => {
 													setSelectedGood(item);
@@ -367,23 +379,34 @@ export const InventoryTable = () => {
 												}}
 											/>
 											<Button
-												icon={<DeleteRegular />}
+												className={styles.actionButtonDelete}
+												icon={<Delete12Regular />}
 												aria-label="Delete"
 												onClick={() => {
 													setGoodToDelete(item);
 												}}
 											/>
 											<Button
-												icon={<AddFilled />}
+												icon={<Add12Filled />}
 												aria-label="Add"
+												className={styles.actionButtonAdd}
 												onClick={() => {
+													console.log(change);
 													if (change) {
+														if (
+															convertStringToDate(currentSession.startDate) <
+															convertStringToDate(change.time)
+														)
+															console.log(
+																convertStringToDate(currentSession.startDate) <
+																	convertStringToDate(change.time),
+															);
+														setgoodNotInSessionToAdd(item);
+													} else {
 														contactTheServerToCreateAChangeInTheCurrentSession(
 															item,
 															change,
 														);
-													} else {
-														setSelectedGood(item);
 													}
 												}}
 											/>
@@ -416,6 +439,26 @@ export const InventoryTable = () => {
 				/>
 			)}
 
+			{!!goodNotInSessionToAdd && (
+				<ConfimationDialog
+					open={!!goodNotInSessionToAdd}
+					title={"Ajout d'un bien"}
+					content={
+						"Vous êtes en train d'ajouter un  bien qui a été créer après la session, êtes-vous sûr de vouloir le faire. Cette action ne peut être faite que par un superviseur"
+					}
+					risky
+					disabled={!canUpdateGoods() || !canUpdateSessions()}
+					onClose={(confirmed) =>
+						confirmed
+							? contactTheServerToCreateAChangeInTheCurrentSession(
+									goodNotInSessionToAdd,
+									goodNotInSessionToAdd.change,
+								)
+							: setgoodNotInSessionToAdd(undefined)
+					}
+				/>
+			)}
+
 			{!!selectedGood && (
 				<GoodEditorDrawer
 					isOpen={!!selectedGood}
@@ -433,6 +476,7 @@ export const InventoryTable = () => {
 					}}
 				/>
 			)}
+
 			{!!isGoodsNotInSessionDrawerOpen && (
 				<GoodsNotInSessionDrawer
 					open={isGoodsNotInSessionDrawerOpen}
