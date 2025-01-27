@@ -228,7 +228,7 @@ export const InventoryTable = () => {
 			</div>
 			{stagingGoods.length > 0 && (
 				<InventoryMessageBox
-					count={currentSession?.goodsNotInSession?.length || 0}
+					count={stagingGoods?.length || 0}
 					onShowGoods={() => setIsGoodsNotInSessionDrawerOpen(true)}
 				/>
 			)}
