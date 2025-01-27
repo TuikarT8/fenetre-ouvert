@@ -22,6 +22,7 @@ import {
 	Tooltip,
 	Caption2,
 	Title3,
+	Spinner,
 } from '@fluentui/react-components';
 import axios from 'axios';
 import _, { cloneDeep } from 'lodash';
@@ -63,6 +64,12 @@ const useStyles = makeStyles({
 		flexDirection: 'row',
 		height: 'fit-content',
 		width: 'fit-content',
+		padding: '50px'
+	},
+
+	tableCellName: {
+		display: 'flex',
+		width: '100px',
 	},
 
 	main: {
@@ -101,8 +108,7 @@ const useStyles = makeStyles({
 		justifyContent: 'center',
 		textDecoration: 'line-through',
 		alignContent: 'center',
-		padding: 'auto',
-		color: tokens.colorNeutralForeground4,
+		color: tokens.colorNeutralForeground4,	
 	},
 });
 
@@ -114,6 +120,7 @@ export const InventoryTable = () => {
 	const [selectedGood, setSelectedGood] = useState(null);
 	const [goodToDelete, setGoodToDelete] = useState(null);
 	const [goodNotInSessionToAdd, setgoodNotInSessionToAdd] = useState(null);
+	const [isLoading, setIsLoading] = useState(true);
 
 	const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 	const focusableGroupAttr = useFocusableGroup({
@@ -163,6 +170,7 @@ export const InventoryTable = () => {
 			);
 			setCurrentGoods(goodsResponse.data.goods || []);
 			setStagingGoods(goodsResponse.data.goodsNotInSession || []);
+			setIsLoading(false);
 		});
 	}, [sessionId]);
 
@@ -224,6 +232,13 @@ export const InventoryTable = () => {
 		setSelectedGood(good);
 	};
 
+	if (isLoading) {
+		return (
+			<div>
+				<Spinner></Spinner>
+			</div>
+		);
+	}
 	return (
 		<div>
 			<div className={styles.imgContainer}>
@@ -338,7 +353,7 @@ export const InventoryTable = () => {
 												setSelectedGood(item);
 												setIsDisabled(true);
 											}}
-											className={styles.centerIcon}>
+											className={styles.tableCellName}>
 											<Tooltip
 												content="Ce bien n'est pas encore inclut dans la session active"
 												relationship="label">
