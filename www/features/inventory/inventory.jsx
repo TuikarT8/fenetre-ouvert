@@ -6,7 +6,6 @@ import {
 	BreadcrumbButton,
 	BreadcrumbDivider,
 	BreadcrumbItem,
-	Spinner,
 } from '@fluentui/react-components';
 
 export function Inventory() {

@@ -64,7 +64,6 @@ const useStyles = makeStyles({
 		flexDirection: 'row',
 		height: 'fit-content',
 		width: 'fit-content',
-		padding: '50px'
 	},
 
 	tableCellName: {
@@ -334,95 +333,6 @@ export const InventoryTable = () => {
 												aria-label="Delete"
 												onClick={() => {
 													setGoodToDelete(item);
-												}}
-											/>
-										</TableCellLayout>
-									</TableCell>
-								</TableRow>
-							);
-						})}
-
-						{stagingGoods.map((item) => {
-							const change = _.last(item.changes);
-
-							return (
-								<TableRow key={item.id} className={styles.foreignRow}>
-									<TableCell className={styles.tableCell}>
-										<TableCellLayout
-											onClick={() => {
-												setSelectedGood(item);
-												setIsDisabled(true);
-											}}
-											className={styles.tableCellName}>
-											<Tooltip
-												content="Ce bien n'est pas encore inclut dans la session active"
-												relationship="label">
-												<WarningFilled style={{ marginTop: '16px' }} />
-											</Tooltip>
-											{capitalizeFirstLetter(item.name)}
-										</TableCellLayout>
-									</TableCell>
-									<TableCell>
-										<TableCellLayout key={item.id}>
-											{convertStringToDate(
-												change?.time || null,
-											)?.toLocaleDateString()}
-										</TableCellLayout>
-									</TableCell>
-									<TableCell>
-										<TableCellLayout>
-											{capitalizeFirstLetter(change?.condition || null)}
-										</TableCellLayout>
-									</TableCell>
-									<TableCell>
-										<TableCellLayout>{item.count}</TableCellLayout>
-									</TableCell>
-									<TableCell>
-										<TableCellLayout>{change?.saleValue}</TableCellLayout>
-									</TableCell>
-									<TableCell
-										role="gridcell"
-										tabIndex={0}
-										{...focusableGroupAttr}>
-										<TableCellLayout>
-											<Button
-												icon={<Edit12Regular />}
-												aria-label="Edit"
-												onClick={() => {
-													setSelectedGood(item);
-													setIsDisabled(false);
-												}}
-											/>
-											<Button
-												className={styles.actionButtonDelete}
-												icon={<Delete12Regular />}
-												aria-label="Delete"
-												onClick={() => {
-													setGoodToDelete(item);
-												}}
-											/>
-											<Button
-												icon={<Add12Filled />}
-												aria-label="Add"
-												className={styles.actionButtonAdd}
-												onClick={() => {
-													console.log(change);
-													if (change) {
-														if (
-															convertStringToDate(currentSession.startDate) <
-															convertStringToDate(change.time)
-														)
-															console.log(
-																convertStringToDate(currentSession.startDate) <
-																	convertStringToDate(change.time),
-															);
-														setgoodNotInSessionToAdd(item);
-													} else {
-														contactTheServerToCreateAChangeInTheCurrentSession(
-															item,
-															change,
-														);
-													}
 												}}
 											/>
 										</TableCellLayout>

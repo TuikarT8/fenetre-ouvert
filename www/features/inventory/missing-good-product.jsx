@@ -19,6 +19,7 @@ import {
 import PropTypes from 'prop-types';
 import { PreviousSessionGoodDeleteConfirmationPopover } from './delete-popOver';
 import { useInventory } from '../../provider';
+import { useAppContext } from '../../common';
 
 function capitalizeFirstLetter(elem) {
 	if (elem == undefined || elem == null) {
@@ -44,16 +45,17 @@ const useStyles = makeStyles({
 });
 
 export function GoodsNotInSessionDrawer({ open, onClose }) {
-	const { session } = useInventory();
+	const {stagingGoods} = useAppContext();
 	const styles = useStyles();
 	const restoreFocusSourceAttributes = useRestoreFocusSource();
 	const [goods, setGoods] = useState([]);
 
 	useEffect(() => {
-		if (session?.goodsNotInSession) {
-			setGoods(session.goodsNotInSession);
+		if (stagingGoods) {
+			setGoods(stagingGoods);
+
 		}
-	}, [JSON.stringify(session?.goodsNotInSession)]);
+	}, [JSON.stringify(stagingGoods)]);
 
 	return (
 		<div className={styles.root}>
