@@ -10,10 +10,13 @@ import {
 	TableRow,
 	TableCell,
 	TableCellLayout,
+	tokens,
 } from '@fluentui/react-components';
 import {
+	Add12Filled,
 	AddFilled,
 	Dismiss24Regular,
+	Edit12Regular,
 	EditRegular,
 } from '@fluentui/react-icons';
 import PropTypes from 'prop-types';
@@ -30,17 +33,8 @@ function capitalizeFirstLetter(elem) {
 }
 
 const useStyles = makeStyles({
-	root: {
-		border: '2px solid #ccc',
-		overflow: 'hidden',
-
-		display: 'flex',
-		height: '480px',
-		backgroundColor: '#fff',
-	},
-
-	button: {
-		margin: '8px',
+	actionButtonAdd: {
+		marginLeft: '4px',
 	},
 });
 
@@ -97,8 +91,8 @@ export function GoodsNotInSessionDrawer({ open, onClose }) {
 								<TableCell role="gridcell" tabIndex={0}>
 									<TableCellLayout>
 										<PreviousSessionGoodDeleteConfirmationPopover />
-										<Button icon={<EditRegular />} aria-label="Modifier" />
-										<Button icon={<AddFilled />} aria-label="Ajouter" />
+										<Button className={styles.actionButtonAdd} icon={<Edit12Regular />} aria-label="Modifier" />
+										<Button className={styles.actionButtonAdd} icon={<Add12Filled />} aria-label="Ajouter" />
 									</TableCellLayout>
 								</TableCell>
 							</TableRow>

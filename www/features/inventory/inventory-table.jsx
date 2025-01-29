@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-	WarningFilled,
 	Edit12Regular,
 	Delete12Regular,
-	Add12Filled,
 } from '@fluentui/react-icons';
 import {
 	TableBody,
@@ -19,7 +17,6 @@ import {
 	makeStyles,
 	themeToTokensObject,
 	webLightTheme,
-	Tooltip,
 	Caption2,
 	Title3,
 	Spinner,

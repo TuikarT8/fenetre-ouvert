@@ -1,19 +1,34 @@
 import React from 'react';
-import { Delete24Regular } from '@fluentui/react-icons';
+import { Delete12Regular } from '@fluentui/react-icons';
 import PropTypes from 'prop-types';
 import {
 	Button,
+	makeStyles,
 	Popover,
 	PopoverSurface,
 	PopoverTrigger,
 	Title3,
+	tokens,
 } from '@fluentui/react-components';
 
+const useStyles = makeStyles({
+	actionButtonDelete: {
+			backgroundColor: tokens.colorStatusDangerBackground2,
+			color: '#000',
+			':hover': {
+				backgroundColor: tokens.colorStatusDangerBackground1,
+			},
+			marginLeft: '4px',
+		},
+	}
+)
+
 export function PreviousSessionGoodDeleteConfirmationPopover() {
+   const styles = useStyles()
 	return (
 		<Popover withArrow>
 			<PopoverTrigger disableButtonEnhancement>
-				<Button icon={<Delete24Regular />} aria-label="Delete" />
+				<Button className={styles.actionButtonDelete} icon={<Delete12Regular />} aria-label="Delete" />
 			</PopoverTrigger>
 
 			<PopoverSurface tabIndex={-1}>
