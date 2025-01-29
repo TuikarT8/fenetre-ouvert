@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
+	WarningFilled,
 	Edit12Regular,
 	Delete12Regular,
+	Add12Filled,
 } from '@fluentui/react-icons';
 import {
 	TableBody,
@@ -17,6 +19,7 @@ import {
 	makeStyles,
 	themeToTokensObject,
 	webLightTheme,
+	Tooltip,
 	Caption2,
 	Title3,
 	Spinner,
@@ -122,8 +125,8 @@ export const InventoryTable = () => {
 	const focusableGroupAttr = useFocusableGroup({
 		tabBehavior: 'limited-trap-focus',
 	});
-	const { canDeleteGoods, canUpdateGoods, canUpdateSessions } =
-		usePermissions();
+		const { canDeleteGoods, canUpdateGoods, canUpdateSessions } =
+			usePermissions();
 	const {
 		sessions,
 		activeSession,
@@ -170,7 +173,7 @@ export const InventoryTable = () => {
 		});
 	}, [sessionId]);
 
-	const contactTheServerToCreateAChangeInTheCurrentSession = (
+const contactTheServerToCreateAChangeInTheCurrentSession = (
 		good,
 		lastChange,
 	) => {
@@ -337,6 +340,7 @@ export const InventoryTable = () => {
 								</TableRow>
 							);
 						})}
+
 					</TableBody>
 				</Table>
 			)}
